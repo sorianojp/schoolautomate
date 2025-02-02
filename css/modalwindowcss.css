@@ -1,0 +1,76 @@
+@charset "utf-8";
+/* CSS Document */
+#mask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 9000;
+  background-color: #000;
+  display: none;
+}
+  
+/*#boxes .window {
+  margin: auto;
+  width: 440px;
+  height: 200px;
+  display: none;
+  z-index: 9999;
+  padding: 20px;
+}*/
+
+#boxes .window {
+  margin: auto;
+  width: 440px;
+  height: 200px;
+  display: none;
+  z-index: 9999;
+  padding: 20px;
+}
+
+
+#boxes #dialog {
+  position: fixed;
+  /**width: 1200px; */
+  width: 95%;
+  height: auto;
+  padding: 0px;
+  margin-top: auto;  
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: auto;
+  border-radius:13px;
+}
+#dialog-top {
+ float: left;
+ width: 900px;
+ height: 40px;
+ padding-top: 0px;
+ margin: 0px;
+}
+#dialog-content {
+ float: left;
+ width: 900px;
+ height: auto;
+ padding: 0px;
+ margin: 0px;
+ background: #ffffff;
+ /*border:1px #ccc solid;*/
+}
+#dialog-bottom {
+ float: left;
+ width: 900px;
+ height: 55px;
+ text-align: center;
+ font-size: 10.5px;
+ color: #663300;
+ padding: 0px;
+ margin: 0px;
+}
+#btn-x{
+ width:20px; 
+ height:20px;
+ margin-top:8px; 
+ float:right; 
+ text-align:right; 
+ margin-right:15px; 
+}

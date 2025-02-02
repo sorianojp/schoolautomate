@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td width="100%" height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>:::: 
+          JOURNAL VOUCHER - A/R FS SUPPORTING DETAILS ENTRY PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25"><font size="1"><a href="journal_voucher_entry.jsp"><img src="../../../../images/go_back.gif" border="0"></a></font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="27" colspan="4">(NOTE: Show DEBIT or CREDIT depending on where 
+        the A/R was ticked)</td>
+    </tr>
+    <tr> 
+      <td width="15%" height="27"><strong><u>&lt;DEBIT&gt; &lt;CREDIT&gt; : </u></strong></td>
+      <td width="17%">&nbsp;</td>
+      <td width="29%">&nbsp;</td>
+      <td width="39%">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="10" colspan="4"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="29">&nbsp;</td>
+      <td height="29">Employee Name</td>
+      <td width="81%" height="29"><input name="textfield" type="text" size="32" maxlength="32">
+        , 
+        <input name="textfield3" type="text" size="32" maxlength="32"> <input name="textfield5" type="text" size="1" maxlength="8">
+        ( Lastname, Firstname Middle Initial)</td>
+    </tr>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30">Employee ID</td>
+      <td height="30">$emp_id</td>
+    </tr>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30">College/Dept/Office</td>
+      <td height="30">$colleg/dept/office</td>
+    </tr>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30">Position / Status</td>
+      <td height="30">$position / $status</td>
+    </tr>
+    <tr> 
+      <td height="10" colspan="3"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td  width="6%"height="30">&nbsp;</td>
+      <td width="13%" height="30">Amount </td>
+      <td height="30"><input name="textfield4" type="text" size="16" maxlength="16"></td>
+    </tr>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30">Deposit Date /<br>
+        Date of Payment</td>
+      <td height="30"><input name="textfield43" type="text" size="10" maxlength="0"> 
+        <font size="1"><img src="../../../../images/calendar_new.gif" border="0"></font> 
+      </td>
+    </tr>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30">Bank Name</td>
+      <td height="30"><select name="select">
+        </select>
+        (NOTE : List here the banks that is encoded in the BANKS link in Administration)</td>
+    </tr>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30">Account #</td>
+      <td height="30"><input name="textfield2" type="text" size="16" maxlength="16"></td>
+    </tr>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30">&nbsp;</td>
+      <td height="30"><select name="select2">
+          <option>Asset</option>
+          <option>Liability</option>
+          <option>Income</option>
+        </select> <select name="select4">
+        </select> <select name="select5">
+        </select> <font size="1">(You can use this as reference for Chart Account 
+        Number)</font></td>
+    </tr>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30">Transaction Type</td>
+      <td height="30"><select name="select3">
+        </select> </td>
+    </tr>
+    <tr> 
+      <td height="50">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><font size="1"><img src="../../../../images/save.gif" border="0">click 
+        to save entries <img src="../../../../images/cancel.gif" border="0">click 
+        to cancel/clear entries </font></td>
+    </tr>
+    <tr> 
+      <td height="22">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="1" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#6699FF"> 
+      <td height="25" colspan="9"><div align="center"><strong><font color="#FFFFFF">:: 
+          LIST OF SUPPORTING ENTRIES FOR A/R OTHERS ::</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5"><font size="1"><strong>TOTAL AMOUNT :</strong></font></td>
+      <td height="25" colspan="4"><font size="1"><strong>TOTAL NO. OF PAYEE :</strong></font></td>
+    </tr>
+    <tr> 
+      <td width="23%" height="25"><div align="center"><font size="1"><strong>EMPLOYEE 
+          NAME </strong></font></div></td>
+      <td width="9%" height="25"><div align="center"><font size="1"><strong>COLLEGE/DEPT/OFFICE</strong></font></div></td>
+      <td width="9%"><div align="center"><font size="1"><strong>POSITION/STATUS</strong></font></div></td>
+      <td width="9%"><div align="center"><strong><font size="1">AMOUNT</font></strong></div></td>
+      <td width="10%"><div align="center"><font size="1"><strong>DATE OF PAYMENT/DEPOSIT 
+          DATE</strong></font></div></td>
+      <td width="17%" height="25"><div align="center"><font size="1"><strong>BANK 
+          NAME</strong></font></div></td>
+      <td width="10%"><div align="center"><font size="1"><strong>ACCOUNT #</strong></font></div></td>
+      <td width="13%"><div align="center"><font size="1"><strong>TRANSACTION TYPE</strong></font></div></td>
+      <td width="9%">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><font size="1"><img src="../../../../images/edit.gif" border="0"><img src="../../../../images/delete.gif" border="0"></font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><font size="1"><img src="../../../../images/edit.gif" border="0"><img src="../../../../images/delete.gif" border="0"></font></td>
+    </tr>
+  </table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25"><div align="left"></div></td>
+      <td width="94%" height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" colspan="2" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

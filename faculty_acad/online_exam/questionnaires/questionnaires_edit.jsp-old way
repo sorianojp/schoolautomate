@@ -1,0 +1,271 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript">
+function EditRecord()
+{
+	document.question.editRecord.value =1;
+	document.question.submit();
+}
+function ReloadPage()
+{
+	document.question.reloadPage.value ="1";
+	document.question.submit();
+}
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,OLExam.OLECommonUtil,OLExam.OLEQuestionnair,java.util.Vector " %>
+<%
+ 
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	MessageConstant mConst = new MessageConstant();
+	WebInterface WI = new WebInterface(request);
+	String strErrMsg = null;
+	String strTemp = null;
+	boolean bolFatalErr = false;
+	String strSubName = null;
+	
+//add security here.
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+
+
+//end of security code. 
+
+OLECommonUtil comUtil = new OLECommonUtil();
+OLEQuestionnair qN = new OLEQuestionnair();
+strTemp = WI.fillTextValue("editRecord");
+if(strTemp.compareTo("1") == 0)
+{
+	if(!qN.editQN(dbOP,request))
+		strErrMsg = qN.getErrMsg();
+	else
+		strErrMsg = "Questionnaire edited successfully.";
+}
+
+Vector vTeacherList = new Vector();
+Vector vSubList = new Vector();
+Vector vEditInfo = null;
+if(WI.fillTextValue("reloadPage").compareTo("1") != 0)
+{
+	vEditInfo = qN.getEditQNDetail(dbOP, request.getParameter("info_index"));
+	if(vEditInfo == null)
+	{
+		strErrMsg = qN.getErrMsg();
+		bolFatalErr = true;
+	}
+	else
+	{
+		request.setAttribute("teacher",vEditInfo.elementAt(0));
+		request.setAttribute("college",vEditInfo.elementAt(5));
+	}
+}
+vTeacherList = comUtil.getTeacherList(dbOP,request);
+if(vTeacherList == null)
+{
+	if(strErrMsg != null)
+		strErrMsg += comUtil.getErrMsg();
+	else
+		strErrMsg = comUtil.getErrMsg();
+	bolFatalErr = true;
+}
+else
+{
+	vSubList = comUtil.getSubjectList(dbOP,request);
+	if(vSubList == null)
+	{
+		if(strErrMsg != null)
+			strErrMsg += comUtil.getErrMsg();
+		else
+			strErrMsg = comUtil.getErrMsg();
+		
+		bolFatalErr = true;
+	}
+}
+
+if(strErrMsg == null) strErrMsg = "&nbsp;";
+%>
+<form name="question" method="post" action="./questionnaires_edit.jsp">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#B5AB73"> 
+      <td height="25"><div align="center"><strong><font color="#FFFFFF">:::: 
+          QUESTIONNAIRES PAGE - SET PARAMETERS ::::</font></strong></div></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td colspan="2"><strong><%=strErrMsg%></strong></td>
+    </tr>
+<%
+if(bolFatalErr)
+{
+	dbOP.cleanUP();
+	return;
+}%>
+    <tr> 
+      <td>&nbsp;</td>
+      <td colspan="4">College of 
+        <select name="college" onChange="ReloadPage();">
+          <option value="0"> Select a College offering subject</option>
+<%
+if(vEditInfo != null)
+	strTemp = (String)vEditInfo.elementAt(5);
+else
+	strTemp = WI.fillTextValue("college");
+%>
+          <%=dbOP.loadCombo("C_INDEX","C_NAME"," from COLLEGE where IS_DEL=0 order by C_NAME asc",strTemp, false)%> 
+        </select></td>
+    </tr>
+    <%
+if(vTeacherList != null){%>
+    <tr> 
+      <td width="3%">&nbsp;</td>
+      <td width="97%">Questionnaire parameters prepared by 
+        <select name="teacher">
+          <option value="0">Select a Teacher</option>
+<%
+if(vEditInfo != null)
+	strTemp = (String)vEditInfo.elementAt(0);
+else
+	strTemp = WI.fillTextValue("teacher");
+
+for(int i = 0; i< vTeacherList.size(); ++i)
+{
+	if(strTemp.compareTo((String)vTeacherList.elementAt(i)) ==0)
+	{%>
+          <option value="<%=(String)vTeacherList.elementAt(i++)%>" selected><%=(String)vTeacherList.elementAt(i)%></option>
+          <%}else{%>
+          <option value="<%=(String)vTeacherList.elementAt(i++)%>"><%=(String)vTeacherList.elementAt(i)%></option>
+          <%}
+}%>
+        </select> </td>
+    </tr>
+    <tr> 
+      <td colspan="2"><hr></td>
+    </tr>
+  </table>
+	
+  <table width="100%" border="0" bgcolor="#FFFFFF">
+<%
+if(vSubList != null){%>
+    <tr> 
+      <td width="3%" height="20">&nbsp;</td>
+      <td width="25%">Name 
+        of this questionnaire</td>
+      <td width="72%"> 
+<%
+if(vEditInfo != null)
+	strTemp = (String)vEditInfo.elementAt(3);
+else
+	strTemp = WI.fillTextValue("qn_name");
+%>
+        <input type="text" name="qn_name" value="<%=strTemp%>">
+        </td>
+    </tr>
+    <tr>
+      <td height="20">&nbsp;</td>
+      <td>Duration of exam</td>
+      <td>
+<%
+int iHour = 0;
+int iMin  = 0;
+if(vEditInfo != null)
+{
+	strTemp = (String)vEditInfo.elementAt(4);
+	iMin = Integer.parseInt(strTemp);
+	iHour = iMin/60;
+	iMin = iMin %60;
+}	
+else
+{
+	iHour = Integer.parseInt(WI.fillTextValue("dur_hour"));
+	iMin  = Integer.parseInt(WI.fillTextValue("dur_min"));
+}
+%>	
+		<input name="dur_hour" type="text" size="2" value="<%=iHour%>">
+        Hours 
+        <input name="dur_min" type="text" size="2" value="<%=iMin%>">
+        Minutes </td>
+    </tr>
+  </table>
+  <table width="100%" border="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td colspan="4"><hr> </td>
+    </tr>
+    <tr> 
+      <td width="3%">&nbsp;</td>
+      <td width="25%">Subject 
+        <strong> </strong></td>
+      <td colspan="2"><select name="subject" onChange="ReloadPage();">
+          <option value="0">Select a subject</option>
+<%
+if(vEditInfo != null)
+	strTemp = (String)vEditInfo.elementAt(2);
+else
+	strTemp = WI.fillTextValue("subject");
+
+for(int i = 0; i< vSubList.size(); ++i)
+{
+	if(strTemp.compareTo((String)vSubList.elementAt(i)) ==0)
+	{%>
+          <option value="<%=(String)vSubList.elementAt(i++)%>" selected><%=(String)vSubList.elementAt(i)%></option>
+          <%}else{%>
+          <option value="<%=(String)vSubList.elementAt(i++)%>"><%=(String)vSubList.elementAt(i)%></option>
+          <%}
+}%>
+        </select> 
+        <%
+//get the subject name here. 
+strSubName = dbOP.mapOneToOther("subject","sub_index",strTemp,"sub_name",null);
+if(strSubName == null)
+	strSubName = "";
+%>
+        Subject Name : <strong><%=strSubName%></strong> </td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>Examination Period</td>
+      <td width="45%"><select name="exam_period">
+<%
+if(vEditInfo != null)
+	strTemp = (String)vEditInfo.elementAt(1);
+else
+	strTemp = WI.fillTextValue("exam_period");
+%>	  
+          <%=dbOP.loadCombo("EPERIOD_INDEX","NAME"," from OLE_EPERIOD where IS_VALID=1 order by name asc",strTemp, false)%> 
+        </select></td>
+      <td width="27%">&nbsp;</td>
+    </tr>
+	<tr> 
+		<td></td><td></td>
+      <td colspan="2"><input type="image" src="../../../images/edit.gif" onClick="EditRecord()"><font size="1">Click to edit</font></td>
+    </tr>
+  </table>
+<%
+	} //if vTeacherList == null
+}//if vSubList == null
+%>
+<input type="hidden" name="editRecord" value="0">
+<input type="hidden" name="info_index" value="<%=WI.fillTextValue("info_index")%>">
+<input type="hidden" name="reloadPage" value="0">
+ </form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

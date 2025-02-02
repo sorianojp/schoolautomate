@@ -1,0 +1,266 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript" src="../../../jscript/common.js"></script>
+<script language="JavaScript" src="../../../jscript/date-picker.js"></script>
+<script language="JavaScript">
+function ReloadPage() {
+	this.SubmitOnce('form_');
+}
+function PageAction(strAction, strInfoIndex) {
+	document.form_.page_action.value = strAction;
+	if(strInfoIndex.length > 0)
+		document.form_.info_index.value = strInfoIndex;
+	if(strAction == 1) 
+		document.form_.hide_save.src = "../../../images/blank.gif";
+	this.SubmitOnce('form_');
+}
+function OpenSearch() {
+	var pgLoc = "../../../search/srch_emp.jsp?opner_info=form_.emp_id";
+	var win=window.open(pgLoc,"PrintWindow",'width=900,height=600,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+function FocusID() {
+	document.form_.emp_id.focus();
+}
+function UpdateSalPeriod() {
+	var pgLoc = "./salary_period.jsp";
+	var win=window.open(pgLoc,"PrintWindow",'width=900,height=600,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+
+</script>
+
+<body bgcolor="#D2AE72" onLoad="FocusID();">
+<%@ page language="java" import="utility.*,payroll.PReDTRME,java.util.Vector" buffer="16kb"%>
+<%
+	DBOperation dbOP = null;
+	String strErrMsg = null;
+	String strTemp = null;
+	WebInterface WI = new WebInterface(request);
+
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Payroll - DTR-Absences","dtr_manual.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+ 	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Payroll","DTR",request.getRemoteAddr(),
+														"dtr_manual.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+//end of authenticaion code.
+	PReDTRME prEdtrME = new PReDTRME();
+	Vector vEditInfo  = null;Vector vRetResult = null;
+	
+
+	strTemp = WI.fillTextValue("page_action");//System.out.println("Info Index :: "+request.getParameter("info_index"));
+	if(strTemp.length() > 0) {
+
+	}
+
+Vector vPersonalDetails = null; Vector vSalaryPeriod = null;//detail of salary period.
+String strEmpID = WI.fillTextValue("emp_id");
+if (strEmpID.length() > 0 && WI.fillTextValue("sal_period_index").length() > 0) {
+    enrollment.Authentication authentication = new enrollment.Authentication();
+    vPersonalDetails = authentication.operateOnBasicInfo(dbOP,request,"0");
+}//System.out.println(vPersonalDetails);
+if(WI.fillTextValue("year_of").length() > 0) {
+	vSalaryPeriod = prEdtrME.operateOnSalaryPeriod(dbOP, request, 4);
+}
+
+%>
+<form name="form_" action="./dtr_manual.jsp" method="post">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="5" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" ><strong>:::: 
+          PAYROLL: DTR : DTR ENTRY (MANUAL) PAGE ::::</strong></font></div></td>
+    </tr>
+</table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="23" colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="4%" height="25">&nbsp;</td>
+      <td>Employee ID</td>
+      <td><input name="emp_id" type="text" size="16" value="<%=WI.fillTextValue("emp_id")%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"></td>
+      <td><a href="javascript:OpenSearch();"><img src="../../../images/search.gif" width="37" height="30" border="0"></a></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Salary period for Yr</td>
+      <td colspan="2">
+        <select name="month_of">
+          <%=dbOP.loadComboMonth(WI.fillTextValue("month_of"))%> 
+        </select>
+        - 
+        <select name="year_of">
+          <%=dbOP.loadComboYear(WI.fillTextValue("year_of"),2,1)%> 
+        </select>
+        (Must be filled up to display salary period information)</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td width="16%">Salary Period</td>
+      <td width="28%"><select name="sal_period_index" onChange="ChangeSalPeriod();" style="font-weight:bold;font-size:11px">
+          <%
+		String[] astrConvertMonth = {"January","February","March","April","May","June","July","August",
+									"September","October","November","December"};
+	 	strTemp = WI.fillTextValue("sal_period_index");
+		for(int i = 0; vSalaryPeriod != null && i < vSalaryPeriod.size(); i += 6) {
+		if(strTemp.compareTo((String)vSalaryPeriod.elementAt(i)) == 0) {%>
+          <option selected value="<%=(String)vSalaryPeriod.elementAt(i)%>"> 
+          <%=astrConvertMonth[Integer.parseInt((String)vSalaryPeriod.elementAt(i + 4))] + " :: "+
+		(String)vSalaryPeriod.elementAt(i + 1) +" - "+(String)vSalaryPeriod.elementAt(i + 2)%></option>
+          <%}else{%>
+          <option value="<%=(String)vSalaryPeriod.elementAt(i)%>"> 
+          <%=astrConvertMonth[Integer.parseInt((String)vSalaryPeriod.elementAt(i + 4))] + " :: "+
+		(String)vSalaryPeriod.elementAt(i + 1) +" - "+(String)vSalaryPeriod.elementAt(i + 2)%></option>
+          <%}//end of if condition.
+		 }//end of for loop.%>
+        </select></td>
+      <td width="52%">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="10">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><a href="javascript:ReloadPage();"><img src="../../../images/refresh.gif" border="0"></a><font size="1">Click 
+        to reload page.</font></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="10" colspan="4"><hr size="1" color="#0000FF"></td>
+    </tr>
+  </table>
+ <%// System.out.println(vPersonalDetails);
+if(vPersonalDetails != null && vPersonalDetails.size() > 0){%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr > 
+      <td width="4%" height="25">&nbsp;</td>
+      <td width="18%"> Name</td>
+      <td width="39%"> &nbsp;<strong><%=WI.formatName((String)vPersonalDetails.elementAt(1), (String)vPersonalDetails.elementAt(2),
+							(String)vPersonalDetails.elementAt(3), 4)%></strong></td>
+      <td width="14%">Emp. Status</td>
+      <td width="25%">&nbsp;<strong><%=WI.getStrValue((String)vPersonalDetails.elementAt(16),"")%></strong></td>
+    </tr>
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td>College/Office</td>
+      <td>&nbsp;<strong> 
+        <%if(vPersonalDetails.elementAt(13) != null){%>
+        <%=(String)vPersonalDetails.elementAt(13)%> ; 
+        <%}if(vPersonalDetails.elementAt(14) != null){%>
+        <%=(String)vPersonalDetails.elementAt(14)%> 
+        <%}%>
+        </strong></td>
+      <td>Emp. Type</td>
+      <td>&nbsp;<strong	><%=WI.getStrValue((String)vPersonalDetails.elementAt(15),"")%></strong></td>
+    </tr>
+    <tr > 
+      <td height="18" colspan="5"><hr size="1" color="#0000FF"></td>
+    </tr>
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td>Monthly Rate</td>
+      <td>$Salary</td>
+      <td>Hourly Rate</td>
+      <td>$Rate.</td>
+    </tr>
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td>Daily Rate</td>
+      <td>$salary</td>
+      <td>Addl. Responsibility</td>
+      <td>$salary.</td>
+    </tr>
+    <tr > 
+      <td height="18" colspan="5"><hr size="1" color="#0000FF"></td>
+    </tr>
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td>Hours Worked</td>
+      <td><input name="textfield32" type="text" size="10" maxlength="10">
+        (hrs) </td>
+      <td>Leave with Pay</td>
+      <td><input name="textfield322" type="text" size="10" maxlength="10">
+        (hrs) </td>
+    </tr>
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td>Addl. Responsibility</td>
+      <td><input name="textfield323" type="text" size="10" maxlength="10">
+        (amount to be paid)</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td>OverTime</td>
+      <td>$totalOT hrs <img src="../../../images/update.gif"></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr > 
+      <td height="25" colspan="5"><hr size="1" color="#0000FF"></td>
+    </tr>
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td>Payable Salary</td>
+      <td>$$ Salary.</td>
+      <td colspan="2"><img src="../../../images/view.gif"><font size="1">View salary detail</font></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="46"  colspan="3" valign="bottom" bgcolor="#FFFFFF"><div align="center">
+          <%if(iAccessLevel > 1) {%>
+          <a href="javascript:PageAction(1,'');"> <img src="../../../images/save.gif" border="0" id="hide_save"></a><font size="1">click 
+          to save entries</font> 
+          <%}%>
+        </div></td>
+    </tr>
+  </table>
+<%}//show only if vPersonalDtls is selected.%>  
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25"  colspan="3" bgcolor="#FFFFFF">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25"  colspan="3" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

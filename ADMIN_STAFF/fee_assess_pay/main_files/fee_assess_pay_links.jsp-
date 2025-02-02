@@ -1,0 +1,432 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/regmainlinkcss.css" rel="stylesheet" type="text/css">
+<link href="../../../css/treelinkcss.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" type="text/JavaScript">
+<!--
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+//-->
+</script>
+<link href="../../../css/regmainlinkcss.css" rel="stylesheet" type="text/css">
+<%response.setHeader("Pragma","No-Cache");
+response.setDateHeader("Expires",0);
+response.setHeader("Cache-Control","no-Cache"); //HTTP 1.0
+response.setHeader("Cache-Control","no-store"); //HTTP 1.1
+%>
+</head>
+<body bgcolor="#C39E60" onLoad="MM_preloadImages('../../../images/home_small_admin_rollover.gif','../../../images/help_small_admin_rollover.gif','../../../images/logout_admin_rollover.gif')">
+<style>
+
+.trigger{
+	cursor: pointer;
+	cursor: hand;
+}
+.branch{
+	display: none;
+	margin-left: 16px;
+}
+</style>
+<script language="JavaScript">
+var openImg = new Image();
+openImg.src = "../../../images/box_with_minus.gif";
+var closedImg = new Image();
+closedImg.src = "../../../images/box_with_plus.gif";
+
+function showBranch(branch){
+	var objBranch = document.getElementById(branch).style;
+	if(objBranch.display=="block")
+		objBranch.display="none";
+	else
+		objBranch.display="block";
+}
+
+function swapFolder(img){
+	objImg = document.getElementById(img);
+	if(objImg.src.indexOf('box_with_plus.gif')>-1)
+		objImg.src = openImg.src;
+	else
+		objImg.src = closedImg.src;
+}
+</script>
+<form action="../../../commfile/logout.jsp" method="post" target="_parent">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="8%" height="19" bgcolor="#E9E0D1">&nbsp;</td>
+    <td width="92%" bgcolor="#E9E0D1"><a href="../../main%20files/admin_staff_home_button_content.htm" target="_parent" onMouseOver="MM_swapImage('Image2','','../../../images/home_small_admin_rollover.gif',1)" onMouseOut="MM_swapImgRestore()"><img src="../../../images/home_small_admin.gif" name="Image2" width="65" height="22" border="0" id="Image2"></a><a href="javascript:;" onMouseOver="MM_swapImage('Image1','','../../../images/help_small_admin_rollover.gif',1)" onMouseOut="MM_swapImgRestore()"><img src="../../../images/help_small_admin.gif" name="Image1" width="65" height="22" border="0" id="Image1"></a><a onMouseOver="MM_swapImage('Image3','','../../../images/logout_admin_rollover.gif',1)" onMouseOut="MM_swapImgRestore()"><input type="image" src="../../../images/logout_admin.gif" name="Image3" width="65" height="22" border="0" id="Image3"></a></td>
+  </tr>
+  </table>
+<input type="hidden" name="logout_url" value="../ADMIN_STAFF/main%20files/admin_staff_bottom_content.htm">
+<input type="hidden" name="body_color" value="#C39E60">
+</form>
+<%@ page language="java" import="utility.*, java.util.Vector" %>
+<%
+//check if user is logged in, if logged, check authentication list here and allow the authentic user to access the system.
+DBOperation dbOP = null;
+CommonUtil comUtil = new CommonUtil();
+String strUserId = (String)request.getSession(false).getAttribute("userId");
+String strSchCode    = (String)request.getSession(false).getAttribute("school_code");
+if(strSchCode == null)
+	strSchCode = "";
+String strErrMsg = null;
+boolean bolGrantAll = false;
+boolean isAuthorized = false;
+if(strUserId != null)
+{
+	//open dbConnection here to check if user is registered already.
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		strErrMsg = "error in opening connection.";
+	}
+
+	if(strErrMsg == null)
+	{
+		//check here the authentication of the user.
+		if(comUtil.IsSuperUser(dbOP,strUserId))
+			bolGrantAll = true;	//grant all ;-)
+	}
+}
+else
+	strErrMsg = "";
+
+//Another way of checking authorization.. 
+Vector vAuthList = null;
+if(!bolGrantAll) {
+	vAuthList = comUtil.getAuthModSubModNameList(dbOP, strUserId, "Fee Assessment & Payments");
+	if(vAuthList == null)
+		vAuthList = new Vector();
+	else if( ((String)vAuthList.elementAt(0)).compareTo("#ALL#") == 0) 
+		bolGrantAll = true;
+}
+boolean bolIsLNU = strSchCode.startsWith("LNU");
+boolean bolIsUI = strSchCode.startsWith("UI");
+
+//old way of doing 
+//comUtil.IsAuthorizedSubModule(dbOP,strUserId,"Fee Assessment & Payments","ASSESSMENT")!=0
+
+if(bolGrantAll || vAuthList.indexOf("ASSESSMENT") != -1){isAuthorized=true;%>
+
+<div class="trigger" onClick="showBranch('branch1');swapFolder('folder1')"> <img src="../../../images/box_with_plus.gif"  border="0" id="folder1">
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">ASSESSMENT</font></strong></div>
+	<span class="branch" id="branch1"><font size="2" face="Geneva, Arial, Helvetica, sans-serif">
+	<img src="../../../images/broken_lines.gif"> <a href="../assessment/fee_assess_pay_assessment.jsp" target="feemainFrame"> Enrollment</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../assessment/re_assessment.jsp" target="feemainFrame">Re-assessment (Requested Subject Charges)</a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../assessment/assessment_sched.jsp" target="feemainFrame">Schedule Assessment</a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../assessment/assessment_sched_batch.jsp" target="feemainFrame">Print Schedule Assessment</a><br>
+<%if(strSchCode.startsWith("CLDH") || strSchCode.startsWith("DBTC")){%>
+	<img src="../../../images/broken_lines.gif"><a href="../assessment/fixed_tuition_entry_info.jsp" target="feemainFrame">Update Student's entry information (if tuition fee is fixed)</a><br>
+<%}%>
+	</font>
+	</span>
+<%}if(bolGrantAll || vAuthList.indexOf("FEE MAINTENANCE") != -1){isAuthorized=true;%>
+<div class="trigger" onClick="showBranch('branch2');swapFolder('folder2')"> <img src="../../../images/box_with_plus.gif"  border="0" id="folder2">
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">FEE MAINTENANCE</font></strong></div>
+
+<span class="branch" id="branch2"> <font size="2" face="Geneva, Arial, Helvetica, sans-serif"> 
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/fm_main_page.jsp?operation=1" target="feemainFrame">Tuition Fees</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/fm_main_page.jsp?operation=2" target="feemainFrame">Miscellaneous Fees</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/fm_main_page.jsp?operation=3" target="feemainFrame">Other Charges</a><br>
+<%if(strSchCode.startsWith("NU") || strSchCode.startsWith("CSAB") || strSchCode.startsWith("CIT") || strSchCode.startsWith("WNU")){%>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/fm_misc_fee_multiple_labfee_tagged.jsp" target="feemainFrame">Map Misc/Other charge To<br>&nbsp;&nbsp;&nbsp;&nbsp; Multiple Sub.Catg</a><br>
+<%}if(strSchCode.startsWith("UI") || strSchCode.startsWith("AUF") ||(strUserId != null && (strUserId.compareTo("1770") ==0 || strUserId.compareTo("biswa-001") == 0)) ){%>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/fm_reenrollment.jsp" target="feemainFrame">Re-enrollment Fee</a><br>
+<%}%>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/fm_main_page.jsp?operation=4" target="feemainFrame">Other School Fees</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/fm_sch_facil_fee.jsp" target="feemainFrame">School Facilities Fees</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/fm_main_page.jsp?operation=6" target="feemainFrame">Excluded Subjects in Fee Assessment</a><br>
+<%
+if(!bolIsLNU){%>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/fm_main_page.jsp?operation=7" target="feemainFrame">Variable Load Rate</a><br>
+<%}if(!bolIsUI){%>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/fm_main_page.jsp?operation=8" target="feemainFrame">Below Min. Student Enrolees</a><br>
+<%}%>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/enrolment_date_param.jsp" target="feemainFrame">Enrollment Date Parameter</a><br>
+<%
+if(strSchCode.startsWith("CPU") || (strUserId != null && (strUserId.compareTo("1770") ==0 || strUserId.compareTo("biswa-001") == 0)) ){%>
+<img src="../../../images/broken_lines.gif"> <a href="../../admission/curriculum_page1.jsp?lf=1" target="feemainFrame">Lab fee (view in curriculum)</a><br>
+<%}
+if(bolIsLNU || (strUserId != null && (strUserId.compareTo("1770") ==0 || strUserId.compareTo("biswa-001") == 0)) ){%>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/lab_deposit_mgmt.jsp" target="feemainFrame">Laboratory Deposit MGMT</a><br>
+<%}%>
+<!--<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/update_fee.htm" target="feemainFrame">Update Fees </a><br>-->
+</font> 
+<!-- TO UPDATE DIFFERENT FEE TYPES -->
+<div class="trigger" onClick="showBranch('branch7');swapFolder('folder7')"> <img src="../../../images/box_with_plus.gif"  border="0" id="folder7"> 
+  <font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">Update/Edit Fees</font></div>
+<span class="branch" id="branch7"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> 
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/update_tution_fee.jsp" target="feemainFrame">Tuition Fees</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/update_misc_fee.jsp" target="feemainFrame">Miscellaneous Fees</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/update_other_sch_fee.jsp" target="feemainFrame">Other School Fees</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/update_sch_facil_fee.jsp" target="feemainFrame">School Facilties Fees</a><br>
+</font> </span></span>  
+<%}if(bolGrantAll || vAuthList.indexOf("PAYMENT MAINTENANCE") != -1){isAuthorized=true;%>
+<div class="trigger" onClick="showBranch('branch3');swapFolder('folder3')"> <img src="../../../images/box_with_plus.gif"  border="0" id="folder3">
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">PAYMENT MAINTENANCE</font></strong></div>
+
+<span class="branch" id="branch3"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> 
+<img src="../../../images/broken_lines.gif"> <a href="../payment_maintenance/bank_list_for_check.jsp" target="feemainFrame">Create Bank Info (for check pmt)</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../payment_maintenance/fee_assess_pay_payee_type.jsp" target="feemainFrame">Payee Type</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../payment_maintenance/fee_assess_pay_aff_inst_payee.jsp" target="feemainFrame">Affiliated Institutional Payee</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../payment_maintenance/fee_assess_pay_receive_type.jsp" target="feemainFrame">Payment Receive Type</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../payment_maintenance/fee_assess_pay_payment_mode.jsp" target="feemainFrame">Payment Mode</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../payment_maintenance/fee_assess_pay_payment_sched.jsp" target="feemainFrame">Payment Schedule</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../payment_maintenance/min_pmt_for_exam_permit.jsp" target="feemainFrame">Required Payment Parameter</a><br>
+<%
+if(strSchCode.startsWith("UI") || (strUserId != null && (strUserId.compareTo("1770") ==0 || strUserId.compareTo("biswa-001") == 0)) ){%>
+<img src="../../../images/broken_lines.gif"> <a href="../payment_maintenance/entry_status_payment_param.jsp" target="feemainFrame">Entry Status Payment</a><br>
+<%}%>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_maintenance/fm_main_page.jsp?operation=5" target="feemainFrame">Fee Adjustment Type</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../payment_maintenance/required_dp.jsp" target="feemainFrame">Required Downpayment </a><br>
+</font> </span> 
+<%}if(bolGrantAll || vAuthList.indexOf("POST CHARGES") != -1){isAuthorized=true;%>
+<div> <img src="../../../images/arrow_blue.gif"  border="0" > 
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif"><a href="../post_other_sch_fees/post_charges_main.jsp" target="feemainFrame">POST 
+  CHARGES</a> </font></strong></div>
+
+<%}if(bolGrantAll || vAuthList.indexOf("PAYMENT") != -1){isAuthorized=true;%>
+<div class="trigger" onClick="showBranch('branch4');swapFolder('folder4')"> <img src="../../../images/box_with_plus.gif"  border="0" id="folder4">
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">PAYMENT</font></strong></div>
+<span class="branch" id="branch4"> <font size="2" face="Geneva, Arial, Helvetica, sans-serif"> 
+<% if (!strSchCode.startsWith("CPU")){%>  
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/assessedfees_main.jsp" target="feemainFrame">Assessed Fees(Enrollment) </a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/install_assessed_fees_payment.jsp" target="feemainFrame">Installment Fees </a><br>
+	<%
+	if(strSchCode.startsWith("CGH") || (strUserId != null && (strUserId.compareTo("1770") ==0 || strUserId.compareTo("biswa-001") == 0)) ){%>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/sponsor_payment.jsp" target="feemainFrame">Sponsor Payment For Student</a><br>
+	<%}
+	if(!bolIsLNU){%>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/check_payment_main.jsp" target="feemainFrame">Check Payment Mgmt</a><br>
+	<%}if(strSchCode.startsWith("AUF")){%>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/creditcard/setting.jsp" target="feemainFrame">Credit Card/E-Pay Mgmt</a><br>
+	<%}%>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/multiple_payment.jsp" target="feemainFrame">Multiple Payment</a><br>
+	<%
+	if(strSchCode != null && !bolIsLNU && !strSchCode.startsWith("CLDH") && !strSchCode.startsWith("UDMC") && !strSchCode.startsWith("CGH") && !strSchCode.startsWith("WNU")){%>
+	<img src="../../../images/broken_lines.gif"> 
+	<a href="<%if(strSchCode.startsWith("UI") || strSchCode.startsWith("AUF") ){%>../payment/install_assessed_fees_payment_bas.jsp<%}else{%>../payment/basic_education_payment_main.htm<%}%>" target="feemainFrame">Basic Education Payment</a><br>
+	<%}%>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/otherschoolfees.jsp" target="feemainFrame">Other School Fees</a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/school_facilities.jsp" target="feemainFrame">School Facilities Fees</a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/back_accounts.jsp" target="feemainFrame">Back Accounts</a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/fee_adjustment.jsp" target="feemainFrame">
+	<%if(strSchCode.startsWith("AUF")){%>Discounts<%}else{%>Fee Adjustments<%}%></a> <br>
+	<%if(!bolIsLNU){%>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/educational_plans_main.htm" target="feemainFrame">Educational Plans</a> <br>
+	<%}if(bolGrantAll || vAuthList.indexOf("PAYMENT-MODIFICATION") != -1){%>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/payment_modification_main.htm" target="feemainFrame">Modifications</a><br>
+	<%}%>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/cancel_or_new.jsp" target="feemainFrame">Cancel OR</a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/or_number_view.jsp" target="feemainFrame">Re-print OR </a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/re_print_assessment.jsp" target="feemainFrame">Re-print Student Assessment</a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/refunds.jsp" target="feemainFrame">Refund/Debit/Credit</a> <br>
+	<%if(strSchCode.startsWith("CLDH")){%>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/exam_permit_exemption.jsp" target="feemainFrame">Allow Exam Permit Printing</a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../../user_admin/appl_fix/insert_ledg_history_info.jsp" target="feemainFrame">Application Fix(Balance Forwarding)</a><br>
+	<%}%>
+<%}else{%> 
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/assessedfees.jsp" target="feemainFrame">A/R Students(Enroll)</a>  <br>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/install_assessed_fees_payment.jsp" target="feemainFrame">A/R Students(Installment)</a>  <br> 
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/multiple_payment_cpu.jsp?stud_status=1&fund_type=0" target="feemainFrame">General Accounts </a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/multiple_payment_cpu.jsp?stud_status=1&fund_type=2" target="feemainFrame">Faculty / Staff</a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/multiple_payment_cpu.jsp?stud_status=1&fund_type=1" target="feemainFrame">Endowment Fund </a><br>
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/re_print_assessment.jsp" target="feemainFrame">Print RF</a><br>
+	<!--
+	<img src="../../../images/broken_lines.gif"> <a href="../payment/refunds.jsp" target="feemainFrame">Endowment Fund </a><br>
+	-->
+<%}%> </font></span> 
+<%}
+if(strSchCode.startsWith("VMUF"))
+if(bolGrantAll || vAuthList.indexOf("DONATION") != -1){isAuthorized=true;%>
+<div class="trigger" onClick="showBranch('branch5');swapFolder('folder5')"> <img src="../../../images/box_with_plus.gif"  border="0" id="folder5"> 
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">DONATION</font></strong></div>
+<span class="branch" id="branch5"> <font size="2" face="Geneva, Arial, Helvetica, sans-serif"> 
+<img src="../../../images/broken_lines.gif"> <a href="../donation/post_donation.jsp" target="feemainFrame">Post donation </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../donation/receive_donation.jsp" target="feemainFrame">Receive Donation</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../donation/ledger.jsp" target="feemainFrame">View Ledger </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../donation/or_number_donation_view.jsp" target="feemainFrame">Print donation receipt</a></font> </span> 
+<%}
+if(!bolIsLNU)
+	if(bolGrantAll || vAuthList.indexOf("REMITTANCE") != -1){isAuthorized=true;%>
+<div class="trigger" onClick="showBranch('branch6');swapFolder('folder6')"> <img src="../../../images/box_with_plus.gif"  border="0" id="folder6">
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">REMITTANCE</font></strong></div>
+<span class="branch" id="branch6"><font size="2" face="Geneva, Arial, Helvetica, sans-serif">
+<img src="../../../images/broken_lines.gif"> <a href="../remittance/remittance_type.jsp" target="feemainFrame">Remittance Type</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../remittance/receive_remittance.jsp" target="feemainFrame">Receive Remittance</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../remittance/modification.jsp" target="feemainFrame">Modifications</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../remittance/viewall_remittance.jsp" target="feemainFrame">View All Remittance</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../remittance/remittance_print.jsp" target="feemainFrame">Re-print OR</a><br>
+</font>
+</span>
+<%}if(bolGrantAll || vAuthList.indexOf("OLD STUDENT ACCOUNT MGMT") != -1){isAuthorized=true;%>
+<div> <img src="../../../images/arrow_blue.gif"  border="0" >
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif"><a href="../student_ledger/old_student_ledger.jsp" target="feemainFrame">OLD STUDENT ACCOUNT MGMT</a> </font></strong></div>
+
+<%}if(bolGrantAll || vAuthList.indexOf("STUDENT LEDGER") != -1){isAuthorized=true;%>
+<div> <img src="../../../images/arrow_blue.gif"  border="0" >
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif"><a href="../student_ledger/student_ledger.jsp" target="feemainFrame">STUDENT LEDGER</a> </font></strong></div>
+
+<%}if(bolGrantAll || vAuthList.indexOf("STUDENT LEDGER") != -1){isAuthorized=true;
+if(false){%>
+<div> <img src="../../../images/arrow_blue.gif"  border="0" >
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif"><a href="../schl_fac_fees_ledger/old_schl_fac_ledger.jsp" target="feemainFrame">OLD OCCUPANT'S LEDGER MGMT</a> </font></strong></div>
+
+<%}
+}if(!bolIsLNU)
+	if(bolGrantAll || vAuthList.indexOf("STUDENT LEDGER") != -1){isAuthorized=true;%>
+<div> <img src="../../../images/arrow_blue.gif"  border="0" >
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif"><a href="../schl_fac_fees_ledger/schl_fac_ledger_view.jsp" target="feemainFrame">SCHOOL FACILITIES LEDGER</a> </font></strong></div>
+
+  <%}if(bolGrantAll || vAuthList.indexOf("DAILY CASH COLLECTION MGMT") != -1){isAuthorized=true;%>
+<div class="trigger" onClick="showBranch('branch8');swapFolder('folder8')"> <img src="../../../images/box_with_plus.gif"  border="0" id="folder8">
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">DAILY CASH COLLECTION MGMT</font></strong></div>
+<span class="branch" id="branch8"><font size="2" face="Geneva, Arial, Helvetica, sans-serif">
+<img src="../../../images/broken_lines.gif"> <a href="../daily_cash_collection/setup_cutoff_time.jsp" target="feemainFrame">Set
+Cutoff Time for Cash Collection</a> <br>
+<!-- FOR NOW I M NOT WORKING ON THE CASH RECEIVE.
+<img src="../../../images/broken_lines.gif"> <a href="../daily_cash_collection/cash_fr_teller.jsp" target="feemainFrame">Receive
+Cash from Teller</a> <br>
+<img src="../../../images/broken_lines.gif"> <a href="../daily_cash_collection/cash_fr_teller.jsp" target="feemainFrame">Modify
+Cash Collection Information</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../daily_cash_collection/cash_fr_teller.jsp" target="feemainFrame">List
+of Teller having shortage</a><br>
+-->
+</font> </span>
+<%}if(strSchCode.startsWith("CPU")){isAuthorized=true;%>
+<div class="trigger" onClick="showBranch('branch10');swapFolder('folder10')"> <img src="../../../images/box_with_plus.gif"  border="0" id="folder10">
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">FEE ADJUSTMENTS</font></strong></div>
+<span class="branch" id="branch10"><font size="2" face="Geneva, Arial, Helvetica, sans-serif">
+<img src="../../../images/broken_lines.gif"> <a href="../fee_adjustments/fee_adjustment_entry_temp.jsp" target="feemainFrame">Add Student Adjustment </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_adjustments/fee_adjustment_entry_view.jsp" target="feemainFrame">View Adjustments </a> <br>
+<img src="../../../images/broken_lines.gif"> <a href="../fee_adjustments/add_drop_entry_view.jsp" target="feemainFrame">View Add/Drop Subjects </a><br>
+<!--
+<img src="../../../images/broken_lines.gif"> <a href="../fee_adjustments/fee_adjustment_for_confirm.jsp" target="feemainFrame">Confirm Adjustment</a><br>
+-->
+<img src="../../../images/broken_lines.gif"> <a href="../fee_adjustments/fee_adjustment_for_cancel.jsp" target="feemainFrame">Cancel Adjustments </a><br>
+<!-- FOR NOW I M NOT WORKING ON THE CASH RECEIVE.
+<img src="../../../images/broken_lines.gif"> <a href="../daily_cash_collection/cash_fr_teller.jsp" target="feemainFrame">Receive
+Cash from Teller</a> <br>
+<img src="../../../images/broken_lines.gif"> <a href="../daily_cash_collection/cash_fr_teller.jsp" target="feemainFrame">Modify
+Cash Collection Information</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../daily_cash_collection/cash_fr_teller.jsp" target="feemainFrame">List
+of Teller having shortage</a><br>
+-->
+</font> </span>
+<%}if(bolGrantAll || vAuthList.indexOf("REPORTS") != -1){isAuthorized=true;%>
+<div class="trigger" onClick="showBranch('branch9');swapFolder('folder9')"> <img src="../../../images/box_with_plus.gif"  border="0" id="folder9">
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">REPORTS</font></strong></div>
+<span class="branch" id="branch9"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> 
+<%if(strSchCode.startsWith("CGH")){%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/bank_deposit/bd_main.jsp" target="feemainFrame">Manage Bank Deposits</a> <br>
+<%}if(strSchCode.startsWith("UDMC")){%>
+<img src="../../../images/broken_lines.gif"> <a href="../../user_admin/set_param/set_msg_user.jsp" target="feemainFrame">Mesage System</a> <br>
+<%}%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/cashier_report_main.jsp" target="feemainFrame">Cashier's Report </a> <br>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/promi_main.htm" target="feemainFrame">Promisory Note</a> <br>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/daily_cash_col.jsp" target="feemainFrame">Daily Cash Collection Details</a> <br>
+<%if(strSchCode.startsWith("AUF")){%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/auf_dropped_outs_details.jsp" target="feemainFrame">Dropout list</a> <br>
+<%}%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/specific_acct_cpu.jsp" target="feemainFrame">Specific Fee Collection (AR)</a> <br>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/specific_acct.jsp" target="feemainFrame">Specific Fee Collection</a> <br>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/summary_daily_cash_coll_new.jsp" target="feemainFrame">Summary of Daily Cash Collection</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/rec_projection_main.jsp" target="feemainFrame">Receivables Projection</a><br>
+<%if(false){%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/back_accounts.htm" target="feemainFrame">Back Accounts</a> <br>
+<%}if(strSchCode.startsWith("UI") || strSchCode.startsWith("AUF") || strSchCode.startsWith("CPU") || strSchCode.startsWith("UDMC") || 
+	strSchCode.startsWith("CGH") || strSchCode.startsWith("CLDH") || strSchCode.startsWith("PHILCST") || strSchCode.startsWith("VMUF") ){%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/admission_slip_main.jsp" target="feemainFrame">Admission Slip</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/statement_of_account_UI_main.jsp" target="feemainFrame">
+	<%if(strSchCode.startsWith("AUF")){%>Certification of Tuition Fees and Payments<%}else{%>Student's SA<%}%>
+	</a><br>
+<%}else if(strSchCode.startsWith("WNU")){%>
+	<img src="../../../images/broken_lines.gif"> <a href="../reports/statement_of_account_UI_main.jsp" target="feemainFrame">Student's SA</a><br>
+<%}else{%>
+	<img src="../../../images/broken_lines.gif"> <a href="../reports/statement_of_account.jsp" target="feemainFrame">Student's SA</a><br>
+<%}
+String strTemp = null;
+if(strSchCode != null && strSchCode.startsWith("UI"))
+	strTemp = "../reports/cert_enrol_billing_ched_ui.jsp";
+else
+	strTemp = "../reports/cert_enrol_billing_ched.jsp";
+if(!bolIsLNU){%>
+<img src="../../../images/broken_lines.gif"> <a href="<%=strTemp%>" target="feemainFrame">Certificate of Enrolment and Billing (CHED)</a> <br>
+<%}if(strSchCode.startsWith("AUF") ){%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/auf_certification(scholarship).jsp" target="feemainFrame">Certification of Fees</a> 
+<br>
+<%}if(!bolIsLNU){%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/list_of_stud_educ_plans.jsp" target="feemainFrame">Students with Educational <br>Plans</a><br>
+<%}
+if(false){///use promisory note link
+%><img src="../../../images/broken_lines.gif"> <a href="../reports/list_stud_take_exam.jsp" target="feemainFrame">Students List for Examination</a><br>
+<%}%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/list_stud_paid_full.jsp" target="feemainFrame">Students Who Paid in FULL</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/list_stud_outstanding_refund.jsp" target="feemainFrame">Students With Outstanding Balance (OR) Refund</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/list_educational_assistance.jsp" target="feemainFrame">Students with Educational Assistance</a> <br>
+<%
+
+if(strSchCode.startsWith("AUF") || strSchCode.startsWith("UI") || strSchCode.startsWith("UDMC") || strSchCode.startsWith("WNU") || strSchCode.startsWith("CLDH")){%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/other_report_main.jsp" target="feemainFrame">Other 
+Reports</a><br>
+<%}%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/external_payments.jsp" target="feemainFrame">List of External/Internal Payment</a> <br>
+<%if(!bolIsLNU){//donot show to LNU.%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/list_basic_educ_payments.jsp" target="feemainFrame">List of Basic Educ Payments</a> <br>
+<%}if(strSchCode.startsWith("UI")){%>
+<img src="../../../images/broken_lines.gif"> <a href="../reports/tuition_fee_compare.jsp" target="feemainFrame">Tuition Fee Comparison</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../student_ledger/ui_ledger_summary.jsp" target="feemainFrame">Print Student Ledger Summary</a><br>
+<%}%>
+</font> </span> 
+
+<%if( (strSchCode.startsWith("UI") || strSchCode.startsWith("WNU")) && bolGrantAll){%><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">
+	<img src="../../../images/arrow_blue.gif"> <a href="../close_sy_ledg/close_sy_ledg.jsp" target="feemainFrame">Close SY-Term (Finalize Ledger)</a></font><br>
+<%}%>
+
+<%}
+if(!bolIsLNU)
+	if(bolGrantAll || vAuthList.indexOf("LISTING FOR EXAMINATION") != -1){isAuthorized=true;%>
+<div> <img src="../../../images/arrow_blue.gif"  border="0" > 
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif"><a href="../../fee_assess_pay/listing_for_exam/list_stud_take_exam.jsp" target="feemainFrame">LISTING FOR EXAMINATION</a> </font></strong></div>
+
+<%}
+
+if(strUserId == null)
+	strErrMsg = "Session timeout. Please login again.";
+else if(!isAuthorized)
+	strErrMsg = "You are not authorized to view any link in this page. Please contact system admin for access permission.";
+if(strErrMsg == null)
+	strErrMsg = "";
+%>
+<font size="2" face="Verdana, Arial, Helvetica, sans-serif"><%=strErrMsg%></font>
+</body>
+</html>
+<%
+if(dbOP != null) dbOP.cleanUP();
+%>

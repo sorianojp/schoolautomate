@@ -1,0 +1,324 @@
+<%@ page language="java" import="utility.*, inventory.InventoryMaintenance, java.util.Vector"%>
+<%
+	WebInterface WI = new WebInterface(request);
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../..//css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../..//css/tableBorder.css" rel="stylesheet" type="text/css">
+</head>
+<script language="javascript"  src ="../../../..//jscript/common.js" ></script>
+<script language="javascript"  src ="../../../..//jscript/date-picker.js" ></script>
+<script>
+function ReloadPage()
+{
+	document.form_.executeSearch.value = "";
+	document.form_.print_pg.value = "";
+	this.SubmitOnce('form_');
+}
+</script>
+
+<%
+	DBOperation dbOP = null;
+	String strErrMsg = null;
+
+	String strImgFileExt = null;
+	int iSearchResult = 0;
+	
+//add security here.
+
+	int iAccessLevel = -1;
+	java.util.Hashtable svhAuth = (java.util.Hashtable)request.getSession(false).getAttribute("svhAuth");
+	
+	if(svhAuth == null)
+		iAccessLevel = -1; // user is logged out.
+	else if (svhAuth.size() == 1 && svhAuth.get("ALL") != null)//super user.
+		iAccessLevel = Integer.parseInt(WI.getStrValue(svhAuth.get("ALL"),"0"));
+	else {
+		iAccessLevel = Integer.parseInt(WI.getStrValue(svhAuth.get("PAYROLL-DTR"),"0"));
+		if(iAccessLevel == 0) {
+			iAccessLevel = Integer.parseInt(WI.getStrValue(svhAuth.get("PAYROLL-DTR"),"0"));
+		}
+	}
+	
+	if(iAccessLevel == -1)//for fatal error.
+	{
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+		request.getSession(false).setAttribute("errorMessage","You are logged out. Please login again.");
+		response.sendRedirect("../../../commfile/fatal_error.jsp");
+		return;
+	}
+	else if(iAccessLevel == 0)//NOT AUTHORIZED.
+	{
+		response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+		return;
+	}
+
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-INVENTORY-INV_MAINT- View Inventory","inv_view_inventory_print.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+ 	}
+
+	Vector vRetResult = null;
+	int iTemp = 0;
+	String strTemp2 = null;
+	String strTemp3 = null;
+	String strQuery = "";
+	
+	String[] astrSortByName   = {"Status", "College", "Laboratory/Stock Room", "Non-Acad Office/Department", "Building"};
+	String[] astrSortByVal    = {"inv_preload_status.INV_STATUS", "college.C_CODE", "E_ROOM_DETAIL.ROOM_NUMBER", "DEPARTMENT.D_NAME", "E_ROOM_BLDG.BLDG_NAME"};
+	
+	InventoryMaintenance InvMaint = new InventoryMaintenance();
+%>
+<body bgcolor="#FFFFFFF">
+<form name="form_" action="../../../..//ADMIN_STAFF/inventory/inv_maint/inv_view_inventory_print.jsp" method="post" >
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#000000"> 
+      <td height="25" colspan="5" bgcolor="#FFFFFF"><div align="center"><div align="center"><font size="2"><strong><%=SchoolInformation.getSchoolName(dbOP,true,false)%></strong><br>
+          <%=SchoolInformation.getAddressLine1(dbOP,false,false)%><br>
+          <%=SchoolInformation.getInfo1(dbOP,false,false)%></font></div></div></td>
+    </tr>
+</table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="2%" height="29">&nbsp;</td>
+      <td width="4%" height="29">&nbsp;</td>
+      <td width="4992%" height="29" colspan="4"><div align="center"><strong>LAND 
+          AND LAND IMPROVEMENTS </strong></div></td>
+    </tr>
+  </table>
+	
+  <table width="100%" border="0" cellpadding="1" cellspacing="0"  bgcolor="#FFFFFF" >
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="4" ><div align="center"> 
+          <p align="left"><strong><font size="2">A. LAND</font></strong></p>
+        </div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td width="6%" height="25" ><div align="center"><font size="1"><u>COUNT</u></font></div></td>
+      <td width="58%" ><div align="center"><font size="1"><u>NAME/DESCRIPTION</u></font></div></td>
+      <td width="17%" ><div align="center"><font size="1"><u>COST</u></font></div></td>
+      <td width="19%" >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" ><div align="center">1</div></td>
+      <td >Baguio Property</td>
+      <td ><div align="right">77,070.00</div></td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" ><div align="center">2</div></td>
+      <td >Campus Site (23.1574 has.)</td>
+      <td ><div align="right">2,500,000.00</div></td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" ><div align="center">3</div></td>
+      <td >Cathedral's Lot</td>
+      <td ><div align="right">1,167,959.00</div></td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" ><div align="center"></div></td>
+      <td >&nbsp;</td>
+      <td ><hr size="1"></td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" >&nbsp;</td>
+      <td >Total as of May 31, 2001</td>
+      <td ><div align="right">3,745,029.00</div></td>
+      <td ><div align="right"></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" >&nbsp;</td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="2" ><strong><font size="2">B. LAND IMPROVEMENTS</font></strong></td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td ><div align="center">1</div></td>
+      <td height="25" >Baguio Cottage Fence</td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td ><div align="center">2</div></td>
+      <td height="25" >&nbsp;</td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td ><div align="center">3</div></td>
+      <td height="25" >&nbsp;</td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="10" >&nbsp;</td>
+      <td height="10" >&nbsp;</td>
+      <td height="10" valign="top" ><hr size="1"></td>
+      <td height="10" >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td >&nbsp;</td>
+      <td height="25" >Total as of May 31, 2001</td>
+      <td ><div align="right">$total</div></td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td >&nbsp;</td>
+      <td height="25" >Less: Accumulated Depreciation - Land Improvements</td>
+      <td ><div align="right">$acc_dep-land_imp</div></td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="10" >&nbsp;</td>
+      <td height="10" >&nbsp;</td>
+      <td height="10" valign="top" ><hr size="1"></td>
+      <td height="10" >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td >&nbsp;</td>
+      <td height="25" >Net Total as of May 31, 2001</td>
+      <td >&nbsp;</td>
+      <td ><div align="right"><strong>$total-$acc_dep-land_imp</strong></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td >&nbsp;</td>
+      <td height="25" >&nbsp;</td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="4" ><strong><font size="2">C. ADD: $add_date_from 
+        - $add_date_to LAND ADDITIONS</font></strong></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td ><div align="center">1</div></td>
+      <td height="25" >&nbsp;</td>
+      <td height="25" >&nbsp;</td>
+      <td height="25" >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td ><div align="center">2</div></td>
+      <td height="25" >&nbsp;</td>
+      <td height="25" >&nbsp;</td>
+      <td height="25" >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td ><div align="center">3</div></td>
+      <td height="25" >&nbsp;</td>
+      <td height="25" >&nbsp;</td>
+      <td height="25" >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" >&nbsp;</td>
+      <td height="25" >&nbsp;</td>
+      <td height="25" ><hr size="1"></td>
+      <td height="25" >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" >&nbsp;</td>
+      <td height="25" >Total Addition to Land from <font size="2">$add_date_from 
+        - $add_date_to</font></td>
+      <td height="25" >&nbsp;</td>
+      <td height="25" ><div align="right">$total</div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="4" >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="4" ><strong><font size="2">D. ADD: $add_date_from 
+        - $add_date_to LAND IMPROVEMENTS ADDITIONS </font></strong></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td ><div align="center">1</div></td>
+      <td height="25" >&nbsp;</td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td ><div align="center">2</div></td>
+      <td height="25" >&nbsp;</td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td ><div align="center">3</div></td>
+      <td height="25" >&nbsp;</td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td ><div align="center">4</div></td>
+      <td height="25" >&nbsp;</td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr valign="top" bgcolor="#FFFFFF"> 
+      <td height="10" ><div align="center"></div></td>
+      <td height="10" >&nbsp;</td>
+      <td height="10" ><hr size="1"></td>
+      <td height="10" >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td >&nbsp;</td>
+      <td height="25" >Total Addition to Land Improvements from <font size="2">$add_date_from 
+        - $add_date_to</font></td>
+      <td >&nbsp;</td>
+      <td ><div align="right">$total</div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="10" >&nbsp;</td>
+      <td height="10" >&nbsp;</td>
+      <td height="10" >&nbsp;</td>
+      <td height="10" valign="top" ><hr size="1"></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="2" >TOTAL LAND &amp; LAND IMPROVEMENTS AS OF <font size="2"> 
+        $add_date_to</font></td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td >&nbsp;</td>
+      <td height="25" >&nbsp;</td>
+      <td >&nbsp;</td>
+      <td ><hr size="2"></td>
+    </tr>
+    <%if (vRetResult != null && vRetResult.size() > 0){
+		for (int i = 0; i < vRetResult.size(); i+=10){
+	%>
+    <%}
+	}
+	%>
+  </table>
+  <input type="hidden" name="print_pg">
+</form>
+<script language="JavaScript">
+window.print();
+</script>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

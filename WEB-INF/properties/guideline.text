@@ -1,0 +1,9 @@
+//add this to your dbpool.properties. in vmmcdtr.url, put the IP address of teh DTR Terminal you are going to use in VMMC... you have to change the DTR IP address too.. 
+//NOte: You can't have more than one instance of schoolbliz under webapps folder. So, if you have backup schoolbliz under webapps, you have to remove those out of apacheTomcat folder.
+
+</pre>
+vvmcdtr.driver=com.mysql.jdbc.Driver
+vvmcdtr.url=jdbc:mysql://192.168.1.2/dtr_standalone
+vvmcdtr.user=edtr
+vvmcdtr.password=123
+</pre>

@@ -1,0 +1,547 @@
+<%
+///added code for HR/companies.
+boolean bolIsSchool = false;
+if( (new CommonUtil().getIsSchool(null)).equals("1"))
+	bolIsSchool = true;
+String[] strColorScheme = CommonUtil.getColorScheme(6);
+//strColorScheme is never null. it has value always.
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Payroll Payslip</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+.bgDynamic {
+	background-color:<%=strColorScheme[1]%>
+}
+.footerDynamic {
+	background-color:<%=strColorScheme[2]%>
+}
+</style>
+</head>
+<script language="JavaScript" src="../../../../jscript/common.js"></script>
+<script language="JavaScript" src="../../../../jscript/date-picker.js"></script>
+<script language="JavaScript">
+
+function ReloadPage()
+{	
+	document.form_.searchEmployee.value = "";
+	document.form_.print_pg.value = "";
+	document.form_.print_all.value ="";	
+	if (document.form_.tenure.selectedIndex != 0){		
+		document.form_.tenure_name.value = document.form_.tenure[document.form_.tenure.selectedIndex].text;		
+	}else{
+		document.form_.tenure_name.value = "";
+	}	
+	this.SubmitOnce('form_');
+}
+
+function SearchEmployee()
+{
+	document.form_.searchEmployee.value = "1";
+	document.form_.print_pg.value = "";
+	document.form_.print_all.value ="";	
+	this.SubmitOnce('form_');
+}
+
+function PrintSlip(emp_id, sal_period_index,sal_index,strBankAcct,strReceiptNo,strStatus,strIsAtm,strTenure, strShow)
+{
+	var pgLoc = "./payroll_slip_print2.jsp?emp_id="+emp_id+"&sal_period_index="+sal_period_index+
+				"&sal_index="+sal_index+"&bank_account="+strBankAcct+"&rec_no="+strReceiptNo+
+				"&rec_no="+strReceiptNo+"&pt_ft="+strStatus+"&is_atm="+strIsAtm+"&tenure="+strTenure+
+				"&finalize=1&show_signatory="+strShow;
+	var win=window.open(pgLoc,"PrintWindow",'width=700,height=500,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+
+function PrintALL() {
+	document.form_.print_all.value ="1";
+	document.form_.print_pg.value = "";
+	this.SubmitOnce('form_');
+}
+
+</script>
+<%@ page language="java" import="utility.*,java.util.Vector,payroll.ReportPayroll, payroll.PReDTRME" %>
+<%
+
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+	String strErrMsg = null;
+	String strTemp = null;
+	boolean bolProceed = true;
+	String strImgFileExt = null;
+	int iSearchResult = 0;
+	String strPayrollPeriod  = null;
+	
+//add security here.
+try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Payroll-REPORTS-Payroll Slip main","Payroll_slip_main.jsp");
+
+	}
+catch(Exception exp)
+	{
+		exp.printStackTrace();
+		if(strErrMsg == null)
+			strErrMsg = "Error in opening DB Connection.";
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3"><%=strErrMsg%></font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"PAYROLL","REPORTS",request.getRemoteAddr(),
+														"Payroll_slip_main.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+//end of authenticaion code.
+
+
+String[] strConvertAlphabet = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","0","5"};
+
+Vector vSalaryPeriod 		= null;//detail of salary period.
+
+PReDTRME prEdtrME = new PReDTRME();
+EnrlReport.StatementOfAccount SOA = new EnrlReport.StatementOfAccount();
+
+Vector vRetResult = null;;
+ReportPayroll RptPay = new ReportPayroll(request);
+String strTenure = WI.fillTextValue("tenure_name");
+
+if(WI.fillTextValue("searchEmployee").equals("1")){
+  vRetResult = RptPay.searchPayrollSlip(dbOP);
+	if(vRetResult == null){
+		strErrMsg = RptPay.getErrMsg();
+	}else{	
+		iSearchResult = RptPay.getSearchCount();
+	}
+}
+
+if(WI.fillTextValue("year_of").length() > 0) {
+	vSalaryPeriod = prEdtrME.operateOnSalaryPeriod(dbOP, request, 4);
+}
+if(strErrMsg == null) 
+strErrMsg = "";
+%>
+
+<body  class="bgDynamic">
+<p>&nbsp;</p>
+<form name="form_" method="post" action="./payroll_slip_main.jsp">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr > 
+      <td height="25" colspan="5"><div align="center"><font color="#000000" ><strong>:::: 
+          PAYROLL: PAYROLL SLIP PAGE ::::</strong></font></div></td>
+    </tr>
+</table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="23" colspan="5"><strong><%=strErrMsg%></strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Salary period for Yr</td>
+      <td colspan="3"> <select name="month_of">
+          <%=dbOP.loadComboMonth(WI.fillTextValue("month_of"))%> 
+        </select>
+        - 
+        <select name="year_of">
+          <%=dbOP.loadComboYear(WI.fillTextValue("year_of"),2,1)%> 
+        </select>
+        (Must be filled up to display salary period information)</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Salary Period</td>
+      <td colspan="3"><strong> 
+        <select name="sal_period_index" style="font-weight:bold;font-size:11px" onChange="ReloadPage();">
+          <%
+		String[] astrConvertMonth = {"January","February","March","April","May","June","July","August",
+									"September","October","November","December"};
+
+	 	strTemp = WI.fillTextValue("sal_period_index");		
+		
+		for(int i = 0; vSalaryPeriod != null && i < vSalaryPeriod.size(); i += 8) {
+
+		if(strTemp.equals((String)vSalaryPeriod.elementAt(i))) {%>
+          <option selected value="<%=(String)vSalaryPeriod.elementAt(i)%>"> 
+          <%=astrConvertMonth[Integer.parseInt((String)vSalaryPeriod.elementAt(i + 4))] + " :: "+
+		(String)vSalaryPeriod.elementAt(i + 6) +" - "+(String)vSalaryPeriod.elementAt(i + 7)%> </option>
+          <%}else{%>
+          <option value="<%=(String)vSalaryPeriod.elementAt(i)%>"> 
+          <%=astrConvertMonth[Integer.parseInt((String)vSalaryPeriod.elementAt(i + 4))] + " :: "+
+		(String)vSalaryPeriod.elementAt(i + 6) +" - "+(String)vSalaryPeriod.elementAt(i + 7)%></option>
+          <%}//end of if condition.
+		  strPayrollPeriod = (String)vSalaryPeriod.elementAt(i + 6) +" - "+(String)vSalaryPeriod.elementAt(i + 7);
+		 }//end of for loop.%>
+        </select>
+        </strong></td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td>Position</td>
+      <td colspan="3"> <select name="emp_type_index">
+          <option value="" selected>ALL</option>
+          <%=dbOP.loadCombo("EMP_TYPE_INDEX","EMP_TYPE_NAME"," from HR_EMPLOYMENT_TYPE where IS_DEL=0 order by EMP_TYPE_NAME asc", WI.fillTextValue("emp_type_index"), false)%> </select></td>
+    </tr>	
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td>Employee Status</td>
+      <td colspan="3"><select name="pt_ft" onChange="ReloadPage();">
+          <option value="" selected>Employees Without Service Record</option>
+          <%if (WI.fillTextValue("pt_ft").equals("0")){%>
+          <option value="0" selected>Part - time</option>
+          <option value="1">Full - time</option>
+          <%}else if (WI.fillTextValue("pt_ft").equals("1")){%>
+          <option value="0">Part - time</option>
+          <option value="1" selected>Full - time</option>
+          <%}else{%>
+          <option value="0">Part - time</option>
+          <option value="1">Full - time</option>
+          <%}%>
+        </select></td>
+    </tr>	
+    <% 
+	String strCollegeIndex = WI.fillTextValue("c_index");	
+	%>
+	<%if(bolIsSchool){%>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td>Employee Category</td>
+      <td colspan="3"><select name="employee_category" onChange="ReloadPage();">
+          <option value="" selected>Employees Without Service Record</option>
+          <%if (WI.fillTextValue("employee_category").equals("0")){%>
+          <option value="0" selected>Non-Teaching</option>
+          <option value="1">Teaching</option>
+          <option value="2">Non-Teaching w/ Teaching Load</option>
+          <%}else if (WI.fillTextValue("employee_category").equals("1")){%>
+          <option value="0">Non-Teaching</option>
+          <option value="1" selected>Teaching</option>
+          <option value="2">Non-Teaching w/ Teaching Load</option>
+          <%}else if (WI.fillTextValue("employee_category").equals("2")){%>
+          <option value="0">Non-Teaching</option>
+          <option value="1">Teaching</option>
+          <option value="2" selected>Non-Teaching w/ Teaching Load</option>
+          <%}else{%>
+          <option value="0">Non-Teaching</option>
+          <option value="1">Teaching</option>
+          <option value="2">Non-Teaching w/ Teaching Load</option>
+          <%}%>
+        </select> </td>
+    </tr>
+	<%}%>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td>Employee Tenure</td>
+      <td colspan="3"><select name="tenure" onChange="ReloadPage();">
+          <option value="">ALL</option>
+          <%=dbOP.loadCombo("status_index","status"," from user_status where IS_FOR_STUDENT=0 order by status asc",WI.fillTextValue("tenure"), false)%> 
+		  </select>
+		  <input type="hidden" name="tenure_name" value="<%=strTenure%>">
+	  </td>
+		 
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td>Account Type</td>
+      <td colspan="3">
+	    <select name="is_atm" onChange="ReloadPage();">
+          <option value="0" selected>Non-ATM Account</option>
+          <%if (WI.fillTextValue("is_atm").equals("1")){%>
+          <option value="1" selected>ATM Account</option>
+          <%}else{%>
+          <option value="1">ATM Account</option>
+          <%}%>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td><%if(bolIsSchool){%>College<%}else{%>Division<%}%></td>
+      <td colspan="3"> <select name="c_index" onChange="ReloadPage();">
+          <option value="">ALL</option>
+          <%=dbOP.loadCombo("c_index","c_name", " from college where is_del= 0", strCollegeIndex,false)%> </select> </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Department/Office</td>
+      <td colspan="3"> <select name="d_index" onChange="ReloadPage();">
+          <option value="">ALL</option>
+          <%if ((strCollegeIndex.length() == 0)){%>
+          <%=dbOP.loadCombo("d_index","d_name", " from department where is_del= 0", WI.fillTextValue("d_index"),false)%> 
+          <%}else if (strCollegeIndex.length() > 0){%>
+          <%=dbOP.loadCombo("d_index","d_name", " from department where is_del= 0 and c_index = " + strCollegeIndex , WI.fillTextValue("d_index"),false)%> 
+          <%}%>
+        </select> </td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>Employee ID</td>
+      <td colspan="3"> <input name="emp_id" type="text" size="16"maxlength="16" value="<%=WI.fillTextValue("emp_id")%>"> 
+      </td>
+    </tr>
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="20%">&nbsp;</td>
+      <td width="78%" colspan="3"><a href="javascript:SearchEmployee();"><img src="../../../../images/form_proceed.gif" border="0"></a><font size="1">click 
+        to display employee list to print.</font></td>
+    </tr>
+    <%if (vRetResult != null && vRetResult.size() > 0){%>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td colspan="4">Print Employee payroll whose lastname starts with 
+        <select name="lname_from" onChange="ReloadPage();">
+          <%
+	 strTemp = WI.fillTextValue("lname_from");
+	 int j = 0; //displays from and to to avoid conflict -- check the page ;-)
+	 for(int i=0; i<28; ++i){
+	 if(strTemp.compareTo(strConvertAlphabet[i]) ==0){
+	 j = i; %>
+          <option selected><%=strConvertAlphabet[i]%></option>
+          <%}else{%>
+          <option><%=strConvertAlphabet[i]%></option>
+          <%}
+			}%>
+        </select>
+        to 
+        <select name="lname_to">
+          <option value="0"></option>
+          <%
+			 strTemp = WI.fillTextValue("lname_to");
+			 
+			 for(int i=++j; i<28; ++i){
+			 if(strTemp.compareTo(strConvertAlphabet[i]) ==0){%>
+          <option selected><%=strConvertAlphabet[i]%></option>
+          <%}else{%>
+          <option><%=strConvertAlphabet[i]%></option>
+          <%}
+		}%>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="10">&nbsp;</td>
+      <td height="10">&nbsp;</td>
+      <td height="10" colspan="3">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <%if (vRetResult != null)
+	  	  strTemp = Integer.toString(vRetResult.size()/11);
+		else
+		  strTemp = "";
+	  %>
+      <td height="25" colspan="4"><font size="3">TOTAL EMPLOYEES TO BE PRINTED 
+        : <strong><%=WI.getStrValue(strTemp,"0")%></strong></font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">PRINT OPTION 1</td>
+      <td height="25" colspan="3"> <select name="print_page_range">
+          <option value="">ALL</option>
+          <%
+	  strTemp = WI.fillTextValue("print_page_range");
+	  int iTemp = vRetResult.size()/11;
+	  int iLastCount = 0;
+	  for(int i = 1; i <= iTemp;){
+	  	i += 25; //in batch of 25
+		if(i > iTemp)
+			iLastCount = iTemp;
+		else	
+			iLastCount += 25;
+		 if(strTemp.compareTo(Integer.toString(iLastCount)) == 0){%>
+          <option value="<%=iLastCount%>" selected><%=i - 25%> to <%=iLastCount%></option>
+          <%}else{%>
+          <option value="<%=iLastCount%>"><%=i - 25%> to <%=iLastCount%></option>
+          <%}
+	  }%>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td valign="top">PRINT OPTION 2</td>
+      <td height="25" colspan="3" valign="top"><input name="print_option2" type="text" size="16" maxlength="32" 
+	  value="<%=WI.fillTextValue("print_option2")%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"> 
+        <br> <font color="#0099FF"> <strong>(Enter page numbers and/or page ranges 
+        separated by commas. For ex: 1,3,5-12)</strong></font></td>
+    </tr>
+    <%}%>
+    <tr> 
+      <td height="10" colspan="5">&nbsp;</td>
+    </tr>
+  </table>
+    
+  <table width="100%" border="0" cellpadding="0" cellspacing="0"  bgcolor="#FFFFFF" class="thinborder">
+    <% if(vRetResult != null && vRetResult.size() > 0  ) { %>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="5" align="right">
+		<a href="javascript:PrintALL();"> 
+        <img src="../../../../images/print.gif" border="0"></a> <font size="1">Click 
+        to print all</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B9B292" class="thinborder"> 
+      <td height="23" colspan="5" align="center"  class="footerDynamic"><b>LIST OF EMPLOYEES FOR PRINTING.</b></td>
+    </tr>
+    <tr bgcolor="#ffff99" class="thinborder"> 
+      <td class="thinborder" height="25" colspan="2" align="center"><strong>EMPLOYEE 
+        ID</strong></td>
+      <td class="thinborder" width="29%" align="center"><strong>EMPLOYEE NAME</strong></td>
+      <td class="thinborder" width="43%" align="center"><strong> 
+        <%if(bolIsSchool){%>
+        COLLEGE/DEPARTMENT 
+        <%}else{%>
+        DIVISION 
+        <%}%>
+        /OFFICE</strong></td>
+      <td class="thinborder" width="8%" align="center"><strong>PRINT</strong></td>
+    </tr>
+    <% 	//System.out.println("size " +vRetResult.size());	
+	for(int i = 0,iCount=1; i < vRetResult.size(); i += 11,++iCount){		
+	%>
+    <tr bgcolor="#FFFFFF" class="thinborder"> 
+      <td class="thinborder" width="4%">&nbsp;<%=iCount%>.</td>
+      <td class="thinborder" width="16%" height="25">&nbsp;<%=(String)vRetResult.elementAt(i)%></td>
+      <td class="thinborder" >&nbsp;<%=(String)vRetResult.elementAt(i + 2)%>, <%=(String)vRetResult.elementAt(i + 1)%> </td>
+      <%if((String)vRetResult.elementAt(i + 3)== null || (String)vRetResult.elementAt(i + 4)== null){
+		  	strTemp = " ";			
+		  }else{
+		  	strTemp = " - ";
+		  }
+		%>
+      <td class="thinborder" >&nbsp; <%=WI.getStrValue((String)vRetResult.elementAt(i + 3)," ")%><%=strTemp%><%=WI.getStrValue((String)vRetResult.elementAt(i + 4)," ")%> </td>
+      <td class="thinborder" align="center"> 	  
+	  <a href='javascript:PrintSlip("<%=(String)vRetResult.elementAt(i)%>",
+	  								"<%=WI.fillTextValue("sal_period_index")%>",
+									"<%=(String)vRetResult.elementAt(i+7)%>",
+									"<%=(String)vRetResult.elementAt(i+9)%>",
+									"<%=iCount%>","<%=WI.fillTextValue("pt_ft")%>",
+									"<%=WI.fillTextValue("is_atm")%>",
+									"<%=WI.fillTextValue("tenure_name")%>"'> 
+        <img src="../../../../images/print.gif" border="0"></a> </td>
+    </tr>
+    <%} // end for loop
+	
+	} // end if vRetResult != null && vRetResult.size() %>
+  </table>
+  <input type="hidden" name="searchEmployee" value="<%=WI.fillTextValue("searchEmployee")%>">
+  <input type="hidden" name="print_pg" value="">
+  <input type="hidden" name="print_all" value="">  
+</form>
+<%
+//if print all - i have to print all one by one.. 
+if(WI.fillTextValue("print_all").compareTo("1") == 0 && vRetResult != null && vRetResult.size() > 0){
+int iMaxPage = vRetResult.size()/11;
+if(WI.fillTextValue("print_option2").length() > 0) {
+//I have to now check if format entered is correct.
+	int[] aiPrintPg = SOA.getPrintPage(WI.fillTextValue("print_option2"),iMaxPage);
+	if(aiPrintPg == null) {
+		strErrMsg = SOA.getErrMsg();%> 
+		<script language="JavaScript">alert("<%=strErrMsg%>");</script><%
+	}
+	else {//print here.
+		int iCount = 0; %>
+		<script language="JavaScript">
+		var countInProgress = 0;
+		<%
+		for(int i = 0; i < aiPrintPg.length; ++i,++iCount) {%>
+			function PRINT_<%=iCount%>() {
+				var pgLoc = "./payroll_slip_print2.jsp?emp_id=<%=(String)vRetResult.elementAt(aiPrintPg[i] * 11 - 11)%>" +
+					"&sal_period_index=<%=WI.fillTextValue("sal_period_index")%>&sal_index=<%=(String)vRetResult.elementAt(i+7)%>" +
+					"&bank_account=<%=(String)vRetResult.elementAt(i+9)%>&rec_no=<%=iCount+1%>" +
+					"&pt_ft=<%=WI.fillTextValue("pt_ft")%>&is_atm=<%=WI.fillTextValue("is_atm")%>" +
+					"&tenure=<%=WI.fillTextValue("tenure_name")%>&finalize=1";							
+				window.open(pgLoc);
+			}
+		<%}%>
+		function callPrintFunction() {
+			//alert(countInProgress);
+			if(eval(countInProgress) > <%=iCount-1%>)
+				return;
+			eval('this.PRINT_'+countInProgress+'()');//alert(countInProgress);
+			countInProgress = eval(countInProgress) + 1;//alert(printCountInProgress);
+		
+			window.setTimeout("callPrintFunction()", 6000);
+		}
+		this.callPrintFunction();
+		</script>
+	<%
+	}
+}
+else {
+	//enter this only if page number is selected. -- but call the above only if page range in enter in the input box.
+	int iPrintRangeTo = Integer.parseInt(WI.getStrValue(WI.fillTextValue("print_page_range"),"0"));
+	int iPrintRangeFr = iPrintRangeTo - 25; if(iPrintRangeFr < 1) iPrintRangeFr = 0;
+	if(iPrintRangeTo == iMaxPage && iMaxPage %25 > 0) {
+		//i can't subtract just like that.. i have to find the last page count.
+		iPrintRangeFr = iMaxPage - iMaxPage%25;	
+	}
+	%>
+		<script language="JavaScript">
+			var printCountInProgress = 0;
+			var totalPrintCount = 0;
+			<%int iCount = 0; 
+			for(int i = 0; i < vRetResult.size(); i += 11,++iCount) {
+				if(iPrintRangeTo > 0) {
+					if( (iCount + 1) < iPrintRangeFr || (iCount + 1) > iPrintRangeTo)
+						continue;				
+				}%>
+				
+				function PRINT_<%=iCount%>() {
+						var pgLoc = "./payroll_slip_print2.jsp?emp_id=<%=(String)vRetResult.elementAt(i)%>" +					
+						"&sal_period_index=<%=WI.fillTextValue("sal_period_index")%>&sal_index=<%=(String)vRetResult.elementAt(i+7)%>" +
+						"&bank_account=<%=(String)vRetResult.elementAt(i+9)%>&rec_no=<%=iCount+1%>"+
+						"&pt_ft=<%=WI.fillTextValue("pt_ft")%>&is_atm=<%=WI.fillTextValue("is_atm")%>" +
+					    "&tenure=<%=WI.fillTextValue("tenure_name")%>&finalize=1";							
+
+					window.open(pgLoc);
+				}//end of printing function.
+			<%
+		}//end of for loop.
+		
+		//for(int i = 0;  i < vRetResult.size(); i += 2){
+		%>totalPrintCount = <%=iCount%>;
+		printCountInProgress = <%=iPrintRangeFr%>;
+		<%if(iPrintRangeTo == 0)
+			iPrintRangeTo = iCount;
+		%>
+		totalPrintCount = <%=iPrintRangeTo%>;
+		function callPrintFunction() {
+			//alert(printCountInProgress);
+			if(eval(printCountInProgress) >= eval(totalPrintCount))
+				return;
+			eval('this.PRINT_'+printCountInProgress+'()');//alert(printCountInProgress);
+			printCountInProgress = eval(printCountInProgress) + 1;//alert(printCountInProgress);
+		
+			window.setTimeout("callPrintFunction()", 6000);
+		}
+		//function PrintALL(strIndex) {
+			//if(eval(strIndex) < eval(totalPrintCount))
+		//}	
+			this.callPrintFunction();
+		</script>
+
+<%}//end if print_option2 is not entered.
+
+}//end if print is called.%>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

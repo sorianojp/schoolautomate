@@ -1,0 +1,289 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>COURSES CURRICULUM</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<%response.setHeader("Pragma","No-Cache");
+response.setDateHeader("Expires",0);
+response.setHeader("Cache-Control","no-Cache"); //HTTP 1.0
+response.setHeader("Cache-Control","no-store"); //HTTP 1.1 
+%>
+</head>
+<script language="JavaScript">
+function ReloadCourseIndex()
+{
+	document.ccurriculum.view_info.value = 0;
+	//course index is changed -- so reset all dynamic fields. 
+	if(document.ccurriculum.cy_from.selectedIndex >=0)
+		document.ccurriculum.cy_from[document.ccurriculum.cy_from.selectedIndex].value = "";
+	if(document.ccurriculum.major_index.selectedIndex >=0)
+		document.ccurriculum.major_index[document.ccurriculum.major_index.selectedIndex].value = "";
+	document.ccurriculum.course_name.value = document.ccurriculum.course_index[document.ccurriculum.course_index.selectedIndex].text;
+	ReloadPage();
+}
+function ReloadPage()
+{
+	document.ccurriculum.action="./courses_curriculum_m_d.jsp";
+	document.ccurriculum.major_name.value = document.ccurriculum.major_index[document.ccurriculum.major_index.selectedIndex].text;
+
+	document.ccurriculum.submit();
+}
+function ViewInfo()
+{
+	document.ccurriculum.view_info.value = 1;
+	ReloadPage();
+}
+function PrintPage()
+{
+ 	var vProceed = confirm("Please keep your printer ready and click <OK> to print.if you are not ready to print, please click cancel.");
+	if(vProceed)
+	{
+		document.ccurriculum.ci.value = document.ccurriculum.course_index[document.ccurriculum.course_index.selectedIndex].value;
+		document.ccurriculum.mi.value = document.ccurriculum.major_index[document.ccurriculum.major_index.selectedIndex].value;
+		document.ccurriculum.course_name.value = document.ccurriculum.course_index[document.ccurriculum.course_index.selectedIndex].text;
+		document.ccurriculum.major_name.value = document.ccurriculum.major_index[document.ccurriculum.major_index.selectedIndex].text;
+		document.ccurriculum.action="courses_curriculum_m_d_print.jsp";
+	}
+}
+
+</script>
+<body bgcolor="#9FBFD0">
+<%@ page language="java" import="utility.*,CurriculumMaintenance,SubjectSection,java.util.Vector, java.util.Date" %>
+<%
+ 
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	WebInterface WI = new WebInterface(request);
+	String strErrMsg = null;
+	String strTemp = null;
+	Vector vTemp = null;
+	int i = 0; int j=0;
+	float fTotalUnit = 0;
+	
+	String strCourseIndex 	= request.getParameter("course_index");
+	String strCourseName 	= request.getParameter("course_name");
+	String strMajorIndex 	= request.getParameter("major_index");
+	String strCYFrom 		= request.getParameter("cy_from");
+	String strCYTo = null; // this is used in 
+	
+//add security here.
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_veiwall.jsp","While Opening DB Con");
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+
+
+//end of security code. 
+strErrMsg = null; //if there is any message set -- show at the bottom of the page.
+SubjectSection SS = new SubjectSection();
+CurriculumMaintenance CM = new CurriculumMaintenance();
+Vector[] vCurDetail = CM.getMasteralCurDetail(dbOP, strCourseIndex, strMajorIndex,strCYFrom, request.getParameter("cy_to"));
+
+if(vCurDetail == null)
+	strErrMsg = CM.getErrMsg();
+
+if(strErrMsg == null) strErrMsg = "";
+	
+%>
+<form action="" method="post" name="ccurriculum">
+  <table width="100%" border="0" bgcolor="#FFFFFF" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#47768F"> 
+      <td height="25" colspan="4" ><div align="center"><font color="#FFFFFF"><strong>:::: 
+          COURSES CURRICULUM MAINTENANCE - MASTERS &amp; DOCTORAL DEGREE ::::</strong></font></div></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5" bgcolor="#BECED3">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td colspan="2"><%=strErrMsg%></td>
+      <td width="32%">&nbsp;</td>
+    </tr>
+</table>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+	<tr> 
+      <td height="25" width="2%">&nbsp;</td>
+	  <td width="31%">Course</td>
+	  <td width="22%">Major</td>
+	  <td width="27%">Curriculum Year</td>
+	  <td width="18%">&nbsp;</td>
+    </tr>
+	
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="31%" valign="middle">
+<select name="course_index" onChange="ReloadCourseIndex();">
+          <option value="0">Select Any</option>
+<%
+strTemp = " from course_offered where IS_DEL=0 AND IS_VALID=1 and c_index not in (select c_index from college "+
+			"where is_del=0 and c_name='College Of Medicine') and cc_index in (select cc_index from cclassification "+
+			"where is_del=0 and degree_type=1) order by course_name asc";
+%>
+<%=dbOP.loadCombo("course_index","course_name",strTemp, strCourseIndex, false)%> 
+        </select>
+        </td>
+      <td width="22%" valign="middle">
+<select name="major_index" onChange="ReloadPage();">
+		<option value="0"></option>
+		
+<%
+if(strCourseIndex != null && strCourseIndex.compareTo("0") != 0)
+{
+strTemp = " from major where is_del=0 and course_index="+strCourseIndex+" order by major_name asc" ; 
+%>
+<%=dbOP.loadCombo("major_index","major_name",strTemp, strMajorIndex, false)%>         
+<%}%>
+
+   </select>
+		
+      </td>
+      <td width="27%" valign="middle"> 
+        <select name="cy_from" onChange="ReloadPage();">
+          <%
+//get here school year
+vTemp = SS.getSchYearDOCMed( dbOP, request,"CCULUM_MASTERS");
+dbOP.cleanUP();
+strTemp = WI.fillTextValue("cy_from");
+
+for(i = 0, j=0 ; i< vTemp.size();)
+{
+	if(	((String)vTemp.elementAt(i)).compareTo(strTemp) == 0)
+	{%>
+          <option value="<%=(String)vTemp.elementAt(i)%>" selected><%=(String)vTemp.elementAt(i)%></option>
+          <%	j = i;
+	}
+	else{
+	%>
+          <option value="<%=(String)vTemp.elementAt(i)%>"><%=(String)vTemp.elementAt(i)%></option>
+          <%	}
+	i = i+2;
+
+}
+if(vTemp.size() > 0)
+	strCYTo = (String)vTemp.elementAt(j+1);
+else
+	strCYTo = "";
+
+%>
+        </select> <font size="2" face="Verdana, Arial, Helvetica, sans-serif">to 
+        <b><%=strCYTo%></b></font> 
+        <input type="hidden" name="cy_to" value="<%=strCYTo%>">
+		 </td>
+      <td width="18%" valign="middle"><input type="image" src="../../../../images/view.gif" name="Submit2" onClick="ViewInfo();"></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5"><hr></td>
+    </tr>
+</table>
+
+<%
+if(vCurDetail != null && vCurDetail[0].size() > 0){%>
+
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="3%" height="25">&nbsp;</td>
+      <td width="34%" bgcolor="#FFFFFF">&nbsp;</td>
+      <td colspan="3" align="right"><input name="image" type="image" src="../../../../images/print.gif" onClick="PrintPage();"> 
+        <font size="1">click to print curriculum</font></td>
+    </tr>
+   <tr> 
+      <td width="3%" height="25">&nbsp;</td>
+      <td width="34%" bgcolor="#FFFFFF"><strong>Course Requirement</strong></td>
+      <td width="39%" >&nbsp;</td>
+      <td ><div align="center"></div></td>
+      <td >&nbsp;</td>
+    </tr>
+<%
+for(i=0; i< vCurDetail[0].size(); ++i)
+{
+	fTotalUnit += Float.parseFloat((String)vCurDetail[0].elementAt(i+1));
+%> <tr>
+     <td height="25" >&nbsp;</td>
+      <td ><%=(String)vCurDetail[0].elementAt(i++)%></td>
+      <td >.................................................................</td>
+      <td ><div align="center"><%=(String)vCurDetail[0].elementAt(i)%> units</div></td>
+      <td >&nbsp;</td>
+    </tr>
+<%}%>
+    
+    <tr> 
+      <td height="25" >&nbsp;</td>
+      <td >&nbsp;</td>
+      <td >&nbsp;</td>
+      <td width="10%" valign="top" align="center" ><hr><%=fTotalUnit%></td>
+      <td width="14%" >&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" height="100" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25" colspan="5"><hr></td>
+    </tr>
+<%
+//System.out.println(vCurDetail[0]);
+//System.out.println(vCurDetail[1]);
+String strTemp2 = null;
+for(i=0, j=0; i< vCurDetail[0].size(); ++i) //arrange according to requirement
+{
+	strTemp = (String)vCurDetail[0].elementAt(i++);
+	
+%>
+<tr> 
+      <td width="3%" height="25">&nbsp;</td>
+      <td colspan="4"><strong><%=strTemp%></strong></td>
+    </tr>
+<%	for(;j<vCurDetail[1].size();++j){
+	strTemp2 = (String)vCurDetail[1].elementAt(j);
+	if(strTemp.compareTo(strTemp2) != 0) break;
+	%>	
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td width="9%">&nbsp;</td>
+      <td width="23%"><%=(String)vCurDetail[1].elementAt(++j)%></td>
+      <td width="47%"><%=(String)vCurDetail[1].elementAt(++j)%></td>
+      <td width="18%"><%=(String)vCurDetail[1].elementAt(++j)%></td>
+    </tr>
+<%}
+//}//if compare is matching.
+}//outer loop%>
+
+  </table>
+<%}//if vCurDetail ! = null
+%>
+  <table width="100%" bgcolor="#FFFFFF" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+   
+    <tr> 
+      <td colspan="2"><div align="center"> </div></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2" bgcolor="#47768F">&nbsp; </td>
+    </tr>
+  </table>
+
+<input type="hidden" name="course_name" value="">
+<input type="hidden" name="ci" value="">
+<input type="hidden" name="mi" value="">
+<input type="hidden" name="major_name" value="">
+
+
+
+<input type="hidden" name="view_info" value="0">
+<input type="hidden" name="printpage" value="0">
+</form>
+
+</body>
+</html>

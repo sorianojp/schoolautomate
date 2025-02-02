@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/lms_redesigned/css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D0E19D">
+<form>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#77A251"> 
+      <td height="25" colspan="4"><div align="center"><font color="#FFFFFF" ><strong>:::: 
+          CIRCULATION : RETURN PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr> 
+      <td height="18" colspan="4">&nbsp;</td>
+    </tr>
+	</table>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="20%" height="25"><font size="1">Accession / Barcode No. </font></td>
+      <td width="21%"><input name="textfield22" type="text" size="20" maxlength="32"></td>
+      <td width="15%"><img src="file:///D|/ApacheTomcat4.1.31/webapps/lms_redesigned/images/search_book_circulation.gif" ></td>
+      <td width="44%"><img src="file:///D|/ApacheTomcat4.1.31/webapps/lms_redesigned/images/form_proceed.gif"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="15" colspan="2"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td width="43%" height="25"><font size="1">Title : <strong>$title</strong></font></td>
+      <td width="57%"><font size="1">Due Date :</font></td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">Author :<strong> $author</strong></font></td>
+      <td><font size="1">Fine :</font></td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">Material Type :</font></td>
+      <td><font size="1">Book Status : 
+        <select name="select">
+          <option>OK</option>
+          <option>LOST</option>
+          <option>DAMAGED</option>
+        </select>
+        <input name="textfield3" type="text" size="16">
+        </font></td>
+    </tr>
+    <tr>
+      <td height="25"><font size="1">Edition :</font></td>
+      <td><font size="1">Action : 
+        <select name="select2">
+          <option>Pay price of collection</option>
+          <option>Pay specified amount</option>
+        </select>
+        <input name="textfield" type="text" size="10" maxlength="10">
+        </font></td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">Call No. :</font></td>
+      <td>&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td height="25"><div align="center"><img src="file:///D|/ApacheTomcat4.1.31/webapps/lms_redesigned/images/save_circulation.gif" width="51" height="29"><font size="1">click 
+          to Return </font></div></td>
+      <td><img src="file:///D|/ApacheTomcat4.1.31/webapps/lms_redesigned/images/print_circulation.gif" ><font size="1">click 
+        to print Return Slip</font></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="13%" height="25"><font size="1">Patron Name :</font></td>
+      <td width="59%"><font size="1"><strong>&lt;Lastname, Firstname MI. &gt;</strong></font></td>
+      <td width="28%" rowspan="7" valign="top"><img src="file:///D|/ApacheTomcat4.1.31/webapps/lms_redesigned/images/sample_emp.jpg" width="140" height="160"></td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">Patron Type :</font></td>
+      <td><font size="1"><strong>$patron_type</strong></font></td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">Course/Major :</font></td>
+      <td><font size="1"><strong>$course / $major</strong></font></td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">Year Level :</font></td>
+      <td><font size="1"><strong>$year_level</strong></font></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2"><font size="1">Contact Address :&nbsp;<strong> 
+        $address</strong></font></td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">Contact Nos. :</font></td>
+      <td><font size="1"><strong>$contact_nos</strong></font></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2"><font size="1"><img src="file:///D|/ApacheTomcat4.1.31/webapps/lms_redesigned/images/schedule_circulation.gif" > 
+        click to see Class Schedule&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="file:///D|/ApacheTomcat4.1.31/webapps/lms_redesigned/images/view_circulation.gif" > 
+        click to see complete Patron Information</font></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="3"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="1" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="20" colspan="7" bgcolor="#9FC081"><div align="center"><font size="1"><strong>ISSUE 
+          DETAILS</strong></font></div></td>
+    </tr>
+    <tr> 
+      <td width="10%" height="27"><div align="center"><strong><font size="1">ACCESSION 
+          / BARCODE NO.</font></strong></div></td>
+      <td width="27%"><div align="center"><strong><font size="1">TITLE</font></strong></div></td>
+      <td width="20%"><div align="center"><strong><font size="1">AUTHOR</font></strong></div></td>
+      <td width="10%"><div align="center"><strong><font size="1">CALL NO.</font></strong></div></td>
+      <td width="13%"><div align="center"><strong><font size="1">DUE DATE</font></strong></div></td>
+      <td width="8%"><div align="center"><strong><font size="1">STATUS</font></strong></div></td>
+      <td width="12%"><div align="center"><strong><font size="1">FINE</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td> <div align="center">&nbsp;</div></td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  </form>
+</body>
+</html>

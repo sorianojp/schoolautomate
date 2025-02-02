@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<style type="text/css">
+<!--
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+
+td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+
+th {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+
+-->
+</style>
+<body >
+<%@ page language="java" import="utility.*,enrollment.ReportEnrollment,java.util.Vector" %>
+<%
+
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	WebInterface WI = new WebInterface(request);
+
+	String strErrMsg = null;
+	String strTemp = null;
+	String strDegType = null;//0-> uG,1->doctoral,2->college of medicine.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Enrollment-REPORT-student load print","student_sched_print.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_veiwall.jsp","While Opening DB Con");
+
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+Vector vRetResult = null;
+Vector vStudDetail= null;
+
+ReportEnrollment reportEnrl= new ReportEnrollment();
+vRetResult = reportEnrl.getStudentLoad(dbOP, request.getParameter("stud_id"),request.getParameter("sy_from"),
+						request.getParameter("sy_to"),request.getParameter("offering_sem"));
+if(vRetResult == null)
+	strErrMsg = reportEnrl.getErrMsg();
+else
+	vStudDetail = (Vector)vRetResult.elementAt(0);
+
+//dbOP.cleanUP();
+
+String[] astrConvertSem = {"Summer","1st Semester","2nd Semester","3rd Semester","4th Semester","5th Semester"};
+
+if(strErrMsg != null){dbOP.cleanUP();
+%>
+<table width="100%" border="0">
+    <tr>
+      <td width="100%"><div align="center"><%=strErrMsg%></div></td>
+    </tr>
+</table>
+<%}else{%>
+
+  <table width="100%" border="0">
+    <tr>
+      <td width="100%"><div align="center"><%=SchoolInformation.getSchoolName(dbOP,true,false)%> <br>
+          <%=SchoolInformation.getAddressLine1(dbOP,false,true)%></div></td>
+    </tr>
+    <tr>
+      <td height="30"><div align="center"><strong>
+        <br>
+        STUDENT SCHEDULE<br>
+        </strong><%=astrConvertSem[Integer.parseInt(request.getParameter("offering_sem"))]%>,
+        SY <%=request.getParameter("sy_from")%> - <%=request.getParameter("sy_to")%></div></td>
+    </tr>
+   </table>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr >
+    <td height="19" colspan="2"><div align="center">
+        <hr size="1">
+      </div></td>
+  </tr>
+  <tr >
+    <td width="42%" height="25">Student ID : <strong><%=request.getParameter("stud_id")%></strong></td>
+    <td width="58%" height="25">Course/Major :<strong> <%=(String)vStudDetail.elementAt(3)%></strong></td>
+  </tr>
+  <tr >
+    <td height="25">Student Name : <strong><%=(String)vStudDetail.elementAt(2)%></strong></td>
+    <td height="25">Year : <strong><%=(String)vStudDetail.elementAt(4)%></strong></td>
+  </tr>
+  <tr >
+    <td height="10"  colspan="2">&nbsp;</td>
+  </tr>
+</table>
+
+<table width="100%" border="1" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="13%" height="34"><div align="center"><strong>SUBJECT
+        CODE </strong></div></td>
+    <td width="23%"><div align="center"><strong>SUBJECT NAME</strong></div></td>
+    <td width="20%"><div align="center"><strong>SCHEDULE</strong></div></td>
+    <td width="13%"><div align="center"><strong>SECTION &amp; ROOM
+        #</strong></div></td>
+    <td width="13%"><div align="center"><strong>INSTRUCTOR</strong></div></td>
+    <td width="6%"><div align="center"><strong>LEC. UNITS </strong></div></td>
+    <td width="6%"><div align="center"><strong>LAB. UNITS</strong></div></td>
+    <td width="6%"><div align="center"><strong>TOTAL UNITS </strong></div></td>
+  </tr>
+ <%
+ int iTotalLoad = 0;//System.out.println(vRetResult);
+ for(int i=1; i< vRetResult.size(); ++i){
+ iTotalLoad += Integer.parseInt((String)vRetResult.elementAt(i+9));
+ %>
+  <tr>
+    <td height="25"><%=(String)vRetResult.elementAt(i)%></td>
+    <td><%=(String)vRetResult.elementAt(i+1)%></td>
+    <td><%=(String)vRetResult.elementAt(i+2)%></td>
+    <td><%=(String)vRetResult.elementAt(i+3)%>/<%=(String)vRetResult.elementAt(i+4)%>(<%=(String)vRetResult.elementAt(i+5)%>)</td>
+    <td><%=(String)vRetResult.elementAt(i+6)%></td>
+    <td align="center"><%=(String)vRetResult.elementAt(i+7)%></td>
+    <td align="center"><%=(String)vRetResult.elementAt(i+8)%></td>
+    <td align="center"><%=(String)vRetResult.elementAt(i+9)%></td>
+  </tr>
+<% i = i+9;
+}%>
+  <tr>
+    <td colspan="8" height="25"><div align="center">TOTAL LOAD UNITS : <%=iTotalLoad%></div></td>
+  </tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="3%" height="18">&nbsp;</td>
+    <td width="73%" valign="top">&nbsp;</td>
+    <td width="24%" valign="top">&nbsp;</td>
+  </tr>
+</table>
+<script language="JavaScript">
+window.print();
+window.setInterval("javascript:window.close();",0);
+</script>
+<%} // only if there is no error
+%>
+
+
+
+</body>
+</html>

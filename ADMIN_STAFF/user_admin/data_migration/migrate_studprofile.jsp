@@ -1,0 +1,240 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript" src="../../../jscript/common.js"></script>
+<script language="JavaScript">
+function Migrate() {
+	document.form_.migrate_.value = "1";
+	document.form_.hide_move.src = "../../../images/blank.gif";
+	document.form_.show_data.value = "";
+	this.SubmitOnce('form_');
+}
+function ShowData() {
+	document.form_.migrate_.value = "";
+	document.form_.show_data.value = "1";
+	this.SubmitOnce('form_');
+}
+
+</script>
+<%@ page language="java" import="utility.*,java.util.Vector" %>
+<%
+	DataMigrate dm = null;
+	String strErrMsg = null;
+	String strTemp = null;
+	WebInterface WI = new WebInterface(request);
+
+//add security here.
+	try
+	{
+		if (WI.fillTextValue("user_name").length() > 0 && WI.fillTextValue("table_name").length() > 0){
+			dm = new DataMigrate(request);
+		}
+		else {
+			strErrMsg = "Please enter all database information.";
+		}
+	}
+	catch(Exception exp)
+	{	if(dm != null)
+			dm.cleanUP();
+		dm = null;
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		//dm.cleanUP();
+		return;
+	}
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = 2;
+if(dm != null) {
+	iAccessLevel = comUtil.isUserAuthorizedForURL(dm.dbOPLiveDB,(String)request.getSession(false).getAttribute("userId"),
+														"System Administration","Data Migrate",request.getRemoteAddr(),
+														"migrate_studprofile.jsp");
+	//iAccessLevel = 2;
+	if(iAccessLevel == -1)//for fatal error.
+	{
+		dm.dbOPLiveDB.cleanUP();
+		request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+		request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+		response.sendRedirect("../../../commfile/fatal_error.jsp");
+		return;
+	}
+	else if(iAccessLevel == 0)
+	{
+		dm.dbOPLiveDB.cleanUP();
+		response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+		return;
+	}
+	
+	if(WI.fillTextValue("migrate_").compareTo("1") == 0) {
+		dm.migrateStudBasicInfo();
+		strErrMsg = dm.getErrMsg();
+	}
+
+}
+%>
+
+
+<body>
+<form name="form_" action="./migrate_studprofile.jsp" method="post">
+<%if(strErrMsg!= null){%><font size="3" color="#FF0000"><%=WI.getStrValue(strErrMsg)%></font><br><br><br><%}%>
+  <p><font size="3">NOTE : <br>
+    1. Create all courses and majors offered or used by the students to be migrated.<br>
+    2. All informations left in database after migration are not migrated due 
+    to error. Error messages will be included in migration status message.<br></font> 
+    <br>
+    <br>
+ <%
+ strTemp = WI.fillTextValue("donot_save");
+ if(strTemp.compareTo("1") == 0)
+ 	strTemp = " checked";
+ else
+ 	strTemp = "";
+%>
+   <input type="checkbox" name="donot_save" value="1" <%=strTemp%>> Check if migration is possible (To save/migrate uncheck this option)
+<br>
+   <input type="checkbox" name="same_db" value="selected" <%=WI.fillTextValue("same_db")%>> Raw data is in main Database
+  </p><br>
+    </font> SB_DataMigrate Database Information : <br>
+    Name of Table 
+    <input type="text" name="table_name" value="<%=WI.fillTextValue("table_name")%>" size="7" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+    ; User name 
+    <input type="text" name="user_name" value="<%=WI.fillTextValue("user_name")%>" size="7" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+    ; Password 
+    <input type="password" name="password" value="<%=WI.fillTextValue("password")%>" size="12" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+  </p>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" class="thinborder">
+    <tr bgcolor="#FFFFAF"> 
+      <td height="25" class="thinborder"><div align="center"><strong>FIELD NAME 
+          OF SB_DATAMIGRATE TO MIGRATE</strong></div></td>
+      <td class="thinborder"><strong>DATA TO MIGRATE</strong></td>
+    </tr>
+    <tr> 
+      <td width="37%" height="25" class="thinborder"> <div align="center"> 
+          <input type="text" name="stud_id" value="<%=WI.fillTextValue("stud_id")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td width="63%" class="thinborder">STUD ID</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="fname" value="<%=WI.fillTextValue("fname")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td class="thinborder">FIRST NAME</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="mname" value="<%=WI.fillTextValue("mname")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+        </div></td>
+      <td class="thinborder">MIDDLE NAME</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="lname" value="<%=WI.fillTextValue("lname")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td class="thinborder">LAST NAME</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="gender" value="<%=WI.fillTextValue("gender")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td class="thinborder">GENDER (INDICATE WHAT MALE STANDS FOR) 
+        <select name="gender_map" style="font-size:10px;font-weight:bold">
+          <option value="M">M</option>
+          <option value="Male">Male</option>
+          <option value="0">0</option>
+          <option value="1">1</option>
+        </select> </td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="course" value="<%=WI.fillTextValue("course")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td class="thinborder">COURSE (NAME OF COURSE)</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="major" value="<%=WI.fillTextValue("major")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td class="thinborder">MAJOR (NAME OF MAJOR)</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="sy_from" value="<%=WI.fillTextValue("sy_from")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td class="thinborder">SCHOOL YEAR FROM</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="sy_to" value="<%=WI.fillTextValue("sy_to")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td class="thinborder">SCHOOL YEAR TO</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="semester" value="<%=WI.fillTextValue("semester")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td class="thinborder">SEMESTER</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="year_level" value="<%=WI.fillTextValue("year_level")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td class="thinborder">YEAR LEVEL</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="stud_stat" value="<%=WI.fillTextValue("stud_stat")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td class="thinborder">STUDENT STATUS (NEW, TRANSFEREE, ETC)</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="cy_from" value="<%=WI.fillTextValue("cy_from")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td class="thinborder">CURRICULUM YEAR FROM</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder"><div align="center"> 
+          <input type="text" name="cy_to" value="<%=WI.fillTextValue("cy_to")%>" size="32" class="textbox" style="font-size:14px"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+          <font size="3"><font color="#FF0000"><strong>*</strong></font></font></div></td>
+      <td class="thinborder">CURRICULUM YEAR TO</td>
+    </tr>
+  </table>
+<p>
+<div align="center"><a href="#"><img src="../../../images/online_help.gif" border="0"></a><font size="1"> 
+  Click to view datas not yet migrated&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font> 
+  <a href="javascript:Migrate()"><img src="../../../images/move.gif" border="0" name="hide_move"></a><font size="1">Click 
+  to move/migrate information</font></div>
+</p>
+<input type="hidden" name="migrate_">
+<input type="hidden" name="show_data">
+</form>
+</body>
+</html>
+<%
+if(dm != null) 
+	dm.cleanUP();
+%>

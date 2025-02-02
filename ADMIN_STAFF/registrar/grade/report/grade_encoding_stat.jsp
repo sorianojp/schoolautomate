@@ -1,0 +1,666 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript" src="../../../../jscript/common.js"></script>
+<script language="javascript" src="../../../../Ajax/ajax.js"></script>
+<script language="JavaScript">
+
+//all about ajax - to display student list with same name.
+function AjaxMapName() {
+		var strCompleteName = document.form_.emp_id.value;
+		var objCOAInput = document.getElementById("coa_info");
+		
+		if(strCompleteName.length <=2) {
+			objCOAInput.innerHTML = "";
+			return ;
+		}
+
+		this.InitXmlHttpObject(objCOAInput, 2);//I want to get innerHTML in this.retObj
+  		if(this.xmlHttp == null) {
+			alert("Failed to init xmlHttp.");
+			return;
+		}
+		var strURL = "../../../../Ajax/AjaxInterface.jsp?methodRef=2&search_id=1&is_faculty=1&name_format=4&complete_name="+
+			escape(strCompleteName);
+
+		this.processRequest(strURL);
+}
+function UpdateID(strID, strUserIndex) {
+	document.form_.emp_id.value = strID;
+	document.getElementById("coa_info").innerHTML = "<font size='1' color=blue>...end of processing..</font>";
+	this.viewInfo();
+}
+function UpdateName(strFName, strMName, strLName) {
+	//do nothing.
+}
+function UpdateNameFormat(strName) {
+	//do nothing.
+}
+
+function ReloadPage(){
+	document.form_.showall.value = "";
+	document.form_.print_page.value = "";
+	document.form_.submit();
+}
+
+function showValues(){
+	document.form_.showall.value = "1";
+	document.form_.print_page.value = "";
+	document.form_.grade_name.value = document.form_.grade_for[document.form_.grade_for.selectedIndex].text;
+	document.form_.submit();
+}
+
+function PrintPg(){
+//	document.form_.print_page.value = "1";
+//	document.form_.submit();
+	document.bgColor = "#FFFFFF";
+	//return; 	
+    document.getElementById('myADTable1').deleteRow(0);
+
+    document.getElementById('myADTable2').deleteRow(0);
+    document.getElementById('myADTable2').deleteRow(0);
+    document.getElementById('myADTable2').deleteRow(0);
+
+    document.getElementById('myADTable3').deleteRow(0);
+    document.getElementById('myADTable3').deleteRow(0);
+    document.getElementById('myADTable3').deleteRow(0);
+    document.getElementById('myADTable3').deleteRow(0);
+    document.getElementById('myADTable3').deleteRow(0);
+    document.getElementById('myADTable3').deleteRow(0);
+
+    document.getElementById('myADTable4').deleteRow(0);
+
+    document.getElementById('myADTable5').deleteRow(0);
+    document.getElementById('myADTable5').deleteRow(0);
+	alert("Click OK to print this page");
+	window.print();
+	
+}
+
+function UpdateCollege(){
+	if (document.form_.view_reserved.checked){
+		document.form_.c_index.selectedIndex = 0;
+		document.form_.course_index.selectedIndex = 0;
+		document.form_.major_index.selectedIndex = 0;
+		document.form_.course_index[0].text = "All";
+	}
+}
+function PrintClassList(strSubSecIndex, strSubIndex, strSubCode, strSubDesc, strSection) {
+	if(strSubSecIndex.length == 0 || strSubSecIndex == 'null') {
+		alert("subject section information missing.");
+		return;
+	}
+	if(strSubIndex.length == 0 || strSubIndex == 'null') {
+		alert("subject information missing.");
+		return;
+	}
+	var pgLoc = "../../../enrollment/reports/class_lists_print.jsp?subject="+strSubIndex+
+		"&section="+strSubSecIndex+"&sy_from="+document.form_.sy_from.value+
+		"&sy_to="+document.form_.sy_to.value+
+		"&offering_sem="+document.form_.semester[document.form_.semester.selectedIndex].value+
+		"&grade_relation=1&subject_name="+escape(strSubCode)+
+		"&section_name="+escape(strSection)+
+		"&subject_desc="+escape(strSubDesc);//grade_relation = 1 without grade.
+	var win=window.open(pgLoc,"PrintWindow",'width=800,height=600,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+	
+}
+function viewGradeFinalSheet(strSection, strSubject, strEmpID) {
+	var pgLoc = "../grade_sheet_final_report.jsp?encoding_stat=1&section_name="+escape(strSection)+
+	"&subject="+strSubject+"&sy_from="+document.form_.sy_from.value+
+	"&sy_to="+document.form_.sy_to.value+
+	"&offering_sem="+document.form_.semester[document.form_.semester.selectedIndex].value+
+	"&emp_id="+strEmpID;
+	var win=window.open(pgLoc,"PrintWindow",'width=900,height=600,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,enrollment.ReportRegistrarExtn,java.util.Vector" %>
+<%
+	DBOperation dbOP = null;
+	String strErrMsg = "";
+	String strTemp = null;
+	WebInterface WI = new WebInterface(request);
+
+//add security here.
+
+	if (WI.fillTextValue("print_page").compareTo("1") == 0){ %>
+	<jsp:forward page="grade_encoding_stat.jsp" />
+<%	}
+
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Registrar management - Grade encoding stat","grade_encoding_stat.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Registrar Management","Reports",request.getRemoteAddr(),
+														null);
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+
+//end of authenticaion code.
+
+ReportRegistrarExtn rRE = new ReportRegistrarExtn();
+Vector vRetResult       = null;
+
+boolean bolEncodedDate  = false;
+String strEncodeDate    = null;
+Vector vEncodeDate      = new Vector();
+int iIndexOf = 0;
+
+Vector vSubIndexList = new Vector();
+
+java.sql.ResultSet rs = null;
+if (WI.fillTextValue("showall").length() > 0){
+	vRetResult = rRE.viewFacultyGradeEncodeStatus(dbOP,request);	
+	if(vRetResult == null){
+		strErrMsg = rRE.getErrMsg();
+	}else{
+	
+		String strSQLQuery = "select sub_sec_index, sub_index from e_sub_section where is_valid = 1 and is_lec = 0 and IS_CHILD_OFFERING = 0 and offering_sy_from = "+
+						WI.fillTextValue("sy_from")+" and offering_sem = "+WI.fillTextValue("semester");
+		rs = dbOP.executeQuery(strSQLQuery);
+		while(rs.next()){
+			vSubIndexList.addElement(rs.getString(1));
+			vSubIndexList.addElement(new Integer(rs.getInt(2)));
+		}
+		rs.close();
+	
+	  String strTableName= null;
+	  if(WI.fillTextValue("show_date_saved").length() > 0){
+	     bolEncodedDate = true ;
+		 
+		 strTemp = "select exam_name from FA_PMT_SCHEDULE where pmt_sch_index="+WI.fillTextValue("grade_for");
+		 strTemp = WI.getStrValue(dbOP.getResultOfAQuery(strTemp,0));
+		 
+		 
+		if (strTemp.toLowerCase().startsWith("final")) {
+            strTableName = " g_sheet_final ";
+			strTemp = "";
+        } else {
+            strTableName = " grade_sheet ";
+			strTemp = " and pmt_sch_index = "+WI.fillTextValue("grade_for");
+        }
+		
+		strTemp = "select sub_sec_index, max(create_date) from "+strTableName
+ 				+ " join  STUD_CURRICULUM_HIST on (STUD_CURRICULUM_HIST.CUR_HIST_INDEX = "+strTableName+".CUR_HIST_INDEX)"
+				+ " where "+strTableName+".IS_VALID= 1 and SEMESTER =" + WI.fillTextValue("semester")
+				+ " and SY_FROM = "+ WI.fillTextValue("sy_from")+strTemp+" and sub_sec_index is not null group by sub_sec_index";
+		rs = dbOP.executeQuery(strTemp);
+		while(rs.next()){
+		    vEncodeDate.addElement(rs.getString(1));//sub_sec_index
+			vEncodeDate.addElement(ConversionTable.convertMMDDYYYY(rs.getDate(2))); // create_date 
+		}rs.close();	
+	  }
+	}
+}
+
+String strSchCode = (String)request.getSession(false).getAttribute("school_code");
+if(strSchCode == null)
+	strSchCode = "";
+boolean bolIsCGH = strSchCode.startsWith("CGH");
+boolean bolIsCIT = strSchCode.startsWith("CIT");
+
+Vector vEncodingSummary = null;
+if(bolIsCIT && WI.fillTextValue("showall").length() > 0)
+	vEncodingSummary = rRE.getVerifySummaryCIT(dbOP, request);
+	
+boolean bolIsBasic = WI.fillTextValue("is_basic").equals("1");
+%>
+
+<form action="./grade_encoding_stat.jsp" method="post" name="form_" id="form_">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" id="myADTable1">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="6"><div align="center"><font color="#FFFFFF"><strong>:::: 
+          GRADE SHEETS ENCODING STATUS PAGE :::::</strong></font></div></td>
+    </tr>
+  </table>
+
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF" id="myADTable2">
+    <tr> 
+      <td height="25" colspan="5">&nbsp;&nbsp;&nbsp;<strong><font size="3" color="#FF0000">
+        <%=WI.getStrValue(strErrMsg,"MESSAGE: ","","")%></font></strong></td>
+    </tr>
+    <tr> 
+      <td width="2%" height="25" rowspan="4" >&nbsp;</td>
+      <td width="25%" height="25" valign="bottom" >Grades status for</td>
+      <td width="22%" valign="bottom" >Term</td>
+      <td width="27%" valign="bottom" >School Year</td>
+      <td >&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom" > 
+	  <select name="grade_for" onChange="ReloadPage()">
+<%if(bolIsBasic){%>
+		  <%=dbOP.loadCombo("PMT_SCH_INDEX","bsc_grading_name"," from FA_PMT_SCHEDULE where is_del=0 and is_valid = 2 and bsc_grading_name is not null order by EXAM_PERIOD_ORDER asc", request.getParameter("grade_for"), false)%> 
+<%}else{%>
+		  <%=dbOP.loadCombo("PMT_SCH_INDEX","EXAM_NAME"," from FA_PMT_SCHEDULE where is_del=0 and (is_valid=1 or is_valid = 0) order by EXAM_PERIOD_ORDER asc", request.getParameter("grade_for"), false)%> 
+<%}%>
+        </select>
+	  <select name="semester" onChange="ReloadPage();">
+        <option value="1">1st Sem</option>
+        <%
+strTemp = WI.fillTextValue("semester");
+if(strTemp.length() ==0)
+	strTemp = (String)request.getSession(false).getAttribute("cur_sem");
+
+if(strTemp.compareTo("2") ==0){%>
+        <option value="2" selected>2nd Sem</option>
+        <%}else{%>
+        <option value="2">2nd Sem</option>
+        <%}if(strTemp.compareTo("3") ==0){%>
+        <option value="3" selected>3rd Sem</option>
+        <%}else{%>
+        <option value="3">3rd Sem</option>
+        <%}if(strTemp.compareTo("0") ==0){%>
+        <option value="0" selected>Summer</option>
+        <%}else{%>
+        <option value="0">Summer</option>
+        <%}%>
+      </select>	  </td>
+      <td valign="bottom" >&nbsp;</td>
+      <td valign="bottom" > <%
+strTemp = WI.fillTextValue("sy_from");
+if(strTemp.length() ==0)
+	strTemp = (String)request.getSession(false).getAttribute("cur_sch_yr_from");
+%> <input name="sy_from" type="text" size="4" maxlength="4" value="<%=strTemp%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"
+	  onKeypress=" if(event.keyCode<48 || event.keyCode > 57) event.returnValue=false;"
+	  onKeyUp='DisplaySYTo("form_","sy_from","sy_to")'>
+        - 
+        <%
+strTemp = WI.fillTextValue("sy_to");
+if(strTemp.length() ==0)
+	strTemp = (String)request.getSession(false).getAttribute("cur_sch_yr_to");
+%> <input name="sy_to" type="text" size="4" maxlength="4" value="<%=strTemp%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"
+	  onKeypress=" if(event.keyCode<48 || event.keyCode > 57) event.returnValue=false;"
+	  readonly="yes"> </td>
+      <td > <a href="javascript:ReloadPage();"><img src="../../../../images/form_proceed.gif" border="0"></a>      </td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0"  bgcolor="#FFFFFF" id="myADTable3">
+<%if(!bolIsBasic){%>
+    <tr> 
+      <td width="2%" height="18">&nbsp;</td>
+      <td><%if(strSchCode.startsWith("UDMC")) {%>Year Level: <%}%></td>
+      <td valign="bottom">
+<%if(strSchCode.startsWith("UDMC")) {%>
+	  <select name="year_level">
+        <option value="">ALL</option>
+        <%
+strTemp = WI.fillTextValue("year_level");
+if(strTemp.compareTo("1") == 0){%>
+        <option value="1" selected>1st</option>
+        <%}else{%>
+        <option value="1">1st</option>
+        <%}if(strTemp.compareTo("2") ==0){%>
+        <option value="2" selected>2nd</option>
+        <%}else{%>
+        <option value="2">2nd</option>
+        <%}if(strTemp.compareTo("3") ==0){%>
+        <option value="3" selected>3rd</option>
+        <%}else{%>
+        <option value="3">3rd</option>
+        <%}if(strTemp.compareTo("4") ==0){%>
+        <option value="4" selected>4th</option>
+        <%}else{%>
+        <option value="4">4th</option>
+        <%}if(strTemp.compareTo("5") ==0){%>
+        <option value="5" selected>5th</option>
+        <%}else{%>
+        <option value="5">5th</option>
+        <%}%>
+      </select>
+<%}%></td>
+    </tr>
+<%}%>
+    <tr> 
+      <td width="2%" height="18">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td valign="bottom">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="2"> <%
+strTemp = WI.getStrValue(WI.fillTextValue("gs_stat"),"0");
+if(strTemp.equals("0"))
+	strErrMsg = " checked";
+else
+	strErrMsg = "";
+%> <input type="radio" name="gs_stat" value="0" <%=strErrMsg%> onClick="ReloadPage()"> Grades not encoded 
+&nbsp; &nbsp; 
+<%
+if(strTemp.equals("1"))
+	strErrMsg = " checked";
+else
+	strErrMsg = "";
+%> <input type="radio" name="gs_stat" value="1" <%=strErrMsg%> onClick="ReloadPage()"> Grades encoded 
+&nbsp; &nbsp; 
+<%if(strTemp.equals("1")){
+if(WI.fillTextValue("show_lacking").equals("1"))
+	strErrMsg = " checked";
+else
+	strErrMsg = "";
+%> <input type="checkbox" name="show_lacking" value="1" <%=strErrMsg%>> Show only encoded but not complete (some students' grade not encoded)
+<%}%>
+
+
+<br> <hr size="1" color="#0000FF"> <% //System.out.println(strTemp);
+//show only if show grade encoded is selected.
+if(strTemp.length() > 0){
+
+		strTemp = WI.fillTextValue("show_nv");
+		if(strTemp.length() > 0)
+			strTemp = " checked";
+		if(bolIsCIT && request.getParameter("show_nv") == null && request.getParameter("show_wv") == null)
+			strTemp = " checked";
+
+		%> <input type="checkbox" name="show_nv" value="1" <%=strTemp%>> Show all grade verified &nbsp; &nbsp; &nbsp; 
+        <%
+		strTemp = WI.fillTextValue("show_wv");
+		if(strTemp.length() > 0)
+			strTemp = " checked";
+		%> <input type="checkbox" name="show_wv" value="1" <%=strTemp%>> Show all grades not verified 
+		<br> <hr size="1" color="#0000FF"> <%}//hide or display 
+
+strTemp = WI.fillTextValue("show_wd");
+if(strTemp.length() > 0)
+	strTemp = " checked";
+%> <input type="checkbox" name="show_wd" value="1" <%=strTemp%>>
+        Include department w/o college </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td width="12%" class="thinborderTOP"><font size="2">College</font></td>
+      <td width="86%" valign="bottom" class="thinborderTOP"> <select name="c_index">
+          <option value="">ALL</option>
+          <%
+strTemp = WI.fillTextValue("c_index");
+if(strTemp.compareTo("0") == 0){%>
+          <option value="0" selected>Do not include College(only department)</option>
+          <%}else{%>
+          <option value="0">Do not include College(only department)</option>
+          <%}%>
+          <% strTemp = WI.fillTextValue("c_index"); %>
+          <%=dbOP.loadCombo("c_index","C_NAME"," from COLLEGE where IS_DEL=0 order by c_name asc", strTemp, false)%> </select> </td>
+    </tr>
+    <tr> 
+      <td height="29">&nbsp;</td>
+      <td>Employee ID</td>
+      <td><input name="emp_id" type="text" size="24" maxlength="32" class="textbox"  onKeyUp="AjaxMapName(1);"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" value="<%=WI.fillTextValue("emp_id")%>">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="javascript:showValues()"><img src="../../../../images/form_proceed.gif"border="0"></a>     
+		 &nbsp;&nbsp;&nbsp;<label id="coa_info" style="position:absolute; width:400px"></label>
+		 </td>
+    </tr>
+    <tr>
+      <td height="29">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>
+	  	<table width="95%" cellpadding="0" cellspacing="0" border="0" class="thinborderALL">
+			<tr>
+				<td bgcolor="#CCCCCC" class="thinborderBOTTOM"><strong>&nbsp;&nbsp;FILTERS</strong></td>
+			</tr>
+			<tr>
+			  <td bgcolor="#CCCCCC" class="thinborderNONE">
+<%
+strTemp = WI.fillTextValue("show_college");
+if(strTemp.length() > 0 || request.getParameter("grade_name") == null) 
+	strTemp = " checked";
+else	
+	strTemp = "";
+%>			<input type="checkbox" value="0" name="show_college"<%=strTemp%>>Show College &nbsp;&nbsp;&nbsp;
+<%
+strTemp = WI.fillTextValue("show_subname");
+if(strTemp.length() > 0 || request.getParameter("grade_name") == null) 
+	strTemp = " checked";
+else	
+	strTemp = "";
+%>			<input type="checkbox" value="0" name="show_subname"<%=strTemp%>>Show Sub. Description&nbsp;&nbsp;&nbsp; 
+<%
+strTemp = WI.fillTextValue("show_onefaculty");
+if(strTemp.length() > 0) 
+	strTemp = " checked";
+else	
+	strTemp = "";
+%>			<input type="checkbox" value="0" name="show_onefaculty"<%=strTemp%>>
+Show one faculty(Multiple faculty loading)			</td>
+		  </tr>
+<%if(WI.fillTextValue("gs_stat").equals("1")){%>
+			<tr>
+			  <td bgcolor="#CCCCCC" class="thinborderNONE">
+			  	<input type="checkbox" name="show_verified_by" value="checked" <%=WI.fillTextValue("show_verified_by")%>> Show Grade Verification Detail
+			  	<%if(strSchCode.startsWith("SPC")) {%>				
+				   <input type="checkbox" name="show_date_saved" value="checked" <%=WI.fillTextValue("show_date_saved")%>> Show Grade Encoded Date 				   
+				<%}%>
+			 </td>
+		  </tr>
+<%}%>
+			<tr>
+			  <td bgcolor="#CCCCCC" class="thinborderNONE">Arrange Result by 
+<%
+strTemp = WI.fillTextValue("order_by");
+if(!strTemp.equals("1"))
+	strTemp = " checked";
+else	
+	strTemp = "";
+%>
+              <input name="order_by" type="radio" value="0"<%=strTemp%>>Faculty Name 
+<%
+if(strTemp.length() == 0) 
+	strTemp = " checked";
+else	
+	strTemp = "";
+%>			  
+		      <input name="order_by" type="radio" value="1"<%=strTemp%>>Subject </td>
+		  </tr>			
+		</table>
+	  
+	  </td>
+    </tr>
+  </table>
+<% int iBasic = 0;
+Vector vBasic = new Vector();
+if (vRetResult != null && vRetResult.size() > 0) { 
+boolean bolShowVerified = false; boolean bolShowCollege = false; boolean bolShowSubDesc = false;
+boolean bolLinkClassList = false;
+boolean bolShowVerifiedByInfo = false;
+
+boolean bolShowIncompleteGradeSheet = false;//some student grade not encoded.. 
+if(WI.fillTextValue("show_lacking").equals("1"))
+	bolShowIncompleteGradeSheet = true;
+	
+	
+
+if(WI.fillTextValue("show_verified_by").length() > 0 && WI.fillTextValue("gs_stat").equals("1"))
+	bolShowVerifiedByInfo = true;
+
+if(WI.fillTextValue("gs_stat").equals("1"))
+	bolShowVerified = true;
+if(WI.fillTextValue("show_college").length() > 0)
+	bolShowCollege  = true;
+if(WI.fillTextValue("show_subname").length() > 0)
+	bolShowSubDesc  = true;
+
+//if status is no grade encoded
+if(WI.fillTextValue("gs_stat").equals("0") && 
+	strSchCode.startsWith("UDMC") && WI.fillTextValue("grade_name").toLowerCase().startsWith("final"))
+	bolLinkClassList = true;
+%>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" id="myADTable4">
+    <tr> 
+      <td width="60%" height="25">&nbsp;</td>
+      <td width="40%"><div align="right"><a href="javascript:PrintPg()"><img src="../../../../images/print.gif" width="58" height="26" border="0"></a><font size="1">click 
+          to print report</font></div></td>
+    </tr>
+  </table> 
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+    <tr bgcolor="#B9B292"> 
+      <td height="26" colspan="10" class="thinborder"><div align="center" class="thinborder"><strong>GRADE 
+          SHEETS ENCODING STATUS REPORT FOR SUBJECT 
+		  <%if(WI.fillTextValue("gs_stat").compareTo("1") == 0){%>WITH
+		  <%}else{%>WITHOUT
+		  <%}%><%=WI.fillTextValue("grade_name").toUpperCase()%></strong></div></td>
+    </tr>
+    <tr> 
+      <td width="10%" class="thinborder"><div align="center"><strong><font size="1">FACULTY ID</font></strong></div></td>
+      <td width="15%" class="thinborder"><div align="center"><font size="1"><strong>FACULTY NAME</strong></font></div></td>
+<%if(bolShowCollege){%>
+      <td width="5%" height="25" class="thinborder"><div align="center"><strong><font size="1">COLLEGE/ DEPT CODE </font></strong></div></td>
+<%}if(bolShowVerifiedByInfo){%>
+      <td width="5%" class="thinborder" style="font-size:9px; font-weight:bold;">DATE VERIFIED </td>
+      <td width="7%" class="thinborder" style="font-size:9px; font-weight:bold;">VERIFIED BY </td>
+<%}else if(bolShowVerified && !bolIsCGH){%>
+      <td width="5%" class="thinborder"><div align="center"><strong><font size="1">VERIFIED</font></strong></div></td>
+	  <%if(bolEncodedDate){%>
+	  <td width="5%" class="thinborder"><div align="center"><strong><font size="1">DATE ENCODED</font></strong></div></td>
+	  <%}%>
+<%}if(!bolShowVerifiedByInfo && !bolIsCGH){%>
+      <td width="7%" class="thinborder"><div align="center"><strong><font size="1"># OF STUD ENROLLED:: # OF STUD WITH GRADE</font></strong></div></td>
+<%}%>
+      <td width="23%" class="thinborder"><div align="center"><strong><font size="1">SUBJECT CODE<%if(bolShowSubDesc){%>(DESCRIPTION)<%}%></font></strong></div></td>
+      <td width="10%" class="thinborder"><div align="center"><strong><font size="1">SECTION</font></strong></div></td>
+<%if(bolIsCIT){%>
+	  <td width="12%" class="thinborder"><div align="center"><strong><font size="1">LOCK DATE</font></strong></div></td>
+<%}%>
+	</tr>
+    <% for (int i = 0; i < vRetResult.size() ; i+=14) {
+		if(bolShowIncompleteGradeSheet) {
+			if(WI.getStrValue(vRetResult.elementAt(i + 11)).equals(WI.getStrValue(vRetResult.elementAt(i + 10),"0")) )
+				continue;
+		}
+		if( WI.getStrValue((String)vRetResult.elementAt(i+7)).startsWith("BE-")) {
+			if(vBasic.indexOf((String)vRetResult.elementAt(i+1)) == -1) {
+				vBasic.addElement((String)vRetResult.elementAt(i+1));
+				++iBasic;
+			}
+			continue;
+			
+		}
+		
+		iIndexOf = vSubIndexList.indexOf((String)vRetResult.elementAt(i+8));
+		if(iIndexOf == -1) 
+			strTemp = "";
+		else	
+			strTemp = ((Integer)vSubIndexList.elementAt(iIndexOf + 1)).toString();
+	%>
+    <tr onDblClick="<%if(strTemp.length() > 0) {%>viewGradeFinalSheet('<%=(String)vRetResult.elementAt(i+7)%>', '<%=strTemp%>', '<%=(String)vRetResult.elementAt(i+1)%>')<%}%>"> 
+      <td height="25" class="thinborder"><font size="1"><%//=i/14%><%=(String)vRetResult.elementAt(i+1)%></font></td>
+      <td class="thinborder"><font size="1"><%=(String)vRetResult.elementAt(i+2)%></font></td>
+<%if(bolShowCollege){%>
+      <td class="thinborder"><font size="1">
+	  <%=WI.getStrValue(vRetResult.elementAt(i+3),"n/a")%>::<%=WI.getStrValue(vRetResult.elementAt(i+4),"n/a")%></font></td>
+<%}if(bolShowVerifiedByInfo){%>
+      <td class="thinborder" align="center"><%=WI.getStrValue(vRetResult.elementAt(i + 10), "&nbsp;")%></td>
+      <td class="thinborder" align="center"><%=WI.getStrValue(vRetResult.elementAt(i + 11), "&nbsp;")%></td>
+<%}else if(bolShowVerified && !bolIsCGH){%>
+      <td class="thinborder" align="center">&nbsp;
+	  <%if(vRetResult.elementAt(i + 13) != null && ((String)vRetResult.elementAt(i + 13)).compareTo("1") == 0) {%>
+	  <img src="../../../../images/tick.gif">
+	  <%}%>	  </td>
+	  <% if(bolEncodedDate){	  		
+	    	iIndexOf = vEncodeDate.indexOf((String)vRetResult.elementAt(i + 8));			
+	   		if(iIndexOf > -1) 
+		   		strTemp = (String)vEncodeDate.elementAt(iIndexOf+1);
+			else		
+	   			strTemp = "&nbsp;";
+	  %>
+	  <td class="thinborder"><%=strTemp%></td>
+	   <%}%>
+<%}if(!bolShowVerifiedByInfo && !bolIsCGH){%>
+      <td class="thinborder">&nbsp;<font size="1">
+	  <%if(bolLinkClassList){%>
+	  <a href="javascript:PrintClassList('<%=vRetResult.elementAt(i + 8)%>','<%=vRetResult.elementAt(i + 13)%>','<%=(String)vRetResult.elementAt(i+5)%>','<%=(String)vRetResult.elementAt(i+6)%>','<%=(String)vRetResult.elementAt(i+7)%>');" title="Print list of student without final grade."><%}%>
+	  <%=WI.getStrValue(vRetResult.elementAt(i + 11))%>::<%=WI.getStrValue(vRetResult.elementAt(i + 10),"0")%><%if(bolLinkClassList){%></a><%}%></font></td>
+<%}%>
+      <td class="thinborder"><font size="1"><%=(String)vRetResult.elementAt(i+5)%><%if(bolShowSubDesc){%>(<%=(String)vRetResult.elementAt(i+6)%>)<%}%></font></td>
+      <td class="thinborder"><font size="1"><%=(String)vRetResult.elementAt(i+7)%>
+	  <%//PUT HERE all sections in comma separated.
+	  if(false)
+	  while(!bolIsCIT && vRetResult.size() > i + 16) {
+	  	if(vRetResult.elementAt(i+2).equals(vRetResult.elementAt(i+2 + 14)) && 
+			vRetResult.elementAt(i + 5).equals(vRetResult.elementAt(i+5 + 14))) {
+				i += 14;%>
+				,<%=vRetResult.elementAt(i+7)%>
+		<%}
+		else
+			break;
+	  
+	  }%>
+	  
+	  </font></td>
+<%if(bolIsCIT){
+strTemp = WI.getStrValue((String)vRetResult.elementAt(i + 13), "&nbsp;");
+if(strTemp.length() < 15)
+	strTemp = "&nbsp;";
+%>
+      <td class="thinborder"><%=strTemp%></td>
+<%}%>
+    </tr>
+    <%}%>
+  </table>
+<%}%>
+<%if(vEncodingSummary != null && vEncodingSummary.size() > 0) {%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr><td> 
+		Faculty  Encoded Grade: <%=(String)vEncodingSummary.elementAt(1)%><br>
+		Faculty Not Encoded Grade: 
+		<%=Integer.parseInt(WI.getStrValue((String)vEncodingSummary.elementAt(2),"0"))%>
+		<br>
+	</td></tr></table>
+<%}%>
+
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0"  bgcolor="#FFFFFF" id="myADTable5">
+    <tr > 
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" >&nbsp;</td>
+    </tr>
+  </table>
+<input type="hidden" name="showall">
+<input type="hidden" name="print_page">
+<input type="hidden" name="grade_name">
+<input type="hidden" name="is_basic" value="<%=WI.fillTextValue("is_basic")%>">
+</form>
+
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

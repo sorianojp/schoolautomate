@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../../../css/tableBorder.css" rel="stylesheet" type="text/css"></head>
+</head>
+<script language="javascript" src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/jscript/date-picker.js"></script>
+<script language="javascript">
+function ShowDetail(strPrintStat) {
+	strTBDate = document.form_.bl_date.value;
+	if(strTBDate.length == 0) {
+		alert("Please enter  cutoff date..");
+		return;
+	}
+	document.form_.print_stat.value = strPrintStat;
+	document.form_.print_pg.value = "1";
+	document.form_.submit();
+}
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.WebInterface" %>
+<form name="form_" method="post" action="/ADMIN_STAFF/accounting/reports/financial_statements/balance_sheet/bl_1st_page.jsp">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td width="100%" height="25" bgcolor="#A49A6A" align="center"><font color="#FFFFFF">
+	  <strong>:::: ACCOUNTS PAYABLE - UPDATE PAYEE RECORD PAGE ::::</strong></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25"><font size="1">&nbsp;</font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+
+    <tr>
+      <td width="4%" height="25">&nbsp;</td>
+      <td width="16%"  height="25">Payee Type :        </td>
+      <td width="80%"><select name="select2">
+        <option>Employee/Staff</option>
+        <option>Physician</option>
+        <option>Student (For SB only)</option>
+        <option>Others</option>
+      </select>
+Specify if Others:
+<input type="text" name="textfield2"></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td  height="25">Payee Name :      </td>
+      <td  height="25"><input name="textfield" type="text" size="64" maxlength="64"></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td  height="25">TIN # :      </td>
+      <td  height="25"><input name="textfield4" type="text" size="16" maxlength="16">
+        <font size="1">(encode the TIN# if no record in the database; display if there is a record already) </font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td  height="25">GL A/P  Code :      </td>
+      <td  height="25"><input name="textfield3" type="text" size="32" maxlength="32"> 
+        <font size="1">(this does not refer to individual GL code, this refers to the A/P group)</font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td  height="25">Applicable Tax :</td>
+      <td  height="25"><select name="select3">
+        <option>N/A</option>
+        <option>VAT</option>
+        <option>EWT</option>
+            </select>
+        <select name="select5">
+          <option>show subgrouping of selected tax</option>
+        </select></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td  height="25">GL A/P  Tax Code :</td>
+      <td  height="25"><input name="textfield32" type="text" size="32" maxlength="32"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="20%" height="25">&nbsp;</td>
+      <td width="80%" height="25" style="font-size:10px;">
+<img src="../../../../../images/save.gif" border="0">click to SAVE update </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25"><span style="font-size:10px;"><a href="show_all_request.htm" target="_self"></a></span></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" colspan="2" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+  <input type="hidden" name="print_pg">
+  <input type="hidden" name="print_stat">
+</form>
+</body>
+</html>

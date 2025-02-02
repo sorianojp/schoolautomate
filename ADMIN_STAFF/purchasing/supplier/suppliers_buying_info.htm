@@ -1,0 +1,327 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="3" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>:::: 
+          PURCHASING - SUPPLIERS : BUYING INFORMATION PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr valign="top" bgcolor="#FFFFFF"> 
+      <td height="36" colspan="3"><font size="1"><a href="supplier_main.htm" target="_self"><img src="../../../images/go_back.gif" border="0"></a></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td>Type 
+        <select name="select" onChange="ReloadPage();">
+          <option>Individual</option>
+          <option>Company</option>
+        </select></td>
+      <td width="73%">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="15" colspan="3"><hr size="1"></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2">Supplier Name : 
+        <select name="select2">
+        </select> </td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2">Supplier Code : <strong>$sup_code</strong></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="15" colspan="3"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#FFFFFF"> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td height="25" colspan="2"><strong><u>ACCOUNT</u></strong></td>
+      <td width="79%" height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td width="3%" height="25">&nbsp;</td>
+      <td width="16%">Credit limit<strong></strong></td>
+      <td height="25" colspan="2"><input name="textfield3" type="text" size="16" maxlength="128"></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">Available Credit<strong></strong></td>
+      <td height="25" colspan="2"><input name="textfield4" type="text" size="68" maxlength="128"></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">Overdue </td>
+      <td height="25" colspan="2"><input name="textfield4" type="text" size="68" maxlength="128"></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">Expense Account</td>
+      <td height="25" colspan="2"><select name="select3">
+        </select> </td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2"><strong><u>TAX INFO</u></strong></td>
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">Tax ID Number</td>
+      <td height="25" colspan="2"><input name="textfield35" type="text" size="16" maxlength="32"></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">Tax Type</td>
+      <td height="25" colspan="2"><select name="select6">
+          <option>VAT</option>
+          <option>Non-VAT</option>
+          <option>Non-Taxable</option>
+          <option>Import Duty</option>
+          <option>E-VAT</option>
+        </select> <font size="1"><a href="purchasing_updatelist_cities.jsp" target="_blank"><img src="../../../images/update.gif" border="0"></a>click 
+        to update list of Tax Type</font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">Freight Tax</td>
+      <td height="25" colspan="2"><select name="select7">
+          <option>VAT</option>
+          <option>Non-VAT</option>
+          <option>Non-Taxable</option>
+          <option>Import Duty</option>
+          <option>E-VAT</option>
+        </select> <font size="1"><a href="purchasing_updatelist_cities.jsp" target="_blank"><img src="../../../images/update.gif" border="0"></a>click 
+        to update list of Tax Type</font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2"><input type="checkbox" name="checkbox" value="checkbox">
+        Implement Supplier Tax Type</td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#FFFFFF"> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td height="25" colspan="4"><strong><u>PAYMENT TERMS</u></strong></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td width="3%" height="25">&nbsp;</td>
+      <td width="13%">Terms<strong></strong></td>
+      <td width="82%" height="25" colspan="2"><select name="select5">
+          <option>Cash on Delivery (COD)</option>
+          <option>Prepaid</option>
+          <option>Given No. of Days</option>
+          <option>Specific Day of the Month</option>
+          <option>No. of Days after End of Month</option>
+          <option>Day of Month after End of Month</option>
+        </select> </td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">Discount Days</td>
+      <td height="25" colspan="2"><font size="1"> 
+        <input name="textfield" type="text" size="3" maxlength="3">
+        &lt;show this for Given Number of Days/No. of Days after end of month&gt;</font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">Balance Due Days</td>
+      <td height="25" colspan="2"><font size="1"> 
+        <input name="textfield2" type="text" size="3" maxlength="3">
+        &lt;show this for Given Number of Days/No. of Days after end of month&gt;</font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">Discount Days</td>
+      <td height="25" colspan="2"><select name="select4">
+          <option>1st</option>
+          <option>2nd</option>
+          <option>3rd</option>
+          <option>4th</option>
+          <option>5th</option>
+          <option>6th</option>
+          <option>7th</option>
+          <option>End of Month</option>
+        </select> <font size="1">&lt;from 1st-31st, then End of Month&gt; &lt;show 
+        this for Specificf Day of the Month/Day of Month after End of Month&gt;</font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">Balance Due Days</td>
+      <td height="25" colspan="2"><select name="select8">
+          <option>1st</option>
+          <option>2nd</option>
+          <option>3rd</option>
+          <option>4th</option>
+          <option>5th</option>
+          <option>6th</option>
+          <option>7th</option>
+          <option>End of Month</option>
+        </select> <font size="1">&lt;from 1st-31st, then End of Month&gt; &lt;show 
+        this for Specificf Day of the Month/Day of Month after End of Month&gt;</font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="24">&nbsp;</td>
+      <td height="24">&nbsp;</td>
+      <td height="24" colspan="3">% Discount for Early Payment : 
+        <input name="textfield5" type="text" size="5" maxlength="5"></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="3">% Discount for Volume Purchase: 
+        <input name="textfield52" type="text" size="5" maxlength="5"></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="5"><hr size="1"></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="3">Purchase Comment : 
+        <select name="select9">
+          <option>Urgent</option>
+          <option>ASAP</option>
+          <option>Happy Holidays!</option>
+          <option>Appreciate your business.</option>
+        </select>
+        <font size="1"><a href="purchasing_updatelist_cities.jsp" target="_blank"><img src="../../../images/update.gif" border="0"></a>click 
+        to update Purchase Comment list</font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="3">Shipping Method : 
+        <select name="select10">
+          <option>Air</option>
+          <option>Courier</option>
+          <option>FedEx</option>
+          <option>DHL</option>
+          <option>LBC</option>
+          <option>Freight</option>
+          <option>UPS</option>
+        </select>
+        <font size="1"><a href="purchasing_updatelist_cities.jsp" target="_blank"><img src="../../../images/update.gif" border="0"></a>click 
+        to update Shipping Method list </font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="64">&nbsp;</td>
+      <td height="64">&nbsp;</td>
+      <td height="64">&nbsp;</td>
+      <td height="64" colspan="2"><font size="1"><a href="purchasing_updatelist_cities.jsp" target="_blank"><img src="../../../images/save.gif" border="0"></a>click 
+        to save entries&nbsp; <a href="purchasing_updatelist_cities.jsp" target="_blank"><img src="../../../images/cancel.gif" border="0"></a>click 
+        to cancel/clear entries </font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="10">&nbsp;</td>
+      <td height="10">&nbsp;</td>
+      <td height="10">&nbsp;</td>
+      <td height="10" colspan="2">&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" dwcopytype="CopyTableRow">
+    <tr> 
+      <td width="100%" height="25" bgcolor="#B9B292"><div align="center"><font color="#FFFFFF"><strong>LIST 
+          OF SUPPLIERS</strong></font></div></td>
+    </tr>
+  </table>
+  <table width="100%" border="1" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td  height="25" colspan="8"><font size="1">TOTAL SUPPLIER(S) : </font></td>
+    </tr>
+    <tr> 
+      <td width="10%"  height="25"><div align="center"><font size="1"><strong>SUPPLIER 
+          CODE </strong></font></div></td>
+      <td width="21%"><div align="center"><font size="1"><strong>SUPPLIER NAME</strong></font></div></td>
+      <td width="12%"><div align="center"><strong><font size="1">TYPE</font></strong></div></td>
+      <td width="15%"><div align="center"><font size="1"><strong>CONTACT NOS.</strong></font></div></td>
+      <td width="18%"><div align="center"><font size="1"><strong>CONTACT PERSON</strong></font></div></td>
+      <td width="12%"><div align="center"><font size="1"><strong>A/P BALANCE</strong></font></div></td>
+      <td colspan="2"><div align="center"><font size="1"><strong>OPTIONS</strong></font></div></td>
+    </tr>
+    <tr> 
+      <td  height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td width="6%"><img src="../../../images/edit.gif"></td>
+      <td width="6%"><img src="../../../images/delete.gif"></td>
+    </tr>
+    <tr> 
+      <td  height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="2"><font size="1">&nbsp;</font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+  <tr>
+    <td height="25">&nbsp;</td>
+  </tr>
+</table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="25" colspan="8"><div align="center"><font size="1"><a href="../../fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/print.gif" border="0"></a>click 
+          to print list</font></div></td>
+    </tr>
+    <tr> 
+      <td width="4%" height="25" colspan="8">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" colspan="8" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>
+<% 
+dbOP.cleanUP();
+%>

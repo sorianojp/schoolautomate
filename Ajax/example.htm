@@ -1,0 +1,32 @@
+<html>
+<body>
+<script language="JavaScript" src="./ajax.js"></script>
+<script type="text/javascript">
+function ajaxFunction(){
+	//Initialize xmlHttp
+	var obj = document.myForm.time;
+	this.InitXmlHttpObject(obj,1);
+	if (this.xmlHttp==null) {
+	  alert ("Your browser does not support AJAX!");
+	  return;
+  	}
+  	this.processRequest('./example.jsp');
+	alert(this.retObj);
+  	//var obj = document.getElementById("myText");
+	//this.InitXmlHttpObject(obj,2);
+  	//this.processRequest('./example.jsp');
+
+
+}
+</script>
+
+<form name="myForm">
+Name: <input type="text"
+onkeyup="ajaxFunction();" name="username" />
+Time: <input type="text" name="time" />
+
+<label id=myText>This will be replaced</label>
+</form>
+
+</body>
+</html>

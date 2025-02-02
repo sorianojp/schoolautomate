@@ -1,0 +1,371 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../css/maintenancelinkscss.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript">
+function AddRecord()
+{
+	document.question.addRecord.value =1;
+	document.question.reloadPage.value =0;
+	
+}
+function ReloadPage()
+{
+	document.question.addRecord.value =0;
+	document.question.reloadPage.value =1;
+	
+	document.question.submit();
+	
+}
+
+
+
+</script>
+<body bgcolor="A27D3E">
+<%@ page language="java" import="utility.*,Question,java.util.Vector " %>
+<%
+ 
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	MessageConstant mConst = new MessageConstant();
+	String strErrMsg = "";
+	String strTemp = null;
+//add security here.
+request.getSession(false).setAttribute("userId","biswa");
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		//exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_add.jsp","While Opening DB Con");
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="+2">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+
+
+//end of security code. 
+Question ques = new Question();
+
+//check for add - edit or delete 
+strTemp = request.getParameter("addRecord");
+if(strTemp != null && strTemp.compareTo("1") == 0)
+{
+	//add it here and give a message.
+	if(ques.add(dbOP,request))
+	{
+		strErrMsg = "Question added successfully.";
+	}
+	else
+	{
+		dbOP.cleanUP();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="+2">
+		<%=ques.getErrMsg()%></font></p>
+		<%
+		return;
+	}
+}
+
+%>
+<form name="question" method="post" action="../../ADMISSION%20MAINTENANCE%20MODULE/one%20files/QUESTION%20BANK/./admission_question_add.jsp">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#B5AB73"> 
+      <td width="88%" height="25" colspan="8"><div align="center"><strong><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif">:::: 
+          QUESTION BANK PAGE - EDIT ::::</font></strong></div></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" bgcolor="#FFFFFF">
+    <tr> 
+      <%
+if(strErrMsg == null) strErrMsg = "";
+%>
+      <td colspan="5"> <font size="3" face="Verdana, Arial, Helvetica, sans-serif"><strong><%=strErrMsg%><a href="online_exam_question_bank_edit_delete_view.htm"><img src="../../../images/go_back.gif" width="50" height="27" border="0"></a></strong></font></td>
+    </tr>
+    <tr> 
+      <td width="5%">&nbsp;</td>
+      <td colspan="4"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Question 
+        prepared by 
+        <input name="textfield7" type="text" size="48">
+        </font><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><a href="#"><img src="../../../images/search.gif" width="37" height="30" border="0"></a></font><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp; 
+        </font></td>
+       </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td width="40%" >Subject</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>Examination Period</td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td colspan="3" ><select name="select">
+        </select> <input name="textfield2" type="text" size="64"></td>
+      <td ><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+        <select name="select5">
+        </select>
+        </font></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td colspan="3"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Domain 
+        of learning </font></td>
+      <td width="30%"><div align="left"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Question 
+          Type</font></div></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+        <select name="q_level_index">
+          <option>Knowledge</option>
+          <option>Comprehension</option>
+          <option>Application</option>
+          <option>Analysis</option>
+          <option>Synthesis</option>
+          <option>Evaluation</option>
+        </select>
+        </font></td>
+      <td width="8%">&nbsp;</td>
+      <td width="17%">&nbsp;</td>
+      <td><select name="q_type_index" onChange="ReloadPage();">
+          <option>True or False</option>
+          <option>Multiple Choice</option>
+          <option>Matching Type</option>
+          <option>Objectives</option>
+          <option>Essay</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="23" colspan="5"><div align="center">
+          <hr>
+        </div></td>
+    </tr>
+  </table>
+  
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25" colspan="4" bgcolor="#FFFFFF"><div align="center"></div></td>
+      <td width="11%" height="25" bgcolor="#FFFFFF">Chapter </td>
+      <td width="61%" bgcolor="#FFFFFF"><select name="select2">
+          <option>I</option>
+          <option>II</option>
+          <option>III</option>
+          <option>IV</option>
+          <option>V</option>
+          <option>VI</option>
+          <option>VII</option>
+          <option>VIII</option>
+          <option>IX</option>
+          <option>X</option>
+          <option>XI</option>
+          <option>XII</option>
+          <option>XIII</option>
+          <option>XIV</option>
+          <option>XV</option>
+          <option>XVI</option>
+          <option>XVII</option>
+          <option>XVIII</option>
+          <option>XIX</option>
+          <option>XX</option>
+          <option>Others</option>
+        </select> <input name="textfield3" type="text" size="4"> <em><font size="1">Specify</font></em></td>
+      <td width="24%" height="25" bgcolor="#FFFFFF">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="4" bgcolor="#FFFFFF">&nbsp;</td>
+      <td>Topic </td>
+      <td><input name="textfield4" type="text" size="64"></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="4" bgcolor="#FFFFFF">&nbsp;</td>
+      <td>Subtopic order </td>
+      <td><select name="select3">
+          <option>a</option>
+          <option>b</option>
+          <option>c</option>
+          <option>d</option>
+          <option>e</option>
+          <option>f</option>
+          <option>g</option>
+          <option>h</option>
+          <option>i</option>
+          <option>j</option>
+          <option>k</option>
+          <option>l</option>
+          <option>m</option>
+          <option>n</option>
+          <option>o</option>
+          <option>p</option>
+          <option>q</option>
+          <option>r</option>
+          <option>s</option>
+          <option>t</option>
+          <option>u</option>
+          <option>v</option>
+          <option>w</option>
+          <option>x</option>
+          <option>y</option>
+          <option>z</option>
+          <option>Others</option>
+        </select> <input name="textfield32" type="text" size="3"> <em><font size="1">Specify</font></em></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="4" bgcolor="#FFFFFF">&nbsp;</td>
+      <td>Sub-topic </td>
+      <td><input name="textfield42" type="text" size="64"></td>
+      <td>&nbsp;</td>
+    </tr>
+	</table>
+	<table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="25" colspan="7" bgcolor="#FFFFFF"><hr></td>
+    </tr>
+  </table>
+<table width="100%" border="0" bgcolor="#FFFFFF" cellpadding="1" cellspacing="1">
+    <tr> 
+      <td>&nbsp;</td>
+      <td colspan="5"><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Points 
+        per question : 
+        <%
+strTemp = request.getParameter("question_credit");
+if(strTemp == null) strTemp = "";
+%>
+        <input name="question_credit" type="text" size="3" value="<%=strTemp%>">
+        </strong> </font></td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="3">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="3%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
+      <td width="6%"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Question 
+        : </font></td>
+      <td colspan="3"><input name="question" type="text" size="64"></td>
+    </tr>
+    <%
+	strTemp = request.getParameter("q_type_index");
+	//refer database for the values.
+	if(strTemp.compareTo("3") ==0)//Objective type     
+	{%>
+    <tr> 
+      <td>&nbsp; </td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Answer &nbsp; 
+        : </font></td>
+      <td colspan="2"><input name="correct_ans" type="text" size="32"></td>
+      <td width="27%">&nbsp;</td>
+    </tr>
+    <%}else if(strTemp.compareTo("1") ==0)//Multiple Choice
+	{%>
+    <tr> 
+      <td>&nbsp;</td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Choices 
+        &nbsp;: (Please select the correct answer)</font></td>
+      <td colspan="2"> <input type="radio" name="correct_choice" value="0" checked> 
+        <input name="choice0" type="text" size="64"> <br> <input type="radio" name="correct_choice" value="1"> 
+        <input name="choice1" type="text" size="64"> <br> <input type="radio" name="correct_choice" value="2"> 
+        <input name="choice2" type="text" size="64"> <br> <input type="radio" name="correct_choice" value="3"> 
+        <input name="choice3" type="text" size="64"> <br> <input type="radio" name="correct_choice" value="4"> 
+        <input name="choice4" type="text" size="64"> <br> <input type="radio" name="correct_choice" value="5"> 
+        <input name="choice5" type="text" size="64"> </td>
+      <td width="27%"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp; 
+        </font></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="3">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="3">&nbsp;</td>
+    </tr>
+    <%}else if(strTemp.compareTo("2") ==0)//True/Flase
+	{%>
+    <tr> 
+      <td>&nbsp; </td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Answer &nbsp; 
+        : </font></td>
+      <td colspan="4"><input type="radio" name="correct_ans" value="T" checked> 
+        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">True</font>&nbsp;&nbsp;&nbsp; 
+        <input type="radio" name="correct_ans" value="F"> <font size="2" face="Verdana, Arial, Helvetica, sans-serif">False</font></td>
+    </tr>
+    <%}%>
+    <tr> 
+      <td width="3%">&nbsp; </td>
+      <td width="6%">&nbsp;</td>
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="5">&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  	
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="1" cellpadding="1">
+    <tr> 
+      <td width="4%">&nbsp;</td>
+      <td colspan="2"><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Points 
+        per question : 
+        <%
+strTemp = request.getParameter("question_credit");
+if(strTemp == null) strTemp = "";
+%>
+        <input name="question_credit2" type="text" size="3" value="<%=strTemp%>">
+        </strong></font></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td width="37%"><strong>COLUMN A</strong></td>
+      <td width="59%"><strong>COLUMN B</strong> (ANSWERS)</td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td><input name="textfield610" type="text" size="45"></td>
+      <td><input name="textfield6102" type="text" size="45"></td>
+    </tr>
+  </table>
+  <%
+strTemp = request.getParameter("q_type_index");
+if(strTemp != null && strTemp.compareTo("selectany") != 0)
+{//display input for answer and question depending on the question type.
+%>
+  <table bgcolor="#FFFFFF" width="100%">
+    <tr> 
+      <td width="10%">&nbsp;</td>
+      <td width="31%"><img src="../../../images/save.gif" width="48" height="28"><font size="1">click 
+        to save changes </font></td>
+      <td width="59%"><img src="../../../images/cancel.gif" width="51" height="26"><font size="1">click 
+        to cancel and clear entries</font></td>
+    <tr> 
+      <td colspan="3">&nbsp;</td>
+    </tr>
+  </table>
+ <%
+ }//end of showing question and answer options. 
+ %>
+  <table width="100%" border="0" bgcolor="#B5AB73">
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+<!-- all hidden fields go here -->
+<input type="hidden" name="addRecord" value="0">
+<input type="hidden" name="reloadPage" value="0">
+
+ </form>
+</body>
+</html>

@@ -1,0 +1,344 @@
+<%@ page language="java" import="utility.*,java.util.Vector,hr.HRManageList" %>
+<%
+	WebInterface WI = new WebInterface(request);//to make sure , i call the dynamic opener form name to reload when close window is clicked.
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript" src="../../../jscript/date-picker.js"></script>
+<SCRIPT LANGUAGE="JavaScript" SRC="../../../jscript/td.js"></script>
+<script language="JavaScript">
+function FocusID() {
+	document.staff_profile.strValue.select();
+	document.staff_profile.strValue.focus();	
+}
+function PrepareToEdit(index){
+	document.staff_profile.prepareToEdit.value = "1";
+	document.staff_profile.info_index.value=index;
+	document.staff_profile.donot_call_close_wnd.value = "1";
+}
+
+function ViewInfo()
+{
+	document.staff_profile.page_action.value="0";
+	document.staff_profile.donot_call_close_wnd.value = "1";
+}
+function AddRecord()
+{
+	document.staff_profile.page_action.value="1";
+	document.staff_profile.donot_call_close_wnd.value = "1";
+}
+
+function EditRecord()
+{
+	document.staff_profile.page_action.value="2";
+	document.staff_profile.donot_call_close_wnd.value = "1";
+}
+function DeleteRecord()
+{
+	document.staff_profile.page_action.value="3";
+	document.staff_profile.donot_call_close_wnd.value = "1";
+}
+function ReloadPage()
+{
+	document.staff_profile.reloadPage.value = "1";
+	document.staff_profile.submit();
+	document.staff_profile.donot_call_close_wnd.value = "1";
+}
+function ShowHideOthers(strSelFieldName, strOthFieldName,strTextBoxID)
+{
+	if( eval('document.staff_profile.'+strSelFieldName+'.selectedIndex') == 0)
+	{
+		eval('document.staff_profile.'+strOthFieldName+'.disabled=false');
+		showLayer(strTextBoxID);
+	}
+	else
+	{
+		hideLayer(strTextBoxID);
+		eval('document.staff_profile.'+strOthFieldName+'.disabled=true');
+	}
+	document.staff_profile.donot_call_close_wnd.value = "1";
+}
+function CancelEdit(tablename,indexname,colname,labelname){
+	document.staff_profile.donot_call_close_wnd.value = "1";
+	location = "./hr_updatelist.jsp?tablename=" + tablename + "&indexname=" + indexname + 
+	"&colname=" + colname + "&label=" + labelname+"&opner_form_name="+
+	document.staff_profile.opner_form_name.value;
+}
+
+function CloseWindow()
+{
+	document.staff_profile.close_wnd_called.value = "1";
+	window.opener.document.<%=WI.getStrValue(WI.fillTextValue("opner_form_name"),"staff_profile")%>.submit();
+	window.opener.focus();
+	self.close();
+}
+function ReloadParentWnd() {
+	if(document.staff_profile.donot_call_close_wnd.value.length >0)
+		return;
+
+	if(document.staff_profile.close_wnd_called.value == "0") {
+		window.opener.document.<%=WI.getStrValue(WI.fillTextValue("opner_form_name"),"staff_profile")%>.submit();
+		window.opener.focus();
+	}
+}
+</script>
+
+<body bgcolor="#D2AE72"" onUnload="ReloadParentWnd();" onLoad="FocusID();">
+<%
+	DBOperation dbOP = null;
+	String strErrMsg = null;
+	String strTemp = null;
+	Vector vRetResult = new Vector();
+	String strTemp2 = null;
+
+	
+
+//add security hehol.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-HR Management - update list",
+								"hr_updatelist.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		
+<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3"> 
+  Error in opening connection </font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"HR Management","PERSONNEL",request.getRemoteAddr(), 
+														"hr_updatelist.jsp");	
+if(iAccessLevel < 1) {//All employees are allowed to use this, because this is a common file.
+strTemp = (String)request.getSession(false).getAttribute("authTypeIndex");
+int iAuthTypeIndex = Integer.parseInt(WI.getStrValue(strTemp,"-1"));//System.out.println(iAuthTypeIndex);
+	if(iAuthTypeIndex != -1) {
+		if(iAuthTypeIndex != 4 || iAuthTypeIndex != 6)//no access to parent / student
+			iAccessLevel = 2;
+	}
+
+}
+	//System.out.println(iAccessLevel);
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+	boolean noError = false;
+	int iAction = 0;
+	strTemp = WI.fillTextValue("page_action");
+	
+	Vector vRetEdit = new Vector();
+	String strLabel = WI.fillTextValue("label");
+	String strTableName = WI.fillTextValue("tablename");
+	String strColName = WI.fillTextValue("colname");
+	String strIndexName = WI.fillTextValue("indexname");
+	String strFieldValue = WI.fillTextValue("strValue");
+	String strPrepareToEdit = WI.fillTextValue("prepareToEdit");
+	String strInfoIndex = WI.fillTextValue("info_index");	
+	
+	HRManageList  hrList = new HRManageList();
+	
+	iAction = Integer.parseInt(WI.getStrValue(strTemp,"0"));
+
+	switch(iAction){
+	case 1: 
+		vRetResult = hrList.operateOnList(dbOP,iAction,strTableName,strColName, strFieldValue,null, null);
+		if (vRetResult == null){
+			strErrMsg = hrList.getErrMsg();
+		}else{
+			strErrMsg = strLabel + " added successfully.";
+			noError = true;
+		}
+		break;
+
+	case 2:
+		vRetResult = hrList.operateOnList(dbOP,iAction, strTableName,strColName,strFieldValue,strInfoIndex, strIndexName);
+		if (vRetResult == null){
+			strErrMsg = hrList.getErrMsg();
+		}else{
+			strErrMsg = strLabel + " edited successfully";
+			strPrepareToEdit = "0";
+			noError = true;
+		}
+		break;
+	}
+
+	if (strPrepareToEdit.compareTo("1") == 0){
+		vRetEdit = hrList.operateOnList(dbOP,3,strTableName,strColName,strFieldValue,strInfoIndex,strIndexName);	
+	}
+	
+	vRetResult = hrList.operateOnList(dbOP,4,strTableName,strColName,strFieldValue,null, null);
+
+%>
+<form action="../../../purchasing/HR/./hr_updatelist.jsp" method="post" name="staff_profile">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="5" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>:::: 
+          CHART OF ACCOUNTS - UPDATE ACCOUNTS CLASSIFICATION PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" align="center" cellpadding="4" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="2%" rowspan="2">&nbsp;</td>
+      <% if (vRetEdit!=null && vRetEdit.size() > 0){
+	strTemp = (String) vRetEdit.elementAt(1);
+   }else{
+   	strTemp = WI.fillTextValue("strValue");
+   }
+%>
+      <td valign="top">Account Classification Name</td>
+      <td valign="top"> <input name="textfield" type="text" size="32" maxlength="32"></td>
+    </tr>
+    <tr> 
+      <td valign="top">Starting Code Number (1,2,3,etc)</td>
+      <td valign="top"><input name="textfield2" type="text" size="8" maxlength="8."></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td width="21%">&nbsp;</td>
+      <td width="77%"> <% if (strPrepareToEdit.compareTo("1") == 0){%> <input name="image" type="image" onClick='EditRecord()' src="../../../../images/edit.gif" border="0"> 
+        <font size="1">click to save changes</font> <a href='javascript:CancelEdit("<%=strTableName%>","<%=strIndexName%>","<%=strColName%>","<%=strLabel%>");'><img src="../../../../images/cancel.gif" width="51" height="26" border="0"></a><font size="1">click 
+        to cancel edit</font> <%}else{%> <input name="image" type="image" onClick='AddRecord()' src="../../../../images/add.gif" width="42" height="32"> 
+        <font size="1">click to add entry</font> <%}%> </td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td colspan="2">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+  </table>
+
+
+ <% if (vRetResult !=null){ %>  
+  <table width="100%" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td colspan="5" bgcolor="#666666"><div align="center"><strong><font color="#FFFFFF">LIST 
+          OF ACCOUNT CLASSIFICATIONS</font></strong></div></td>
+    </tr>
+    <tr align="center"> 
+      <td width="12%"><font size="1">&nbsp;</font></td>
+      <td width="23%"><font size="1"><strong>NAME</strong></font></td>
+      <td width="38%"><font size="1"><strong>STARTING CODE NUMBER</strong></font></td>
+      <td width="15%">&nbsp;</td>
+      <td width="12%">&nbsp;</td>
+    </tr>
+    <% for (int i =0; i < vRetResult.size() ; i+=2){ %>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Asset</td>
+      <td height="25">1</td>
+      <td height="25"><div align="center"> 
+          <input type="image" src="../../../../images/edit.gif" onClick='PrepareToEdit("<%=(String)vRetResult.elementAt(i)%>");'
+	  							width="40" height="26">
+        </div></td>
+      <td height="25"><img src="../../../../images/delete.gif" width="55" height="28"></td>
+    </tr>
+    <%}%>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Liability</td>
+      <td height="25">2</td>
+      <td height="25"><div align="center"> 
+          <input type="image" src="../../../../images/edit.gif" onClick='PrepareToEdit("<%=(String)vRetResult.elementAt(i)%>");'
+	  							width="40" height="26">
+        </div></td>
+      <td height="25"><img src="../../../../images/delete.gif" width="55" height="28"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Equity</td>
+      <td height="25">3</td>
+      <td height="25"><div align="center"> 
+          <input type="image" src="../../../../images/edit.gif" onClick='PrepareToEdit("<%=(String)vRetResult.elementAt(i)%>");'
+	  							width="40" height="26">
+        </div></td>
+      <td height="25"><img src="../../../../images/delete.gif" width="55" height="28"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Income</td>
+      <td height="25">4</td>
+      <td height="25"><div align="center"> 
+          <input type="image" src="../../../../images/edit.gif" onClick='PrepareToEdit("<%=(String)vRetResult.elementAt(i)%>");'
+	  							width="40" height="26">
+        </div></td>
+      <td height="25"><img src="../../../../images/delete.gif" width="55" height="28"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Cost of Sales</td>
+      <td height="25">5</td>
+      <td height="25"><div align="center"> 
+          <input type="image" src="../../../../images/edit.gif" onClick='PrepareToEdit("<%=(String)vRetResult.elementAt(i)%>");'
+	  							width="40" height="26">
+        </div></td>
+      <td height="25"><img src="../../../../images/delete.gif" width="55" height="28"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Expense</td>
+      <td height="25">6</td>
+      <td height="25"><div align="center"> 
+          <input type="image" src="../../../../images/edit.gif" onClick='PrepareToEdit("<%=(String)vRetResult.elementAt(i)%>");'
+	  							width="40" height="26">
+        </div></td>
+      <td height="25"><img src="../../../../images/delete.gif" width="55" height="28"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Other Income</td>
+      <td height="25">7</td>
+      <td height="25"><div align="center"> 
+          <input type="image" src="../../../../images/edit.gif" onClick='PrepareToEdit("<%=(String)vRetResult.elementAt(i)%>");'
+	  							width="40" height="26">
+        </div></td>
+      <td height="25"><img src="../../../../images/delete.gif" width="55" height="28"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Other Expenses</td>
+      <td height="25">8</td>
+      <td height="25"><div align="center"> 
+          <input type="image" src="../../../../images/edit.gif" onClick='PrepareToEdit("<%=(String)vRetResult.elementAt(i)%>");'
+	  							width="40" height="26">
+        </div></td>
+      <td height="25"><img src="../../../../images/delete.gif" width="55" height="28"></td>
+    </tr>
+  </table>
+<%}%>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="25"  colspan="3" bgcolor="#A49A6A">&nbsp;</td>
+      </tr>
+  </table>
+  </form>
+</body>
+</html>
+

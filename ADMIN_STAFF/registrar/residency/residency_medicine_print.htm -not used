@@ -1,0 +1,478 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>RESIDENCY STATUS</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<%response.setHeader("Pragma","No-Cache");
+response.setDateHeader("Expires",0);
+response.setHeader("Cache-Control","no-Cache"); //HTTP 1.0
+response.setHeader("Cache-Control","no-store"); //HTTP 1.1 
+%>
+</head>
+<script language="JavaScript">
+function PrintPage()
+{
+ 	var vProceed = confirm("Please keep your printer ready and click <OK> to print.if you are not ready to print, please click cancel.");
+	if(vProceed)
+		return true;
+	return false;
+}
+
+</script>
+<body>
+<%@ page language="java" import="utility.*,CurriculumMaintenance,java.util.Vector, java.util.Date" %>
+<%
+ 
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	String strErrMsg = null;
+	String strTemp = null;
+	
+	String strCourseIndex 	= request.getParameter("ci");
+	String strCourseName 	= request.getParameter("cname");
+	String strMajorIndex 	= request.getParameter("mi");
+	String strMajorName 	= request.getParameter("mname"); 
+	if(strMajorName == null) strMajorName = "None";
+	String strSYFrom 		= request.getParameter("syf");
+	String strSYTo 			= request.getParameter("syt");
+
+	float iNoOfLECUnitPerSem = 0; float iNoOfLABUnitPerSem = 0;
+	float iNoOfLECUnitPerCourse = 0;float iNoOfLABUnitPerCourse = 0;
+	
+	WebInterface WI = new WebInterface(request);
+//add security here.
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_veiwall.jsp","While Opening DB Con");
+		
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+
+
+//end of security code. 
+strErrMsg = null; //if there is any message set -- show at the bottom of the page.
+CurriculumMaintenance CM = new CurriculumMaintenance();
+if(strCourseIndex == null || strSYFrom == null || strSYTo == null)
+{
+	strErrMsg = "Can't process curriculum detail. couse, SY From , SY To information missing.";
+	dbOP.cleanUP();
+	%>
+	<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="+2">
+	<%=strErrMsg%></font></p>
+	<%
+	return;
+}
+
+//get here total year and semester of the course.
+int[][] aiYearSem = CM.getMaxYearSemester(dbOP,strCourseIndex);
+
+if(aiYearSem == null)
+{
+	dbOP.cleanUP();
+	%>
+	<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="+2">
+	<%=CM.getErrMsg()%></font></p>
+	<%
+	return;
+}
+
+%>
+<form action="../curriculum/./curriculum_maintenance_viewall_print.jsp" method="post" target="_blank" onSubmit="return PrintPage();">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr> 
+      <td height="25" ><div align="center">VIRGEN MILAGROSA UNIVERSITY FOUNDATION<br>
+          COLLEGE OF MEDICINE<br>
+          San Carlos City, Pangasinan</div></td>
+    </tr>
+    <tr> 
+      <td width="29%" height="24" valign="bottom"><div align="center">Curriculum 
+          Year: <strong><%=strSYFrom%> - <%=strSYTo%></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="25"><hr></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td width="15%"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Student 
+        name</font> : <strong></strong></td>
+      <td width="45%"><strong><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$stud_name</font></strong></td>
+      <td width="6%"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Year 
+        : </font></td>
+      <td width="32%"><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>$year</strong></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Course/Major 
+        : </font></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>$course 
+        / $major</strong></font></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Status<font size="2" face="Verdana, Arial, Helvetica, sans-serif">:<strong> 
+        </strong></font></font></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>$status</strong></font></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25"  colspan="2">Total units required for this course : <strong>$total_units</strong></td>
+      <td height="25"  colspan="2">Total units taken : <strong>$total_units_taken</strong></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td  colspan="5" height="25"><hr></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" bgcolor="#FFFFFF">
+        <%
+String [] astrConvertToWord={"First","Second","Third","Fourth","Fifth","Sixth","Seventh","Eighth","Nineth"};
+Vector vRetResult = new Vector();
+for( int i = 1; i<= aiYearSem[0][0]; ++i) //[0][0] = no of years
+{%>
+        <tr> 
+          <td>&nbsp;</td>
+          <td colspan="7"><div align="center"><strong><%=astrConvertToWord[i-1]%> 
+              Year </strong></div></td>
+        </tr>
+        <%
+	for(int j= 1; j<= aiYearSem[i][0]; ++j) 
+	{%>
+        <tr> 
+          <td width="2%">&nbsp;</td>
+          <td colspan="7"><strong><u><%=astrConvertToWord[j-1]%> Semester</u></strong></td>
+        </tr>
+        <%
+		vRetResult = CM.viewCurrPerSemester(dbOP, strCourseIndex, i, strMajorIndex,j, strSYFrom, strSYTo);
+		if(vRetResult != null)
+			for(int k= 0 ; k< vRetResult.size(); ++k)
+			{
+			//display the heading only once.
+			if(i ==1 && j ==1 && k==0)
+			{%>
+        <tr> 
+          <td>&nbsp;</td>
+          <td  height="19" >$main_subjectcode</td>
+          <td colspan="3">$main_subj_desc</td>
+          <td>$grading</td>
+          <td>$total_load</td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td>&nbsp;</td>
+          <td width="17%"  height="21"><div align="left"></div></td>
+          <td colspan="2">$subject_code</td>
+          <td width="32%">$subj_desc</td>
+          <td width="8%">$grading</td>
+          <td width="15%"><div align="left">($load)</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <%}%>
+        <tr> 
+          <td>&nbsp;</td>
+          <td  height="19">&nbsp;</td>
+          <td   colspan="2" height="19">$subject_code</td>
+          <td>$subj_desc</td>
+          <td>$grading</td>
+          <td><div align="left">($load)</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <%
+			iNoOfLECUnitPerSem += Float.parseFloat((String)vRetResult.elementAt(k+3));
+			iNoOfLABUnitPerSem += Float.parseFloat((String)vRetResult.elementAt(k+4));
+			k = k+4;
+			}%>
+        <tr> 
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td colspan="2">$subject_code</td>
+          <td>$subj_desc</td>
+          <td>$grading</td>
+          <td><div align="left">($load)</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td align="center"><div align="left">$main_subjectcode</div></td>
+          <td  colspan="3" align="center"><div align="left">$main_subj_desc</div></td>
+          <td align="center"><div align="left">$grading</div></td>
+          <td align="center"><div align="left">$load</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center"><em></em></td>
+          <td align="center"><div align="left">$main_subjectcode</div></td>
+          <td  colspan="3" align="center"><div align="left">$main_subj_desc</div></td>
+          <td align="center"><div align="left">$grading</div></td>
+          <td align="center"><div align="left">$load</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td  height="19" >$main_subjectcode</td>
+          <td colspan="3">$main_subj_desc</td>
+          <td>$grading</td>
+          <td>$total_load</td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td width="17%"  height="21"><div align="left"></div></td>
+          <td colspan="2">$subject_code</td>
+          <td width="32%">$subj_desc</td>
+          <td width="8%">$grading</td>
+          <td width="15%"><div align="left">($load)</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td  height="19">&nbsp;</td>
+          <td height="19"   colspan="2">$subject_code</td>
+          <td>$subj_desc</td>
+          <td>$grading</td>
+          <td><div align="left">($load)</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td>&nbsp;</td>
+          <td colspan="2">$subject_code</td>
+          <td>$subj_desc</td>
+          <td>$grading</td>
+          <td><div align="left">($load)</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td align="center">&nbsp;</td>
+          <td  colspan="3" align="center">&nbsp;</td>
+          <td align="center">&nbsp;</td>
+          <td align="center">&nbsp;</td>
+          <td align="center">&nbsp;</td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td colspan="7"><strong><u><%=astrConvertToWord[j-1]%> Semester</u></strong></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td  height="19" >$main_subjectcode</td>
+          <td colspan="3">$main_subj_desc</td>
+          <td>$grading</td>
+          <td>$total_load</td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td width="17%"  height="21"><div align="left"></div></td>
+          <td colspan="2">$subject_code</td>
+          <td width="32%">$subj_desc</td>
+          <td width="8%">$grading</td>
+          <td width="15%"><div align="left">($load)</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td  height="19">&nbsp;</td>
+          <td height="19"   colspan="2">$subject_code</td>
+          <td>$subj_desc</td>
+          <td>$grading</td>
+          <td><div align="left">($load)</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td>&nbsp;</td>
+          <td colspan="2">$subject_code</td>
+          <td>$subj_desc</td>
+          <td>$grading</td>
+          <td><div align="left">($load)</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td align="center"><div align="left">$main_subjectcode</div></td>
+          <td  colspan="3" align="center"><div align="left">$main_subj_desc</div></td>
+          <td align="center"><div align="left">$grading</div></td>
+          <td align="center"><div align="left">$load</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td align="center"><div align="left">$main_subjectcode</div></td>
+          <td  colspan="3" align="center"><div align="left">$main_subj_desc</div></td>
+          <td align="center"><div align="left">$grading</div></td>
+          <td align="center"><div align="left">$load</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td  height="19" >$main_subjectcode</td>
+          <td colspan="3">$main_subj_desc</td>
+          <td>$grading</td>
+          <td>$total_load</td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td width="17%"  height="21"><div align="left"></div></td>
+          <td colspan="2">$subject_code</td>
+          <td width="32%">$subj_desc</td>
+          <td width="8%">$grading</td>
+          <td width="15%"><div align="left">($load)</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td  height="19">&nbsp;</td>
+          <td height="19"   colspan="2">$subject_code</td>
+          <td>$subj_desc</td>
+          <td>$grading</td>
+          <td><div align="left">($load)</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td>&nbsp;</td>
+          <td colspan="2">$subject_code</td>
+          <td>$subj_desc</td>
+          <td>$grading</td>
+          <td><div align="left">($load)</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td>&nbsp;</td>
+          <td colspan="2">&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td colspan="8" align="center"><strong>4th Year </strong></td>
+        </tr>
+        <tr> 
+          <td colspan="8" align="center"><strong><u>Twelve Full-Month Clinical 
+            Clerkship Program</u></strong></td>
+        </tr>
+        <tr> 
+          <td colspan="8" align="center">&nbsp;</td>
+        </tr>
+        <%}%>
+        <%
+			iNoOfLECUnitPerSem += Float.parseFloat((String)vRetResult.elementAt(k+3));
+			iNoOfLABUnitPerSem += Float.parseFloat((String)vRetResult.elementAt(k+4));
+			k = k+4;
+			}%>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td align="center"><div align="left">$main_subjectcode</div></td>
+          <td  colspan="3" align="center"><div align="left">$main_subj_desc</div></td>
+          <td align="center"><div align="left">$grading</div></td>
+          <td align="center"><div align="left">$load</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center"><em></em></td>
+          <td align="center"><div align="left">$main_subjectcode</div></td>
+          <td  colspan="3" align="center"><div align="left">$main_subj_desc</div></td>
+          <td align="center"><div align="left">$grading</div></td>
+          <td align="center"><div align="left">$load</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td align="center"><div align="left">$subject_code</div></td>
+          <td  colspan="3" align="center"><div align="left">$main_subj_desc</div></td>
+          <td align="center"><div align="left">$grading</div></td>
+          <td align="center"><div align="left">$load</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td align="center"><div align="left">$subject_code</div></td>
+          <td  colspan="3" align="center"><div align="left">$main_subj_desc</div></td>
+          <td align="center"><div align="left">$grading</div></td>
+          <td align="center"><div align="left">$load</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td align="center"><div align="left">$subject_code</div></td>
+          <td  colspan="3" align="center"><div align="left">$main_subj_desc</div></td>
+          <td align="center"><div align="left">$grading</div></td>
+          <td align="center"><div align="left">$load</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <tr> 
+          <td align="center">&nbsp;</td>
+          <td align="center"><div align="left">$subject_code</div></td>
+          <td  colspan="3" align="center"><div align="left">$main_subj_desc</div></td>
+          <td align="center"><div align="left">$grading</div></td>
+          <td align="center"><div align="left">$load</div></td>
+          <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+        </tr>
+        <%
+	iNoOfLECUnitPerCourse += iNoOfLECUnitPerSem;
+	iNoOfLABUnitPerCourse += iNoOfLABUnitPerSem;
+	
+	iNoOfLECUnitPerSem = 0;
+	iNoOfLABUnitPerSem = 0;
+	}//end of loop for semesters
+
+/// end of a year == check if it is having summer for this year.
+	vRetResult = CM.viewSummerCurrPerYr(dbOP,strCourseIndex,i, strMajorIndex,strSYFrom, strSYTo);
+	if(vRetResult != null && vRetResult.size() > 0)
+	{//start of summer courses.
+	%>
+        <%//
+  	for(int p=0; p< vRetResult.size(); ++p)
+	{%>
+        <%
+		iNoOfLECUnitPerSem += Float.parseFloat((String)vRetResult.elementAt(p+3));
+		iNoOfLABUnitPerSem += Float.parseFloat((String)vRetResult.elementAt(p+4));
+		p = p+4;
+	}%>
+        <%
+	iNoOfLECUnitPerCourse += iNoOfLECUnitPerSem;
+	iNoOfLABUnitPerCourse += iNoOfLABUnitPerSem;
+	
+	iNoOfLECUnitPerSem = 0;
+	iNoOfLABUnitPerSem = 0;
+	}//end of loop for Summer == It starts after semister loops.
+	
+	
+}//end of loop for year.
+%>
+</table>
+
+  <%
+dbOP.cleanUP();
+%>
+  <table width="100%" bgcolor="#FFFFFF" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="100%" colspan="2"><div align="center"> </div></td>
+    </tr>
+  </table>
+
+<input type="hidden" name="ci" value="<%=request.getParameter("ci")%>">
+<input type="hidden" name="cname" value="<%=request.getParameter("cname")%>">
+<%
+strTemp = request.getParameter("mi");
+if(strTemp == null) strTemp = "";
+%>
+<input type="hidden" name="mi" value="<%=strTemp%>">
+<input type="hidden" name="syf" value="<%=request.getParameter("syf")%>">
+<input type="hidden" name="syt" value="<%=request.getParameter("syt")%>">
+</form>
+
+</body>
+</html>

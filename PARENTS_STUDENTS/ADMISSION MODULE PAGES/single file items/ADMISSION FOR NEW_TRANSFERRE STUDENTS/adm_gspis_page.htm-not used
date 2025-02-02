@@ -1,0 +1,435 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+}
+
+td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+}
+
+th {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+}
+
+-->
+</style>
+</head>
+
+<body>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><font size="1">Please fill up the 3 copies properly. For old students, 
+      fill up any changes or new data from your previous information.</font></td>
+  </tr>
+</table>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td height="97"><div align="center"> 
+        <p><font size="1"><br>
+          VIRGEN MILAGROSA UNIVERSITY FOUNDATION</font><br>
+          <font size="1">San Carlos City, Pangasinan</font><br>
+          <br>
+          <strong>GENERAL STUDENT PERSONAL INFORMATION SHEET</strong><br>
+          (GSPIS)</p>
+            </div></td>
+  </tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td width="35%" height="20" colspan="4"><strong>Date</strong> &lt;system date&gt;</td>
+    <td width="30%"><strong>Semester :</strong> $semester</td>
+    <td width="35%" rowspan="2" valign="bottom">&nbsp;&nbsp; &nbsp; [photo 2x2]</td>
+  </tr>
+  <tr> 
+    <td height="20" colspan="4" valign="bottom"><strong>STATUS : </strong>$student_status</td>
+    <td width="30%">&nbsp;</td>
+  </tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td width="44%" colspan="4"><strong>DEGREE : </strong>$student_degree</td>
+    <td width="54%">&nbsp;</td>
+    <td width="2%">&nbsp;</td>
+  </tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><strong>TEMP. STUDENT ID # : </strong>$stud_id 
+      (given by the Guidance or the online admission)</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><strong>STUDENT ID # : </strong>$stud_id (given 
+      by the Registrar)</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><strong>COURSE/YEAR : </strong>$course_year</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><strong>CURRICULUM YEAR : </strong>$curr_year</td>
+  </tr>
+  <tr> 
+    <td height="5" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="20" colspan="3"><strong>I - PERSONAL DATA</strong></td>
+  </tr>
+  <tr> 
+    <td width="25%" height="15">Last Name :<strong>$lname</strong> </td>
+    <td width="23%">First Name :<strong>$fname </strong></td>
+    <td width="52%">Maiden Name: <strong>$mname </strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Name in Native Language Character :<strong>$native_name</strong></td>
+  </tr>
+  <tr> 
+    <td height="15">Gender : <strong>$gender</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td height="15">&nbsp;Religion : <strong>$religion</strong></td>
+    <td height="15">Nationality :<strong> $nationality</strong></td>
+  </tr>
+  <tr> 
+    <td  colspan="2" height="15">If Alien/Foreigner, ACR No. : <strong>$ACR_no</strong></td>
+    <td height="15">[ ]PVA &nbsp;&nbsp;&nbsp; [ ]USVA</td>
+  </tr>
+  <tr> 
+    <td height="15">Age : <strong>$age</strong> yrs. old &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td height="15">Date of Birth :<strong>$birth_date</strong></td>
+    <td height="15">Place of Birth : <strong>$birth_place</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Civil Status : <strong>$civil_status</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">If Married:</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Woman 
+      : State Maiden's Name : <strong>$woman_name</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Man 
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Name of Spouse &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      : <strong>$spouse_name</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No. 
+      of children :&nbsp;&nbsp;<strong>$n_children</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><strong>II - RESIDENCE DATA</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><font color="#0000FF"><u>Home Address:</u></font></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">House No./Street/Barangay : <strong>$house_num</strong> 
+      City/Municipality : <strong>$city_num</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Province/State : <strong>$province</strong> Country 
+      : <strong>$country</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Zipcode : <strong>$zipcode </strong>Telephone 
+      Nos.: <strong>$tel_num</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><font color="#0000FF"><u>Current Contact Address:</u></font></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Contact Person/Guardian Name : <strong>$contact_name</strong> 
+      Relation : <strong>$relation</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Apartment Name/House No./Street/Barangay : <strong>$apartment_name</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">City/Municipality :<strong> $city_num_cur_coin</strong> 
+      Province/State :<strong> $prov_cur_coin</strong> Country :<strong> $country_cur_con</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Zipcode : <strong>$zipcode_cur_con</strong> Telephone 
+      Nos.:<strong> $tel_num_cur_con</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Email Address : <strong>$email_cur_con</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><font color="#0000FF"><u>Emergency Contact Data:</u> 
+      (if not same as above)</font></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Contact Person Name <strong>: $contact_name</strong> 
+      Relation :<strong> $relation_emergency</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Apartment Name/House No./Street/Barangay <strong>$apartment_name_emergency</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">City/Municipality :<strong> $city_num_</strong><strong>emergency</strong> 
+      Province/State :<strong> $prov_emergency</strong> Country <strong>: $country_emergency</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Zipcode : <strong>$zipcode_emergency</strong> 
+      Telephone Nos.:<strong> $tel_num_emergency</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><strong>III - PHYSICAL DESCRIPTION</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Height :<strong>$height</strong> Weight :<strong>$weight</strong> 
+      Built :<strong>$built</strong> Eyes :<strong>$eyes</strong> Hair :<strong>$hair</strong> 
+      Complexion :<strong>$complexion</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Other Distinguishing Features :<strong>$dis_features</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Physical Handicap or Disability (if any) :<strong>$handicap</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><strong>IV - FAMILY DATA</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><font color="#0000FF"><u>Parents:</u></font></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Father&#8217;s Name :<strong>$fathers_name</strong> 
+      Occupation :<strong>$father_occupation</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Company Name :<strong>$father_co_name </strong>Telephone 
+      Nos.:<strong>$father_co_tel</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Company Address :<strong>$father_co_address</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Father&#8217;s Email Address :<strong>$father_email_address</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Mother&#8217;s Name :<strong>$mothers_name</strong> 
+      Occupation :<strong>$mothers_occupation</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Company Name :<strong>$mother_co_name</strong> 
+      Telephone Nos. :<strong>$mother_co_tel</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Company Address :<strong>$mother_co_address</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Mother&#8217;s Email Address :<strong>$mother_email</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><font color="#0000FF"><u>Brother(s)/Sister(s):</u></font></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">NAME &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COURSE/OCCUPATION 
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      &nbsp;&nbsp;SCHOOL/COMPANY</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"> ___________________________________ ___________________________________ 
+      ______________________________________ </td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">___________________________________ ___________________________________ 
+      ______________________________________ </td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">___________________________________ ___________________________________ 
+      ______________________________________ </td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"> ___________________________________ ___________________________________ 
+      ______________________________________ </td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">___________________________________ ___________________________________ 
+      ______________________________________ </td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">___________________________________ ___________________________________ 
+      ______________________________________ </td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">___________________________________ ___________________________________ 
+      ______________________________________ </td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><strong>V - EDUCATIONAL BACKGROUND</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NAME 
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      &nbsp; COURSE/YEAR GRADUATED &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HONORS/AWARDS</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Elementary &nbsp;&nbsp;___________________________________ 
+      ___________________________________ __________________________</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">High School &nbsp;&nbsp;___________________________________ 
+      ___________________________________ __________________________</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">College &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;___________________________________ 
+      ___________________________________ __________________________</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Post Graduate___________________________________ 
+      ___________________________________ __________________________</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Vocational &nbsp;&nbsp;&nbsp;&nbsp;___________________________________ 
+      ___________________________________ __________________________</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><strong>VI &#8211; GENERAL QUALIFICATION</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><font color="#0000FF"><u>Languages:</u> </font><strong>$languages</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><font color="#0000FF"><u>Hobbies:</u> </font><strong>$hobbies</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><font color="#0000FF"><u>Skills :</u></font><strong> 
+      $skills</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><font color="#0000FF"><u>Talents :</u></font><strong> 
+      $talents</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><font color="#0000FF"><u>Sports :</u></font> <strong> 
+      $sports</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><font color="#0000FF"><u>Honors/Awards/Merits: 
+      (ex. &quot;Model Student, 1990&quot;) :</u></font> <strong> $honors_awards</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><font color="#0000FF"><u><font color="#0000FF">Extra-Curricular 
+      Activities : (Organizations, Clubs, etc)</font> :</u></font> <strong> $extra_curr</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3"><strong>VII &#8211; REFERENCES</strong></td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" colspan="3">Write two or three references (in VMUF or San 
+      Carlos City) who can vouch or guarantee for your total behavior.</td>
+  </tr>
+  <tr> 
+    <td height="15"><u>NAME</u></td>
+    <td height="15"><u>ADDRESS</u></td>
+    <td height="15">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15"><strong>$name1</strong></td>
+    <td colspan="2" height="15"><strong>$address1</strong></td>
+  </tr>
+  <tr> 
+    <td height="15"><strong>$name2</strong></td>
+    <td colspan="2" height="15"><strong>$address2</strong></td>
+  </tr>
+  <tr> 
+    <td height="15"><strong>$name3</strong></td>
+    <td colspan="2" height="15"><strong>$address3</strong></td>
+  </tr>
+  <tr> 
+    <td height="15">&nbsp;</td>
+    <td colspan="2" height="15">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15">&nbsp;</td>
+    <td colspan="2" height="15">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15">&nbsp;</td>
+    <td colspan="2" height="15">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="3">I HEREBY CERTIFY that the foregoing answers are true and correct 
+      to the best of my knowledge and belief.</td>
+  </tr>
+  <tr> 
+    <td colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="3">&nbsp;</td>
+  </tr>
+  <tr>
+    <td colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="3">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>_________________________________________</td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Student&#8217;s 
+      Signature</td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+</body>
+</html>

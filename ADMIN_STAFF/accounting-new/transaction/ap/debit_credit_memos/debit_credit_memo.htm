@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../../../css/tableBorder.css" rel="stylesheet" type="text/css"></head>
+</head>
+<script language="javascript" src="../../../../../jscript/date-picker.js"></script>
+<script language="javascript">
+function ShowDetail(strPrintStat) {
+	strTBDate = document.form_.bl_date.value;
+	if(strTBDate.length == 0) {
+		alert("Please enter  cutoff date..");
+		return;
+	}
+	document.form_.print_stat.value = strPrintStat;
+	document.form_.print_pg.value = "1";
+	document.form_.submit();
+}
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.WebInterface" %>
+<form name="form_" method="post" action="/ADMIN_STAFF/accounting/reports/financial_statements/balance_sheet/bl_1st_page.jsp">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="3" align="center" bgcolor="#A49A6A"><font color="#FFFFFF">
+	  <strong>:::: ACCOUNTS PAYABLE SUBSIDIARY LEDGER PAGE ::::</strong></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="20" colspan="2"><font size="1">&nbsp;</font></td>
+      <td width="11%"><font size="1"><a href="../../../reports/ap_reports/subsidiary_ledger/ap_deliveries.htm"></a></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td width="4%" height="25"><label></label></td>
+      <td colspan="2"><label>
+        <input name="radiobutton" type="radio" value="radiobutton">
+      Supplier 
+      <input name="radiobutton" type="radio" value="radiobutton">
+Non-supplier </label></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td colspan="2">Payee Name :      
+      <input name="textfield" type="text" size="32" maxlength="32"></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td colspan="2"><div align="right"></div></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+    <tr> 
+      <td height="25" colspan="7" align="center" bgcolor="#B4C5D6" class="thinborder"><strong><font color="#000000">:: 
+        SUMMARY A/P LEDGER OF $PAYEE_NAME :: </font></strong></td>
+    </tr>
+    <tr> 
+      <td width="12%" height="26" class="thinborder"><strong>POSTED DATE </strong></td>
+      <td width="20%" height="26" class="thinborder"><strong>PARTICULAR</strong></td>
+      <td width="12%" class="thinborder"><strong>RETURNS</strong></td>
+      <td width="9%" height="26" class="thinborder"><strong>DUE DATE </strong></td>
+      <td width="11%" class="thinborder"><strong>DEBIT</strong></td>
+      <td width="10%" height="26" class="thinborder"><strong>CREDIT</strong></td>
+      <td width="26%" height="26" class="thinborder"><strong>BALANCE</strong></td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder">01/01/2007</td>
+      <td height="25" class="thinborder">BALANCE FORWARDED </td>
+      <td class="thinborder">&nbsp;</td>
+      <td height="25" class="thinborder">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td height="25" class="thinborder" align="right">5,000.00</td>
+      <td height="25" class="thinborder" align="right">5,000.00</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder">01/01/2007</td>
+      <td height="25" class="thinborder"><a href="../../../reports/ap_reports/subsidiary_ledger/ap_add_to_ledger.htm" target="_blank">DELIVERIES</a> 
+      </td>
+      <td class="thinborder">&nbsp;</td>
+      <td height="25" class="thinborder">01/15/2007</td>
+      <td class="thinborder" align="right">15,000.00</td>
+      <td height="25" class="thinborder" align="right">25,000.00</td>
+      <td height="25" class="thinborder" align="right"><font color="#FF0000">10,000.00 
+        $CURRENCY </font></td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder">02/01/2007</td>
+      <td height="25" class="thinborder"><a href="../../../reports/ap_reports/subsidiary_ledger/ap_add_to_ledger.htm" target="_blank">DELIVERIES</a><a href="#" target="_blank"></a></td>
+      <td class="thinborder">&nbsp;</td>
+      <td height="25" class="thinborder">02/20/2007</td>
+      <td class="thinborder" align="right">5,000.00</td>
+      <td height="25" class="thinborder" align="right">25,000.00</td>
+      <td height="25" class="thinborder" align="right">15,000.00 $CURRENCY</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder">03/01/2007</td>
+      <td height="25" class="thinborder"><a href="../../../reports/ap_reports/subsidiary_ledger/ap_add_to_ledger.htm" target="_blank">DELIVERIES</a><a href="#" target="_blank"> 
+        </a></td>
+      <td class="thinborder"><a href="#">03/05/2007</a></td>
+      <td height="25" class="thinborder">03/15/2007</td>
+      <td class="thinborder" align="right">10,000.00</td>
+      <td height="25" class="thinborder" align="right">50,000.00</td>
+      <td height="25" class="thinborder" align="right">45,000.00 $CURRENCY</td>
+    </tr>
+    <tr> 
+      <td height="20" colspan="4">&nbsp;</td>
+      <td colspan="2" rowspan="4"><strong>TOTAL BALANCE : &nbsp;&nbsp;&nbsp;</strong></td>
+      <td rowspan="4"><table width="100%" border="0" cellpadding="0" cellspacing="0">
+          <tr> 
+            <td height="20"><strong>$TOTAL $currency1</strong></td>
+          </tr>
+          <tr> 
+            <td height="20"><strong>$TOTAL $currency2</strong></td>
+          </tr>
+          <tr> 
+            <td height="20"><strong>$TOTAL $currency3</strong></td>
+          </tr>
+          <tr> 
+            <td height="20"><strong>$TOTAL $currency4</strong></td>
+          </tr>
+        </table></td>
+    </tr>
+    <tr>
+      <td height="20" colspan="4"><strong><span style="font-size:10px;"><strong><img src="../../../../../images/view.gif" border="0"></strong></span></strong><span style="font-size:10px;">click 
+        to SHOW DETAILED A/P SL</span></td>
+    </tr>
+    <tr>
+      <td height="20" colspan="4"><strong><span style="font-size:10px;"> <img src="../../../../../images/print.gif" border="0"></span></strong><span style="font-size:10px;">click 
+        to PRINT SUMMARY LEDGER </span></td>
+    </tr>
+    <tr>
+      <td height="20" colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="7"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td><strong>Transaction Ref. # </strong></td>
+      <td><strong>autogenerated</strong></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="4%" height="25">&nbsp;</td>
+      <td width="20%">Transaction Type </td>
+      <td width="23%"><input type="radio" name="radiobutton" value="radiobutton">
+        Debit 
+        <input type="radio" name="radiobutton" value="radiobutton">
+        Credit </td>
+      <td width="53%">A/P GL Code : 
+      <input type="text" name="textfield3"> 
+      (show this when Credit) </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Transaction Date</td>
+      <td height="25" colspan="2"><input name="textfield2" type="text" size="10" maxlength="10"> 
+        <strong><span style="font-size:10px;"><img src="../../../../../images/calendar_new.gif" border="0"></span></strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Amount</td>
+      <td height="25" colspan="2"><input name="textfield22" type="text" size="16" maxlength="6"> 
+        <select name="select">
+          <option>Philippine Peso</option>
+          <option>US Dollar</option>
+          <option>Euro</option>
+          <option>Francs</option>
+          <option>Yen</option>
+        </select> <strong><span style="font-size:10px;"><img src="../../../../../images/update.gif" border="0"></span></strong><span style="font-size:10px;">click 
+        to update currenly list</span></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Particulars</td>
+      <td height="25" colspan="2"> <textarea name="textarea" cols="45" rows="3"></textarea></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="3"><strong><font color="#0000FF">NOTE: Transaction 
+        reference number will be generated after saving.</font></strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2"><strong><span style="font-size:10px;"><strong><img src="../../../../../images/save.gif" border="0"></strong></span></strong><span style="font-size:10px;"> 
+        click to SAVE transaction <strong><span style="font-size:10px;"><strong><img src="../../../../../images/cancel.gif" border="0"></strong></span></strong><span style="font-size:10px;"> 
+        click to CANCEL transaction </span></span></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="4">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="4">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="4">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1">
+      <td height="25" colspan="4" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+  <input type="hidden" name="print_pg">
+  <input type="hidden" name="print_stat">
+</form>
+</body>
+</html>

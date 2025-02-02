@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>COURSES CURRICULUM</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" type="text/JavaScript">
+<!--
+
+
+
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+//-->
+</script>
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" bgcolor="#FFFFFF" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#47768F"> 
+      <td height="25" colspan="5" bgcolor="#A49A6A" ><div align="center"><strong><font color="#FFFFFF">:: 
+          SCHOLARSHIP EXAM RESULTS ::</font></strong></div></td>
+    </tr>
+    
+  </table>
+  <table width="100%" border="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="6%">&nbsp;</td>
+      <td width="18%">School Name</td>
+      <td colspan="2"> <select name="select2">
+        </select> </td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Last Name</font></td>
+      <td colspan="2"><input name="textfield" type="text" size="48" maxlength="64" class="textbox" 
+	  onfocus="style.backgroundColor='#D3EBFF'" onblur="style.backgroundColor='white'"></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>First Name</td>
+      <td colspan="2"><input name="textfield2" type="text" size="48" maxlength="64" class="textbox" 
+	  onfocus="style.backgroundColor='#D3EBFF'" onblur="style.backgroundColor='white'"></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>Month Taken</td>
+      <td colspan="2"><select name="select">
+          <option>January</option>
+          <option>February</option>
+          <option>March</option>
+          <option>April</option>
+          <option>May</option>
+          <option>June</option>
+          <option>July</option>
+          <option>August</option>
+          <option>September</option>
+          <option>October</option>
+          <option>November</option>
+          <option>December</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="2"><img src="../../images/view.gif" width="40" height="31"><font size="1">click 
+        to show result</font></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B9B292"> 
+      <td height="25" colspan="4"><div align="center"><font color="#FFFFFF"><strong>EXAM 
+          RESULT</strong></font></div></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="25">Total Points </td>
+      <td width="55%"><strong>$total_pts</strong></td>
+      <td  width="21%">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="25">Score </td>
+      <td><strong>$score</strong></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="25">Percentage </td>
+      <td><strong>$percentage</strong></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="25">Scholarship Grant </td>
+      <td><strong>$scholarship_grant</strong></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="4">&nbsp;</td>
+    </tr>
+  </table>
+
+  <table width="100%" bgcolor="#FFFFFF" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="100%" colspan="2">&nbsp;</td>
+    </tr>
+
+    <tr> 
+      <td colspan="2"><div align="center"> </div></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+
+</form>
+</body>
+</html>

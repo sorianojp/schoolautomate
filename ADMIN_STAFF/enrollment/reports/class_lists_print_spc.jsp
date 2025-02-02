@@ -1,0 +1,352 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+th {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+    TABLE.thinborder {
+    border-top: solid 1px #000000;
+    border-right: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+
+    TD.thinborder {
+    border-left: solid 1px #000000;
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+TD.thinborderNONE {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+TD.thinborderBOTTOM {
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+
+-->
+</style>
+</head>
+<body >
+<%@ page language="java" import="utility.*,enrollment.ReportEnrollment,java.util.Vector" %>
+<%
+
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+
+	String strErrMsg = null;
+	String strTemp = null;
+	String strDegType = null;//0-> uG,1->doctoral,2->college of medicine.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Enrollment-REPORT-print class list","class_lists_print.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_veiwall.jsp","While Opening DB Con");
+
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+Vector vSecDetail = null;
+Vector vClassList = null;
+Vector vOfferingCollege = null;
+
+ReportEnrollment reportEnrl= new ReportEnrollment();
+
+vSecDetail = reportEnrl.getSubSecSchDetail(dbOP,request.getParameter("section"));
+
+if(vSecDetail == null)
+	strErrMsg = reportEnrl.getErrMsg();
+else
+{
+	vClassList = reportEnrl.getClassList(dbOP,request);
+	if(vClassList == null)
+		strErrMsg = reportEnrl.getErrMsg();
+}
+if(strErrMsg == null)
+{
+	vOfferingCollege = reportEnrl.getCollegeDeptOffering(dbOP,request.getParameter("course_index"));
+	//if(vOfferingCollege == null)
+	//	strErrMsg = reportEnrl.getErrMsg();
+}
+
+
+String strSchCode = (String)request.getSession(false).getAttribute("school_code");
+String strInfo5   = (String)request.getSession(false).getAttribute("info5");
+if(strSchCode == null)
+	strSchCode = "";
+boolean bolIsVMA = strSchCode.startsWith("VMA");
+Vector vVMASection = new Vector();
+String strVMASection = null;
+
+
+//dbOP.cleanUP();//clean up here.
+if(strErrMsg != null){dbOP.cleanUP();
+%>
+<table width="100%" border="0" >
+    <tr>
+      <td width="100%"><div align="center"><%=strErrMsg%></div></td>
+    </tr>
+</table>
+<%}else{
+if(bolIsVMA) {
+	String strSQLQuery = "select id_number, section_name from stud_curriculum_hist "+
+	"join enrl_final_cur_list on (enrl_final_cur_list.user_index = stud_curriculum_hist.user_index) "+
+	"join user_Table on (user_table.user_index = stud_curriculum_hist.user_index) "+
+	"where enrl_final_cur_list.sy_from = stud_curriculum_hist.sy_from and current_semester = semester and enrl_final_cur_list.is_valid = 1 and "+
+	" enrl_final_cur_list.sub_sec_index = "+ request.getParameter("section")+" and is_temp_stud = 0";
+	java.sql.ResultSet rs = dbOP.executeQuery(strSQLQuery);
+	while(rs.next()) {
+		vVMASection.addElement(rs.getString(1));
+		vVMASection.addElement(rs.getString(2));
+	}
+	rs.close();
+}
+
+
+String[] astrConvertSem = {"Summer","1st Semester","2nd Semester","3rd Semester","4th Semester","5th Semester"};
+%>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+      <td width="100%"><div align="center"><%=SchoolInformation.getSchoolName(dbOP,true,false)%><br>
+          <%=SchoolInformation.getAddressLine1(dbOP,false,true)%></div></td>
+    </tr>
+<%if(vOfferingCollege != null){%>
+    <tr>
+      <td height="30"><div align="center"><%=(String)vOfferingCollege.elementAt(0)%><strong><br>
+        </strong><%=WI.getStrValue(vOfferingCollege.elementAt(1))%><strong><br>
+        CLASS LIST<br>
+        </strong><%=astrConvertSem[Integer.parseInt(request.getParameter("offering_sem"))]%>, SY
+		<%=request.getParameter("sy_from")%> - <%=request.getParameter("sy_to")%></div></td>
+    </tr>
+<%}%>
+</table>
+
+<table  width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr > 
+    <td height="10" colspan="2" ><div align="center"> 
+        <hr size="1">
+      </div></td>
+  </tr>
+  <tr > 
+    <td width="42%" height="10" >Subject code : <%=request.getParameter("subject_name")%></td>
+    <td width="58%">Descriptive Title : <%=request.getParameter("subject_desc")%>
+	<%if(WI.fillTextValue("nstp_val").length() > 0) {%>
+	:::: <%=WI.fillTextValue("nstp_val")%><%}%></td>
+  </tr>
+  <tr > 
+    <td colspan="2" height="10" ><hr size="1"></td>
+  </tr>
+  <tr > 
+    <td height="25" >Section : <%=request.getParameter("section_name")%></td>
+    <td height="25" >Instructor : 
+      <%if(vSecDetail != null){%>
+      <%=WI.getStrValue(vSecDetail.elementAt(0))%> 
+      <%}%>
+    </td>
+  </tr>
+  <tr > 
+    <td height="25" colspan="2" align="center">
+<%if(vSecDetail != null){%>
+		<table width="75%" border="0" cellspacing="0" cellpadding="0" class="thinborder">
+			<tr>
+          	  <td height="20" align="center" class="thinborder"><font size="1"><strong>ROOM NUMBER</strong></font></td>
+			  <td align="center" class="thinborder"><font size="1"><strong>LOCATION</strong></font></td>
+			  <td align="center" class="thinborder"><font size="1"><strong>SCHEDULE</strong></font></td>
+			</tr>
+    <%for(int i = 1; i<vSecDetail.size(); i+=3){%> 
+			<tr>			  
+			  <td height="20" align="center" class="thinborder"><%=WI.getStrValue((String)vSecDetail.elementAt(i),"&nbsp;")%></td>				  
+			  <td align="center" class="thinborder"><%=WI.getStrValue((String)vSecDetail.elementAt(i+1),"&nbsp;")%></td>				  
+          	  <td align="center" class="thinborder"><%=WI.getStrValue((String)vSecDetail.elementAt(i+2),"&nbsp;")%></td>
+			</tr>
+	<%}%>
+	  </table>
+<%}%>
+	</td>
+  </tr>
+  <tr > 
+    <td height="10"  colspan="2">&nbsp;</td>
+  </tr>
+  <tr > 
+    <td height="20"  colspan="2" align="center" class="thinborderBOTTOM"><strong>LIST OF STUDENTS OFFICIALLY ENROLLED
+<%if(WI.fillTextValue("show_not_validated").compareTo("1") == 0){%>
+ NOT VALIDATED 
+<%}else if(WI.fillTextValue("grade_relation").equals("1")){%>
+	(WITHOUT FINAL GRADE)
+<%}else if(WI.fillTextValue("grade_relation").equals("2")){%>
+	(HAVING FINAL GRADE)
+    <%}%> 
+ 		</strong></td>
+  </tr>
+</table>
+<%
+boolean bolShowPageBreak = false;
+
+int iNoOfStudPerPage = 26;
+
+if(WI.fillTextValue("rows_per_pg").length() > 0)
+	iNoOfStudPerPage = Integer.parseInt(WI.fillTextValue("rows_per_pg"));
+
+int iStudPrinted = 0;
+int iTotalStud = Integer.parseInt( (String)vClassList.elementAt(0));
+int iStudCount = 1;
+int iTotalPageCount = iTotalStud/iNoOfStudPerPage;
+if(iTotalStud %iNoOfStudPerPage > 0)
+	++iTotalPageCount;
+int iPageCount = 1;
+String strDispPageNo = null;
+
+boolean bolMalePrinted = false;
+boolean bolFemalePrinted = false;
+
+for(int i=1; i<vClassList.size();){
+	strDispPageNo = Integer.toString(iPageCount)+" of "+Integer.toString(iTotalPageCount);
+	++iPageCount;
+	iStudPrinted = 0;
+
+
+if(WI.fillTextValue("show_not_validated").length() == 0){%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+  <tr style="font-weight:bold">
+    <td width="4%" align="center" class="thinborderBOTTOM">COUNT</td>
+    <td width="12%" align="center" class="thinborderBOTTOM">STUDENT ID</td>
+    <td width="61%" align="center" class="thinborderBOTTOM">STUDENT NAME</td>
+    <td width="17%" align="center" class="thinborderBOTTOM">COURSE </td>
+    <td width="6%" align="center" class="thinborderBOTTOM">YEAR</td>
+  </tr>
+  
+<%
+int iIndexOf;
+
+for(;i<vClassList.size();){
+	if(iStudPrinted++ == iNoOfStudPerPage) {
+		bolShowPageBreak = true;
+		break;
+	}
+	else {
+		bolShowPageBreak = false;
+	}
+if(!bolMalePrinted && vClassList.elementAt(i+7).equals("M")) {
+	bolMalePrinted = true;
+%>
+  <tr>
+    <td height="25" colspan="5" class="thinborderNONE"><u>Male</u></td>
+  </tr>
+<%}if(!bolFemalePrinted && vClassList.elementAt(i+7).equals("F")) {
+	iStudCount = 1;
+	bolFemalePrinted = true;
+%>
+  <tr>
+    <td height="25" colspan="5" class="thinborderNONE"><u>Female</u></td>
+  </tr>
+<%}%>
+  <tr>
+    <td class="thinborderNONE"><%=iStudCount++%></td>
+    <td height="25" align="center" class="thinborderNONE"><%=(String)vClassList.elementAt(i)%></td>
+    <td class="thinborderNONE"><%=WebInterface.formatName((String)vClassList.elementAt(i+2),(String)vClassList.elementAt(i+3),(String)vClassList.elementAt(i+1),4)%></td>
+    <td class="thinborderNONE"><%=(String)vClassList.elementAt(i+4)%><%=WI.getStrValue((String)vClassList.elementAt(i+5),"-","","")%></td>
+    <td align="center" class="thinborderNONE"><%=WI.getStrValue(vClassList.elementAt(i+6),"N/A")%></td>
+  </tr>
+<%i = i+8;}%>
+</table>
+<%}else{//show the students not confirmed.%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+    <tr>
+      <td width="14%" rowspan="2" align="center" class="thinborder"><strong>DATE OF 
+        ENROLLMENT</strong></td>
+      <td width="14%" height="27" rowspan="2" align="center" class="thinborder"><strong>STUDENT 
+        ID</strong></td>
+      <td height="20" colspan="3" align="center" class="thinborder"><strong>STUDENT 
+        NAME</strong></td>
+      
+    <td width="12%" rowspan="2" align="center" class="thinborder"><strong>COURSE 
+      CODE </strong></td>
+      <td width="15%" rowspan="2" align="center" class="thinborder"><strong>MAJOR</strong></td>
+      <td width="7%" rowspan="2" align="center" class="thinborder"><strong>YR</strong></td>
+      <td width="7%" rowspan="2" align="center" class="thinborder"><strong>GEN</strong></td>
+    </tr>
+    <tr> 
+      <td width="17%" align="center" class="thinborder"><strong>LASTNAME</strong></td>
+      <td width="16%" align="center" class="thinborder"><strong>FIRSTNAME</strong></td>
+      <td width="5%" align="center" class="thinborder"><strong>MI</strong></td>
+    </tr>
+<%
+for(;i<vClassList.size();){
+if(iStudPrinted++ == iNoOfStudPerPage) {
+	bolShowPageBreak = true;
+	break;
+}
+else
+	bolShowPageBreak = false;
+%>
+    <tr>
+      <td align="center" class="thinborder"><%=(String)vClassList.elementAt(i + 8)%></td>
+      <td height="25" class="thinborder"><div align="center"><%=(String)vClassList.elementAt(i)%></div></td>
+      <td class="thinborder"><%=(String)vClassList.elementAt(i+1)%></td>
+      <td class="thinborder"><%=(String)vClassList.elementAt(i+2)%></td>
+      <td class="thinborder"><div align="center">&nbsp;<%=WI.getStrValue(vClassList.elementAt(i+3)," ").charAt(0)%>&nbsp;</div></td>
+      <td class="thinborder"><%=(String)vClassList.elementAt(i+4)%></td>
+      <td class="thinborder"><%=WI.getStrValue(vClassList.elementAt(i+5),"&nbsp;")%></td>
+      <td class="thinborder"><div align="center"><%=WI.getStrValue(vClassList.elementAt(i+6),"N/A")%></div></td>
+      <td class="thinborder"><div align="center"><%=(String)vClassList.elementAt(i+7)%></div></td>
+    </tr>
+<%
+i = i+9;
+}%>
+  </table>
+<%}%>  
+<table  width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="3%" height="18">&nbsp;</td>
+    <td width="73%" valign="top">&nbsp;</td>
+    <td width="24%" valign="top"><div align="right">page <strong><%=strDispPageNo%></strong></div></td>
+  </tr>
+</table>
+<!-- introduce page break here -->
+<% if(bolShowPageBreak){%>
+<DIV style="page-break-before:always" >&nbsp;</DIV>
+<%}//do not print for last page.
+
+}%>
+<%if(strSchCode.startsWith("UPH") && strInfo5 == null) {%>
+<u><strong>To the Faculty:</strong></u> Please do not accept any student whose name does <strong>NOT</strong> appear in the Class List 
+unless an official Registration Form indicating that he/she is enrolled in the <u>Subject/Course/Section</u> presented.
+
+<%}%>
+
+<script language="JavaScript">
+	window.print();
+</script>
+<%} // only if there is no error
+%>
+
+
+
+</body>
+</html>

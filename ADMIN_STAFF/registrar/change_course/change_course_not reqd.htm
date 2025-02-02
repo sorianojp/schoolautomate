@@ -1,0 +1,237 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript">
+function ReloadPage()
+{
+	document.studdata_entry.submit();
+}
+function CheckStudent()
+{
+	document.studdata_entry.checkStudent.value = "1";
+}
+function AddRecord()
+{
+	document.studdata_entry.deleteRecord.value = 0;
+	document.studdata_entry.addRecord.value = 1;
+
+	document.studdata_entry.submit();
+}
+function DeleteRecord(strTargetIndex)
+{
+	document.studdata_entry.deleteRecord.value = 1;
+	document.studdata_entry.addRecord.value = 0;
+
+	document.studdata_entry.info_index.value = strTargetIndex;
+
+	document.studdata_entry.submit();
+}
+
+</script>
+
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,GradeSystem,java.util.Vector" %>
+<%
+
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	String strErrMsg = "";
+	String strTemp = null;
+	WebInterface WI = new WebInterface(request);
+	String strStudName = null;
+	Vector vTemp = null;
+	int i=0; int j=0;
+
+	float fCredit = 0;
+
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_veiwall.jsp","While Opening DB Con");
+
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+GradeSystem GS = new GradeSystem();
+vTemp = GS.getTransfereeStudInfo(dbOP, request.getParameter("stud_id"));
+if(vTemp == null)
+	strErrMsg = GS.getErrMsg();
+else
+{
+
+	//check for add - edit or delete
+	strTemp = WI.fillTextValue("addRecord");
+	if(strTemp.compareTo("1") == 0)
+	{
+		//add it here and give a message.
+		if(GS.createTFFinalGrade(dbOP,request))//true -> old data.
+			strErrMsg = "Grade added successfully.";
+		else
+			strErrMsg = GS.getErrMsg();
+	}
+	else //either it is edit or delete -- this page handles add/edit/delete/viewall :-)
+	{
+		strTemp = WI.fillTextValue("deleteRecord");
+		if(strTemp.compareTo("1") == 0)
+		{
+			if(GS.delTFFinalGrade(dbOP,request.getParameter("info_index"),(String)request.getSession(false).getAttribute("login_log_index") ))
+				strErrMsg = "Grade deleted successfully.";
+			else
+				strErrMsg = GS.getErrMsg();
+		}
+	}
+}
+
+if(strErrMsg == null) strErrMsg = "";
+String[] astrConvertYear ={"","1st Year","2nd Year","3rd Year","4th Year","5th Year","6th Year","7th Year"};
+String[] astrConvertSem = {"Summer","1st Sem","2nd Sem","3rd Sem","4th Sem"};
+%>
+
+
+<form action="../transferee_acc/./transferee_data_entry.jsp" method="post" name="studdata_entry">
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="4"><div align="center"><font color="#FFFFFF"><strong>::::
+          CHANGE/SECOND COURSE INFORMATION MANAGEMENT :::: </strong> <br>
+          (migrating curriculum data from curriculum course to another curriculum
+          course)</font></div></td>
+    </tr>
+	</table>
+	<table  bgcolor="#FFFFFF" width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr >
+		<td width="2%" height="25" colspan="4">&nbsp;</td>
+      <td width="98%"><strong><%=strErrMsg%></strong></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr >
+      <td width="4%" height="25">&nbsp;</td>
+      <td width="14%">Student ID</td>
+      <td width="16%"><input name="stud_id" type="text" size="16" value="<%=WI.fillTextValue("stud_id")%>"></td>
+      <td width="66%"><font size="1">
+        <input name="image" type="image" onClick="CheckStudent();" src="../../../images/form_proceed.gif">
+        </font></td>
+    <tr >
+      <td  colspan="4" height="25"><hr size="1"></td>
+    </tr>
+	</table>
+<%
+if(vTemp != null && vTemp.size() > 0)
+{%>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td width="96%">Student ID : </td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>Student name : <strong><%=WI.formatName((String)vTemp.elementAt(0),(String)vTemp.elementAt(1),(String)vTemp.elementAt(2),1)%></strong></td>
+    </tr>
+    <tr>
+      <td width="4%" height="25">&nbsp;</td>
+      <td>Previous course :<strong> <%=(String)vTemp.elementAt(12)%></strong></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>Graduated Course : </td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>Major :<strong> <%=(String)vTemp.elementAt(13)%></strong></td>
+    </tr>
+  </table>
+
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr >
+      <td  colspan="3" height="25"><hr size="1"></td>
+    </tr>
+    <tr>
+      <td width="4%" height="25">&nbsp;</td>
+      <td>New Course : <strong><%=(String)vTemp.elementAt(3)%></strong></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>Major : <strong><%=(String)vTemp.elementAt(4)%></strong></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>Curriculum year : <strong><%=(String)vTemp.elementAt(5)%> - <%=(String)vTemp.elementAt(6)%></strong></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>Year level upon entry : <strong><%=astrConvertYear[Integer.parseInt((String)vTemp.elementAt(9))]%></strong></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>School Year : <strong><%=(String)vTemp.elementAt(7)%></strong> to <strong><%=(String)vTemp.elementAt(8)%></strong></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">Term : <strong><%=astrConvertSem[Integer.parseInt((String)vTemp.elementAt(10))]%></strong></td>
+    </tr>
+    <tr>
+      <td colspan="2" height="25"><hr size="1"></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="25" ><img src="../../../images/move.gif" width="49" height="34">
+        <font size="1">click to move curriculum info from old course to new course</font></td>
+      <td height="25" ><img src="../../../images/copy_all.gif" width="55" height="27">
+        <font size="1">click to copy curriculum info from graduated course to
+        new course</font></td>
+    </tr>
+    <%
+	for(i=0; i< vTemp.size(); ++i)
+	{
+	/*System.out.println(vTemp.elementAt(i));
+	System.out.println(vTemp.elementAt(i+1));
+	System.out.println(vTemp.elementAt(i+2));
+	System.out.println(vTemp.elementAt(i+3));
+	System.out.println(vTemp.elementAt(i+4));
+	System.out.println(vTemp.elementAt(i+5));
+	System.out.println(vTemp.elementAt(i+6));
+	*/
+	fCredit  = Float.parseFloat((String)vTemp.elementAt(i+6));%>
+    <tr>
+      <td height="25" colspan="2">&nbsp;</td>
+      <%i = i+8;
+	}%>
+    </tr>
+    <tr>
+      <td height="25" colspan="2"><div align="center"><strong>MOVING OF PREVIOUS
+          COURSE CURRICULUM TO NEW COURSE CURRICULUM SUCCESSFUL!</strong></div></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr>
+      <td width="44%" height="25"><img src="../../../images/view.gif" width="40" height="31">
+        <font size="1">click to view previous course residency status</font></td>
+      <td width="56%" height="25"><img src="../../../images/view.gif" width="40" height="31">
+        <font size="1">click to view new course residency status</font></td>
+    </tr>
+  </table>
+ <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+  </form>
+</body>
+</html>

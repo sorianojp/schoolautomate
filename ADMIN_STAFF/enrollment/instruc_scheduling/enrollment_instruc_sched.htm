@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="6"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>::::
+          INSTRUCTOR SCHEDULING PAGE ::::</strong></font></div></td>
+    </tr>
+	</table>
+
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="48%" valign="bottom">College </td>
+      <td width="50%" valign="bottom"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Subject
+        offerings for school year </font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td><select name="select">
+        </select> </td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+        <input name="school_year_fr" type="text" size="4" maxlength="4" value="<%=WI.fillTextValue("school_year_fr")%>">
+        to
+        <input name="school_year_to" type="text" size="4" maxlength="4" value="<%=WI.fillTextValue("school_year_to")%>">
+        </font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td valign="bottom">Course<font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;
+        </font></td>
+      <td valign="bottom">Subject offerings for term <font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;
+        </font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+        <select name="select2">
+        </select>
+        </font></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+        <select name="select3" onChange="ReloadIfNecessary();">
+          <option value="1">1st</option>
+          <%
+strTemp = request.getParameter("semester");
+if(strTemp == null) strTemp = "";
+
+if(strTemp.compareTo("2") ==0)
+{%>
+          <option value="2" selected>2nd</option>
+          <%}else{%>
+          <option value="2">2nd</option>
+          <%}if(strTemp.compareTo("3") ==0)
+{%>
+          <option value="3" selected>3rd</option>
+          <%}else{%>
+          <option value="3">3rd</option>
+          <%}if(strTemp.compareTo("0") ==0)
+{%>
+          <option value="0" selected>Summer</option>
+          <%}else{%>
+          <option value="0">Summer</option>
+          <%}%>
+        </select>
+        </font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td valign="bottom"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Subject
+        offerings for year :
+        <select name="year" onChange="ReloadIfNecessary();">
+          <option value="1">1st</option>
+          <%
+strTemp = request.getParameter("year");
+if(strTemp == null) strTemp = "";
+if(strTemp.compareTo("2") ==0)
+{%>
+          <option value="2" selected>2nd</option>
+          <%}else{%>
+          <option value="2">2nd</option>
+          <%}if(strTemp.compareTo("3") ==0)
+{%>
+          <option value="3" selected>3rd</option>
+          <%}else{%>
+          <option value="3">3rd</option>
+          <%}if(strTemp.compareTo("4") ==0)
+{%>
+          <option value="4" selected>4th</option>
+          <%}else{%>
+          <option value="4">4th</option>
+          <%}if(strTemp.compareTo("5") ==0)
+{%>
+          <option value="5" selected>5th</option>
+          <%}else{%>
+          <option value="5">5th</option>
+          <%}if(strTemp.compareTo("6") ==0)
+{%>
+          <option value="6" selected>6th</option>
+          <%}else{%>
+          <option value="6">6th</option>
+          <%}if(strTemp.compareTo("7") ==0)
+{%>
+          <option value="7" selected>7th</option>
+          <%}else{%>
+          <option value="7">7th</option>
+          <%}if(strTemp.compareTo("8") ==0)
+{%>
+          <option value="8" selected>8th</option>
+          <%}else{%>
+          <option value="8">8th</option>
+          <%}%>
+        </select>
+        </font></td>
+      <td valign="bottom">Section
+        <select name="select4">
+        </select></td>
+    </tr>
+    <tr>
+      <td colspan="3" height="25"><hr size="1"></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td colspan="2">Get instructors name from college of
+        <select name="select9">
+        </select></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td colspan="2"><div align="right"><img src="../../../images/show_list.gif" width="57" height="34"><font size="1">click
+          to showl ist of subjects offered with the specifications</font></div></td>
+    </tr>
+  </table>
+
+  <table width="100%" border="1" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#B9B292">
+      <td height="25" colspan="7"><div align="center"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">LIST
+          OF SUBJECTS OFFERED</font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td width="10%" height="25"><div align="center"><font size="1">SUBJECT CODE</font></div></td>
+      <td width="24%"><div align="center"><font size="1">SUBJECT <strong>TITLE</strong></font></div></td>
+      <td width="8%"><div align="center"><font size="1">SUBJECT CATEGORY</font></div></td>
+      <td width="5%"><div align="center"><font size="1">TOTAL UNITS</font></div></td>
+      <td width="22%" height="25"><div align="center"><font size="1">SCHEDULE</font></div></td>
+      <td width="21%"><div align="center"><font size="1">INSTRUCTOR</font></div></td>
+      <td width="10%" height="25"><div align="center"><font size="1">CLICK TO
+          ASSIGN INSTR.</font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="33">&nbsp;</td>
+      <td height="33">&nbsp;</td>
+      <td height="33">&nbsp;</td>
+      <td height="33">&nbsp;</td>
+      <td height="33">&nbsp;</td>
+      <td height="33"><input name="textfield" type="text" size="25"></td>
+      <td height="33"><div align="center"><img src="../../../images/assign.gif" width="41" height="18"></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25"><input name="textfield2" type="text" size="25"></td>
+      <td height="25"><div align="center"><img src="../../../images/assign.gif" width="41" height="18"></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25"><input name="textfield3" type="text" size="25"></td>
+      <td height="25"><div align="center"><img src="../../../images/assign.gif" width="41" height="18"></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25"><input name="textfield4" type="text" size="25"></td>
+      <td height="25"><div align="center"><img src="../../../images/assign.gif" width="41" height="18"></div></td>
+    </tr>
+  </table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr >
+      <td height="25" colspan="2"  bgcolor="#FFFFFF">&nbsp;</td>
+    </tr>
+    <tr >
+      <td height="25"  bgcolor="#FFFFFF"><div align="center"><img src="../../../images/save.gif" width="48" height="28"><font size="1">click
+          to save entries</font></div></td>
+      <td  bgcolor="#FFFFFF"><img src="../../../images/cancel.gif" width="51" height="26"><font size="1">click
+        to cancel and clear entries </font></td>
+    </tr>
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="2" >&nbsp;</td>
+    </tr>
+  </table>
+
+</form>
+
+</body>
+</html>

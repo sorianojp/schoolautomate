@@ -1,0 +1,77 @@
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../css/reportlink.css" rel="stylesheet" type="text/css">
+</head>
+<body bgcolor="#93B5BB">
+  
+<table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+  <tr bgcolor="#6A99A2"> 
+    <td height="25" colspan="2"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>:::: 
+        CLASS ATTENDANCE MAIN PAGE::::</strong></font></div></td>
+  </tr>
+  <tr> 
+    <td width="22%">&nbsp;</td>
+    <td width="78%" height="25">&nbsp;</td>
+  </tr>
+<!--
+  <tr> 
+    <td>&nbsp;</td>
+    <td height="25"><a href="./attendance_setting.jsp"><font color="#FF0000">Attendance 
+      Setting (Visible to System Admin only) </font></a></td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+    <td height="25">&nbsp;&nbsp;&nbsp;&nbsp;- <a href="./attendance_setting.jsp"><font color="#FF0000">Attendance 
+      Status Equivalent Point</font></a></td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+    <td height="25">&nbsp;&nbsp;&nbsp;&nbsp;- <a href="./attendance_setting.jsp"><font color="#FF0000">Lab 
+      Subject Equivalent Point</font></a></td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+    <td height="25">&nbsp;&nbsp;&nbsp;&nbsp;- <a href="./attendance_setting.jsp"><font color="#FF0000">Encode 
+      authentication List </font></a></td>
+  </tr>
+-->
+  <tr>
+    <td>&nbsp;</td>
+    <td height="25">&nbsp;&nbsp;&nbsp;&nbsp;- <a href="./cm_attendance_set_total_days.jsp">
+	<font color="#FF0000">Set Total No. of Days in a Semester</font></a></td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+    <td height="25"><a href="./cm_attendance.jsp"><font color="#FF0000">Record 
+      Attendance(Per day Per subject)</font></a></td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+    <td height="25"><a href="cm_attendance_per_period.jsp"><font color="#FF0000">Record 
+      Attendance(Per Period)</font></a></td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+    <td height="25"><a href="./cm_attendance_view.jsp"><font color="#FF0000">View 
+      Class Attendance (Per day Per subject)</font></a></td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+    <td height="25"><a href="cm_attendance_view_summary.jsp"><font color="#FF0000">View 
+      Class Attendance Summary</font></a></td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+    <td height="25">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td bgcolor="#6A99A2">&nbsp;</td>
+    <td height="25" bgcolor="#6A99A2">&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+</html>

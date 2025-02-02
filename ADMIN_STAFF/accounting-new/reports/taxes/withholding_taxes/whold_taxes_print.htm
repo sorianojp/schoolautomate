@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../../../css/tableBorder.css" rel="stylesheet" type="text/css"></head>
+</head>
+<script language="javascript" src="../../../../../jscript/date-picker.js"></script>
+<script language="javascript">
+function ShowDetail(strPrintStat) {
+	strTBDate = document.form_.bl_date.value;
+	if(strTBDate.length == 0) {
+		alert("Please enter  cutoff date..");
+		return;
+	}
+	document.form_.print_stat.value = strPrintStat;
+	document.form_.print_pg.value = "1";
+	document.form_.submit();
+}
+</script>
+<body>
+<%@ page language="java" import="utility.WebInterface" %>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td height="25"><font color="#000000" size="2"> BIR FORM 1601E - SCHEDULE 
+      I</font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="25"><font size="2"><font color="#000000">ALPHABETICAL LIST OF 
+      PAYEES FROM WHOM TAXES WERE WITHHELD</font></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td width="77%" height="25"><font size="2">FOR THE MONTH OF $MONTH, $YEAR</font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="10">&nbsp;</td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="25">TIN : $school_tin_number</td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="30">WITHHOLDING AGENT'S NAME : $SCHOOL_COMPLETE_NAME</td>
+  </tr>
+  <tr bgcolor="#FFFFFF">
+    <td height="30"><a href="javascript:ShowDetail('1');"><img src="../../../../../images/print.gif" border="0"></a> 
+      c<font size="1">lick to print report</font></td>
+  </tr>
+</table>
+<form name="form_" method="post" action="/ADMIN_STAFF/accounting/reports/financial_statements/balance_sheet/bl_1st_page.jsp">
+  <table width="1600" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+    <tr> 
+      <td height="25" align="center" class="thinborder"><font size="1">SE<br>
+        Q<br>
+        </font></td>
+      <td align="center" class="thinborder"><font size="1">TAXPAYER</font></td>
+      <td align="center" class="thinborder"><font size="1">CORPORATION</font></td>
+      <td align="center" class="thinborder"><font size="1">INDIVIDUAL</font></td>
+      <td align="center" class="thinborder"><font size="1">ATC</font></td>
+      <td height="25" align="center" class="thinborder"><font size="1">NATURE 
+        OF PAYMENT</font></td>
+      <td height="25" align="center" class="thinborder">AMOUNT OF</td>
+      <td height="25" align="center" class="thinborder">TAX</td>
+      <td align="center" class="thinborder">AMOUNT OF</td>
+    </tr>
+    <tr> 
+      <td height="25" align="center" class="thinborder"><font size="1">NO.</font></td>
+      <td align="center" class="thinborder"><font size="1">IDENTIFICATION</font></td>
+      <td align="center" class="thinborder"><font size="1">(Registered Name)</font></td>
+      <td align="center" class="thinborder"><font size="1">(Last Name, First Name, 
+        Middle Name)</font></td>
+      <td align="center" class="thinborder"><font size="1">CODE</font></td>
+      <td height="25" align="center" class="thinborder"><font size="1">&nbsp;</font></td>
+      <td height="25" align="center" class="thinborder"><font size="1">INCOME 
+        PAYMENT</font></td>
+      <td height="25" align="center" class="thinborder"><font size="1">RATE</font></td>
+      <td align="center" class="thinborder"><font size="1">TAX WITHHELD</font></td>
+    </tr>
+    <tr> 
+      <td height="25" align="center" class="thinborder">&nbsp;</td>
+      <td align="center" class="thinborder">NUMBER</td>
+      <td align="center" class="thinborder">&nbsp;</td>
+      <td align="center" class="thinborder">&nbsp;</td>
+      <td class="thinborder" align="center">&nbsp;</td>
+      <td align="center" class="thinborder">&nbsp;</td>
+      <td align="center" class="thinborder">&nbsp;</td>
+      <td align="center" class="thinborder">&nbsp;</td>
+      <td align="center" class="thinborder">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="2%" height="26" class="thinborder"><div align="center">(1)</div></td>
+      <td width="9%" class="thinborder" align="right"><div align="center">(2)</div></td>
+      <td width="16%" class="thinborder" align="right"><div align="center">(3)</div></td>
+      <td width="17%" class="thinborder" align="right"><div align="center">(4)</div></td>
+      <td width="4%" align="right" class="thinborder"><div align="center">(5)</div></td>
+      <td width="31%" align="right" class="thinborder">&nbsp;</td>
+      <td width="7%" align="right" class="thinborder"><div align="center">(6)</div></td>
+      <td width="6%" align="right" class="thinborder"><div align="center">(7)</div></td>
+      <td width="8%" align="right" class="thinborder"><div align="center">(8)</div></td>
+    </tr>
+    <tr> 
+      <td height="26" class="thinborder">-----</td>
+      <td class="thinborder" align="right"><div align="left">--------------------------</div></td>
+      <td class="thinborder" align="right"><div align="left">------------------------------------------------</div></td>
+      <td class="thinborder" align="right"><div align="left">----------------------------------------------</div></td>
+      <td align="right" class="thinborder"><div align="left">---------</div></td>
+      <td align="right" class="thinborder"><div align="left">--------------------------------------------------------------------------------</div></td>
+      <td align="right" class="thinborder"><div align="left">-------------------</div></td>
+      <td align="right" class="thinborder"><div align="left">---------------</div></td>
+      <td align="right" class="thinborder"><div align="left">---------------------</div></td>
+    </tr>
+    <tr> 
+      <td height="26" class="thinborder"><div align="right">1</div></td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="26" class="thinborder"><div align="right">2</div></td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="26" class="thinborder"><div align="right">3</div></td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="26" class="thinborder"><div align="right">4</div></td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="26" class="thinborder"><div align="right"></div></td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="26" colspan="2" class="thinborder"><strong>GRAND TOTAL :</strong></td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder">&nbsp;</td>
+      <td align="right" class="thinborder"><strong>$TOTAL_TAX_WITHHELD</strong></td>
+    </tr>
+  </table>
+  <input type="hidden" name="print_pg">
+  <input type="hidden" name="print_stat">
+</form>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<style type="text/css">
+<!--
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+
+td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+
+th {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+
+-->
+</style>
+<body >
+<%@ page language="java" import="utility.*,ReportEnrollment,java.util.Vector" %>
+<%
+ 
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	WebInterface WI = new WebInterface(request);
+	
+	String strErrMsg = null;
+	String strTemp = null;
+	String strDegType = null;//0-> uG,1->doctoral,2->college of medicine.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Enrollment-REPORT-student load print","student_sched_print.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_veiwall.jsp","While Opening DB Con");
+		
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<table width="100%" border="0">
+    <tr> 
+      <td width="100%"><div align="center"></div></td>
+    </tr>
+</table>
+<table width="100%" border="0">
+  <tr> 
+    <td width="100%"><div align="center">VIRGEN MILAGROSA UNIVERSITY FOUNDATION<br>
+        San Carlos City, Pangasinan<br>
+        <strong><br>
+        </strong> $COLLEGE<br>
+        $DEPARTMENT <br>
+        <br>
+        <font size="2"><strong>PERFORMANCE REPORT</strong></font><br>
+        School Year $school_year<br>
+        <br>
+      </div></td>
+  </tr>
+</table>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr > 
+    <td width="100%" height="19">&nbsp;</td>
+  </tr>
+</table>
+  
+<table width="100%" border="1" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+  <tr> 
+    <td width="13%" height="27" ><div align="center"><font size="1"><strong>PLANNED 
+        ACTIVITIES </strong></font></div></td>
+    <td width="21%" height="27"><div align="center"><font size="1"><strong>ACCOMPLISHMENT 
+        TO DATE</strong></font></div></td>
+    <td width="6%" height="27"><div align="center"><font size="1"><strong>% PROFILE 
+        </strong></font></div></td>
+    <td width="16%"><div align="center"><font size="1"><strong>PROBLEMS ENCOUNTERED</strong></font></div></td>
+    <td width="15%"><div align="center"><font size="1"><strong>ACTION TAKEN </strong></font></div></td>
+    <td width="10%"><div align="center"><font size="1"><strong>PROJECTION</strong></font></div></td>
+    <td width="15%"><div align="center"><font size="1"><strong>EVALUATION</strong></font></div></td>
+  </tr>
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="2%" height="18" rowspan="3">&nbsp;</td>
+    <td height="15" colspan="2">&nbsp;</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="20" colspan="2">Approved by: </td>
+    <td width="61%" height="20">Prepared by: <strong>$prepared_by_name</strong></td>
+  </tr>
+  <tr> 
+    <td width="6%" height="20" valign="top">&nbsp;</td>
+    <td width="31%" height="20"><strong>$approved_by_name</strong></td>
+    <td width="61%" height="20">Adviser(s) : <strong>$adviser_name</strong></td>
+  </tr>
+  <tr> 
+    <td height="18">&nbsp;</td>
+    <td valign="top">&nbsp;</td>
+    <td valign="top">$POSITION</td>
+    <td valign="top">&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>

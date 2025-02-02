@@ -1,0 +1,316 @@
+<%@ page language="java" import="utility.*,enrollment.ScaledScoreConversion,java.util.Vector " %>
+<%
+	WebInterface WI   = new WebInterface(request);
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+<%
+response.setHeader("Pragma","No-Cache");
+response.setDateHeader("Expires",0);
+response.setHeader("Cache-Control","no-Cache"); //HTTP 1.0
+response.setHeader("Cache-Control","no-store"); //HTTP 1.1
+%>
+
+</head>
+<script language="JavaScript" src="../../../jscript/date-picker.js"></script>
+<script language="JavaScript" src="../../../jscript/common.js"></script>
+<script language="JavaScript">
+function ReloadPage(){
+	document.form_.info_index.value = '';
+	document.form_.prepareToEdit.value = '';
+	document.form_.submit();
+}
+
+function PageAction(strAction, strInfoIndex){
+	if(strAction == '0'){
+		if(!confirm("Do you want to delete this entry?"))
+			return;
+	}
+	
+	if(strInfoIndex.length > 0)
+		document.form_.info_index.value = strInfoIndex;
+	
+	document.form_.page_action.value = strAction;	
+	document.form_.submit();
+}
+
+function PrepareToEdit(strInfoIndex){
+	document.form_.prepareToEdit.value = '1';
+	document.form_.info_index.value = strInfoIndex;
+	document.form_.submit();
+}
+</script>
+
+
+<body bgcolor="#D2AE72">
+<form name="form_" action="./iq_score_description.jsp" method="post">
+<%
+	DBOperation dbOP  = null;
+	String strErrMsg  = null;	
+	String strTemp    = null;
+	String strTemp2   = null;
+	String strTemp3   = null;
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Guidance & Counseling-IQ Test","iq_score_description.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+									"Guidance & Counseling","IQ Test",request.getRemoteAddr(), null);
+
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+//end of authenticaion code.
+
+ScaledScoreConversion scoreConversion = new ScaledScoreConversion();
+Vector vRetResult = new Vector();
+Vector vEditInfo  = new Vector();
+String strPrepareToEdit = WI.fillTextValue("prepareToEdit");
+
+strTemp = WI.fillTextValue("page_action");
+if(strTemp.length() > 0){
+	if(scoreConversion.operateOnIQDescription(dbOP, request, Integer.parseInt(strTemp)) == null)
+		strErrMsg = scoreConversion.getErrMsg();
+	else{
+		if(strTemp.equals("0"))
+			strErrMsg = "Entry Successfully Deleted.";
+		if(strTemp.equals("1"))
+			strErrMsg = "Entry Successfully Saved.";
+		if(strTemp.equals("2"))
+			strErrMsg = "Entry Successfully Updated.";
+		strPrepareToEdit = "";
+		
+	}
+}
+
+vRetResult = scoreConversion.operateOnIQDescription(dbOP, request, 4);
+if(vRetResult == null)
+	strErrMsg = scoreConversion.getErrMsg();
+	
+if(strPrepareToEdit.length() > 0){
+	vEditInfo = scoreConversion.operateOnIQDescription(dbOP, request, 3);
+	if(vEditInfo == null)
+		strErrMsg = scoreConversion.getErrMsg();
+}
+
+%>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="6"><div align="center"><font color="#FFFFFF"><strong>::::
+          I.Q. SCORE DESCRIPTION ::::</strong></font></div></td>
+    </tr>
+    <tr><td height="25" colspan="6">&nbsp; &nbsp; &nbsp; <strong><font size="3" color="#FF0000"><%=WI.getStrValue(strErrMsg)%></font></strong></td></tr>
+</table>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF" id="myTable2">
+	<tr>
+		<td height="25" width="5%">&nbsp;</td>
+		<td width="15%">I.Q. Range From</td>
+		<%
+		strTemp = WI.fillTextValue("range_from");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(1);
+		%>
+		<td>
+		<input type="text" name="range_from" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" 
+					onBlur="AllowOnlyInteger('form_','range_from');style.backgroundColor='white';" 
+					onkeyup="AllowOnlyInteger('form_','range_from')" size="5" maxlength="5" value="<%=strTemp%>" />
+		</td>
+	</tr>
+	
+	<tr>
+		<td height="25">&nbsp;</td>
+		<td>I.Q. Range To</td>
+		<%
+		strTemp = WI.fillTextValue("range_to");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(2);
+		%>
+		<td>
+		<input type="text" name="range_to" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" 
+					onBlur="AllowOnlyInteger('form_','range_to');style.backgroundColor='white';" 
+					onkeyup="AllowOnlyInteger('form_','range_to')" size="5" maxlength="5" value="<%=strTemp%>" />
+		</td>
+	</tr>
+	
+	<tr>
+		<td height="25">&nbsp;</td>
+		<td>Description</td>
+		<%
+		strTemp = WI.fillTextValue("iq_description");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(3);
+		%>
+		<td>
+		<input type="text" name="iq_description" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" 
+					onBlur="style.backgroundColor='white';" 
+					size="50" maxlength="128" value="<%=strTemp%>" />
+		</td>
+	</tr>
+	
+	<tr>
+		<td height="25">&nbsp;</td>
+		<td>Description Code</td>
+		<%
+		strTemp = WI.fillTextValue("iq_desc_code");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(4);
+		%>
+		<td>
+		<input type="text" name="iq_desc_code" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" 
+					onBlur="style.backgroundColor='white';" 
+					size="20" maxlength="64" value="<%=strTemp%>" />
+		</td>
+	</tr>
+	
+	<tr>
+		<td height="25" width="5%">&nbsp;</td>
+		<td width="15%">Exam Name</td>
+		<%
+		strTemp = WI.fillTextValue("exam_main_index");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(7);
+		%>		
+		<td>
+		<select name="exam_main_index" onChange="document.form_.submit();">
+			<option value="">Select Any</option>
+			<%=dbOP.loadCombo("EXAM_MAIN_INDEX","exam_name", " from CDD_EXAM_MAIN where is_valid = 1 order by exam_name ", strTemp, false)%>
+		</select>
+		</td>
+	</tr>
+	<%if(strTemp.length() > 0){
+		if(strTemp.equals("2")){
+		
+		strTemp = WI.fillTextValue("rating_main_index");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(8);
+	%>
+	<tr>
+		<td height="25" width="5%">&nbsp;</td>
+		<td width="15%">I.Q. Test Name</td>
+		<td>
+		<select name="rating_main_index" onChange="document.form_.submit();">
+		<option value=""></option>
+		<%=dbOP.loadCombo("RATING_MAIN_INDEX","IQ_EXAM_NAME", " from CDD_IQ_RATING_EXAM_NAME where is_valid = 1 order  by iq_exam_name", strTemp, false)%>
+		</select>		
+		</td>
+	</tr>
+	<%}
+	}%>
+	<tr><td colspan="3">&nbsp;</td></tr>
+	
+	<tr>
+		<td colspan="2" height="25">&nbsp;</td>
+		<td>
+		<%if(iAccessLevel > 1){
+			if(strPrepareToEdit.length() == 0){
+		%>			
+				<a href="javascript:PageAction('1','');">
+				<img src="../../../images/save.gif" border="0"></a>		
+				<font size="1">Click to save conversion</font>
+			<%}else if(strPrepareToEdit.length() > 0 && vEditInfo != null && vEditInfo.size() > 0){%>
+				<a href="javascript:PageAction('2','<%=(String)vEditInfo.elementAt(0)%>');">
+				<img src="../../../images/edit.gif" border="0"></a>		
+				<font size="1">Click to update conversion</font>
+			<%}%>			
+			<a href="javascript:ReloadPage();">
+			<img src="../../../images/cancel.gif" border="0"></a>		
+			<font size="1">Click to refresh page</font>
+		<%}%>
+		</td>
+	</tr>
+	<tr><td colspan="3">&nbsp;</td></tr>
+</table>
+  
+  
+<%if(vRetResult != null && vRetResult.size() > 0){%>
+<table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF" class="thinborder">
+	<tr>
+		<td height="25" class="thinborder" colspan="6" align="center"><strong>LIST OF I.Q. SCORE DESCRIPTION</strong></td>
+	</tr>
+	
+	<tr>
+		<td class="thinborder" align="center" height="25" width="20%"><strong>I.Q.Range From</strong></td>
+		<td class="thinborder" align="center" width="20%"><strong>I.Q. Range To</strong></td>
+		<td class="thinborder" align="" width="20%"><strong>Description</strong></td>
+		<td class="thinborder" align="center" width="10%"><strong>Description Code</strong></td>
+		<td class="thinborder" align="center" width="15%"><strong>Exam Name</strong></td>
+		<td class="thinborder" align="center" width="15%"><strong>Option</strong></td>
+	</tr>
+	
+	<%
+	for(int i = 0; i < vRetResult.size(); i+=9){
+	%>
+	
+	<tr>
+		<td align="center" class="thinborder"><%=(String)vRetResult.elementAt(i+1)%></td>
+		<td align="center" class="thinborder"><%=(String)vRetResult.elementAt(i+2)%></td>
+		<td align="" class="thinborder"><%=WI.getStrValue((String)vRetResult.elementAt(i+3),"&nbsp;")%></td>
+		<td align="center" class="thinborder"><%=WI.getStrValue((String)vRetResult.elementAt(i+4),"&nbsp;")%></td>
+		<td align="" class="thinborder"><%=WI.getStrValue((String)vRetResult.elementAt(i+5),"&nbsp;")%><%=WI.getStrValue((String)vRetResult.elementAt(i+6),"-","","")%></td>
+		<td class="thinborder" align="center">
+			<a href="javascript:PrepareToEdit('<%=(String)vRetResult.elementAt(i)%>');">
+			<img src="../../../images/edit.gif" border="0"></a>
+			
+			<%if(iAccessLevel == 2){%>
+			<a href="javascript:PageAction('0','<%=(String)vRetResult.elementAt(i)%>');">
+			<img src="../../../images/delete.gif" border="0"></a>
+			<%}%>
+		</td>
+	</tr>
+	
+	<%}%>
+</table>
+<%}%>
+
+
+  
+<table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+    <tr>
+      <td colspan="8" height="25" >&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="8"  height="25" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+<input type="hidden" name="page_action" >
+<input type="hidden" name="info_index" value="<%=WI.fillTextValue("info_index")%>" />
+<input type="hidden" name="prepareToEdit" value="<%=strPrepareToEdit%>">
+
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

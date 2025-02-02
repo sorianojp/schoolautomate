@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/css/tableBorder.css" rel="stylesheet" type="text/css"></head>
+</head>
+<script language="javascript" src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/jscript/date-picker.js"></script>
+<script language="javascript">
+function ShowDetail(strPrintStat) {
+	strTBDate = document.form_.bl_date.value;
+	if(strTBDate.length == 0) {
+		alert("Please enter  cutoff date..");
+		return;
+	}
+	document.form_.print_stat.value = strPrintStat;
+	document.form_.print_pg.value = "1";
+	document.form_.submit();
+}
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.WebInterface" %>
+<form name="form_" method="post" action="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/ADMIN_STAFF/accounting/reports/balance_sheet/bl_1st_page.jsp">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="4"  align="center" bgcolor="#A49A6A"><font color="#FFFFFF"><strong>:::: 
+          DELIVERY - RETURN RECEIVED ITEMS TO SUPPLIER PAGE ::::</strong></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="30">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td width="11%" height="30">&nbsp;</td>
+      <td width="12%">PO No. :</td>
+      <td width="32%"><input type="text" name="req_no" class="textbox" value="<%=strTemp%>"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"></td>
+      <td width="45%"><a href="javascript:OpenSearchPO();"><img src="../../../images/search.gif" border="0"></a><font size="1">click to search po no.</font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="30">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><a href="javascript:ProceedClicked();"><img src="../../../images/form_proceed.gif" border="0"></a></td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#C78D8D"> 
+      <td width="4%" height="26">&nbsp;</td>
+      <td colspan="4" align="center"><strong>REQUISITION DETAILS FOR PURCHASE ORDER NO. : <%=(String)vReqInfo.elementAt(1)%></strong></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>PO Status:</td>
+      <td><strong><%=astrReqStatus[Integer.parseInt((String)vReqInfo.elementAt(3))]%></strong></td>
+      <td>PO Date :</td>
+      <td><strong><%=(String)vReqInfo.elementAt(2)%></strong></td>
+    </tr>
+    <tr> 
+      <td height="25" width="2%">&nbsp;</td>
+      <td width="22%">Requisition No. :</td>
+      <td width="28%"><strong><%=(String)vReqInfo.elementAt(4)%></strong></td>
+      <td width="20%">Requested by :</td>
+      <td width="28%"> <strong><%=(String)vReqInfo.elementAt(5)%></strong></td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td>Request Type :</td>
+      <td><strong><%=astrReqType[Integer.parseInt((String)vReqInfo.elementAt(6))]%></strong></td>
+      <td>Purpose/Job :</td>
+      <td><strong><%=(String)vReqInfo.elementAt(7)%></strong></td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td>Requisition Status :</td>
+      <td><strong><%=astrReqStatus[Integer.parseInt((String)vReqInfo.elementAt(8))]%></strong></td>
+      <td>Requisition Date :</td>
+      <td><strong><%=(String)vReqInfo.elementAt(9)%></strong></td>
+    </tr>
+    <%if(((String)vReqInfo.elementAt(10)) == null){%>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td>Non-Acad. Office/Dept :</td>
+      <td><strong><%=(String)vReqInfo.elementAt(11)%></strong></td>
+      <td>Date Needed :</td>
+      <td><strong><%=WI.getStrValue((String)vReqInfo.elementAt(12),"&nbsp;")%></strong></td>
+    </tr>
+    <%}else{%>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td>College/Dept :</td>
+      <td><strong><%=(String)vReqInfo.elementAt(10)+"/"+WI.getStrValue((String)vReqInfo.elementAt(11),"All")%></strong></td>
+      <td>Date Needed :</td>
+      <td><strong><%=WI.getStrValue((String)vReqInfo.elementAt(12),"&nbsp;")%></strong></td>
+    </tr>
+    <%}%>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+    <tr> 
+      <td height="25" bgcolor="#B9B292" colspan="10" class="thinborder" align="center"><font color="#FFFFFF"><strong>LIST OF PO ITEM(S) DELIVERED</strong></font></td>
+    </tr>
+    <tr> 
+      <td width="5%" height="25" class="thinborder"  align="center"><strong>ITEM#</strong></td>
+      <td width="4%" class="thinborder"  align="center"><strong>QTY</strong></td>
+      <td width="4%" class="thinborder"  align="center"><strong>UNIT</strong></td>
+      <td width="29%" class="thinborder"  align="center"><strong>ITEM / PARTICULARS  / DESCRIPTION </strong></td>
+      <td width="12%" class="thinborder"  align="center"><strong>SUPPLIER CODE </strong></td>
+      <td width="9%" class="thinborder"  align="center"><strong>&nbsp;SHIPPING METHOD</strong></td>
+      <td width="9%" class="thinborder"  align="center"><strong>INVOICE NO</strong></td>
+      <td width="10%" class="thinborder"  align="center"><strong>RECEIVE STATUS</strong></td>
+      <td width="10%" class="thinborder"  align="center"><strong>DATE RECEIVED</strong></td>
+      <td width="8%" class="thinborder"  align="center"><strong>RETURN</strong></td>
+    </tr>
+    <%iCount = 1;
+	for(int iLoop = 0;iLoop < vReqItems.size();iLoop+=12,++iCount){%>
+    <tr> 
+      <td height="25" class="thinborder" align="center"><%=iCount%>&nbsp;</td>
+      <td class="thinborder" align="center"><%=(String)vReqItems.elementAt(iLoop+1)%>&nbsp;</td>
+      <td class="thinborder" align="center"><%=(String)vReqItems.elementAt(iLoop+2)%>&nbsp;</td>
+      <td class="thinborder" align="center"><%=(String)vReqItems.elementAt(iLoop+3)%> / <%=(String)vReqItems.elementAt(iLoop+4)%><%=WI.getStrValue((String)vReqItems.elementAt(iLoop+9),"(",")","")%></td>
+      <td class="thinborder" align="center"><%=WI.getStrValue((String)vReqItems.elementAt(iLoop+10),"&nbsp;")%>&nbsp;</td>
+      <td class="thinborder" align="center"><%=WI.getStrValue((String)vReqItems.elementAt(iLoop+11),"&nbsp;")%>&nbsp;</td>
+      <td class="thinborder" align="center"><%=(String)vReqItems.elementAt(iLoop+5)%>&nbsp;</td>
+      <td class="thinborder" align="center"><%=astrReceiveStat[Integer.parseInt((String)vReqItems.elementAt(iLoop+6))]%>&nbsp;</td>
+      <td class="thinborder" align="center"><%=(String)vReqItems.elementAt(iLoop+7)%>&nbsp;</td>
+      <td class="thinborder" align="center"><input type="checkbox" name="checkbox" value="checkbox"></td>
+    </tr>
+    <%}%>
+    <tr> 
+      <td height="25" colspan="10" class="thinborder" align="left"><strong>TOTAL 
+          ITEM(S) : <%=iCount - 1%> </strong></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="10">&nbsp;</td>
+      <td height="10">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td width="95%">Reason for returning item(s) :<br>
+        <select name="select">
+          <option>Defective after few days of use</option>
+          <option>Not meeting the specifications when checked</option>
+        </select>
+          <font size="1"><img src="../../../images/update.gif" border="0">click to UPDATE list of reasons </font><br></td>
+    </tr>
+    <tr> 
+      <td width="5%" height="25">&nbsp;</td>
+      <td><br>
+        Remarks : <br>
+      <textarea name="textarea" cols="40" rows="3"></textarea></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="2" align="center">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2" align="center"><font size="1"><img src="../../../images/save.gif" border="0">click to SAVE item status change &nbsp;&nbsp;&nbsp;&nbsp;<img src="../../../images/cancel.gif" border="0"> click to Cancel item status change </font></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1">
+      <td height="25" colspan="2" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+  <input type="hidden" name="print_pg">
+  <input type="hidden" name="print_stat">
+</form>
+</body>
+</html>

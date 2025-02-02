@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../css/reportlink.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="6"><div align="center"><font color="#FFFFFF"><strong>:::: 
+          SCHOOL FACILITIES FEES MAINTENANCE - POST CHARGES PAGE ::::<br>
+          </strong></font></div></td>
+    </tr>
+	</table>
+	
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25"><a href="fm_schl_fees_post_acct_main.htm"><img src="../../../images/go_back.gif" width="50" height="27" border="0"></a></td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="8%" height="25">&nbsp;</td>
+      <td width="34%" height="25" align="right"><div align="center">School facilities 
+          fee name </div></td>
+      <td width="58%" align="center"><div align="left"> 
+          <select name="select">
+            <option>Select</option>
+            <option>Dormitory</option>
+          </select>
+        </div></td>
+    </tr>
+    <tr> 
+      <td width="8%" height="25">&nbsp;</td>
+      <td width="34%" height="25">&nbsp;</td>
+      <td width="58%" align="center"><div align="left"></div></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td align="center"><div align="left"><a href="fm_schl_fees_post_charges_page1.htm"><img src="../../../images/form_proceed.gif" width="81" height="21" border="0"></a></div></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="9">&nbsp;</td>
+    </tr>
+  </table>
+
+</form>
+</body>
+</html>

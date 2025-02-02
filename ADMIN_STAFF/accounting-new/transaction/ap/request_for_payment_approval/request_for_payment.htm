@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../../../css/tableBorder.css" rel="stylesheet" type="text/css"></head>
+</head>
+<script language="javascript" src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/jscript/date-picker.js"></script>
+<script language="javascript">
+function ShowDetail(strPrintStat) {
+	strTBDate = document.form_.bl_date.value;
+	if(strTBDate.length == 0) {
+		alert("Please enter  cutoff date..");
+		return;
+	}
+	document.form_.print_stat.value = strPrintStat;
+	document.form_.print_pg.value = "1";
+	document.form_.submit();
+}
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.WebInterface" %>
+<form name="form_" method="post" action="/ADMIN_STAFF/accounting/reports/financial_statements/balance_sheet/bl_1st_page.jsp">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="2" align="center" bgcolor="#A49A6A"><font color="#FFFFFF">
+	  <strong>:::: ACCOUNTS PAYABLE - REQUEST FOR PAYMENT PAGE ::::</strong></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25" colspan="2"><font size="1">&nbsp;</font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td width="7%" height="25">&nbsp;</td>
+      <td width="93%"><input name="radiobutton" type="radio" value="radiobutton">
+Supplier
+  <input name="radiobutton" type="radio" value="radiobutton">
+Non-supplier</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td width="7%" height="25" bgcolor="#CCCCFF">&nbsp;</td>
+      <td height="25" colspan="3" bgcolor="#CCCCFF"><label><font size="1">NOTE : This is for supplier </font></label></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="3">Payee Name :
+      <input name="textfield" type="text" size="32" maxlength="32">
+      <img src="../../../../../images/form_proceed.gif"  border="0"></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="4"><hr size="1"></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">Date :<strong> $auto</strong></td>
+      <td width="52%" height="25">Transaction Ref No.:<strong>$auto</strong></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td width="7%" height="25" bgcolor="#00FFFF">&nbsp;</td>
+      <td height="25" colspan="3" bgcolor="#00FFFF"><label><font size="1">NOTE : This is for non-supplier </font></label></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="3">Payee Name :
+      <input name="textfield" type="text" size="32" maxlength="32">
+        <a href="update_payee_record.htm" target="_blank"><img src="../../../../../images/update.gif"  border="0"></a> 
+        <font size="1">click to add the payee name if not yet in record </font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="3"><img src="../../../../../images/add.gif"  border="0"> <font size="1">click to encode requisiton for payment (This is for those payment not automatically entered in the Ledger) </font></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="4"><hr size="1"></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">Date :<strong> $auto</strong></td>
+      <td width="52%" height="25">Transaction Ref No.:<strong>$auto</strong></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+  
+  <tr>
+    <td height="25" colspan="7" align="center" bgcolor="#B4C5D6" class="thinborder"><strong><font color="#000000">:: SUMMARY A/P LEDGER OF $PAYEE_NAME :: </font></strong></td>
+    </tr>
+  <tr> 
+    <td width="12%" height="26" class="thinborder"><strong>POSTED DATE </strong></td>
+    <td width="13%" height="26" class="thinborder"><strong>PARTICULAR</strong></td>
+    <td width="11%" height="26" class="thinborder"><strong>DUE DATE </strong></td>
+    <td width="13%" class="thinborder"><strong>DEBIT</strong></td>
+    <td width="14%" height="26" class="thinborder"><strong>CREDIT</strong></td>
+    <td width="19%" height="26" class="thinborder"><strong>BALANCE</strong></td>
+    <td width="18%" class="thinborder"><strong>RE<strong>Q</strong>UESTED AMOUNT </strong></td>
+  </tr>
+  <tr> 
+    <td height="25" class="thinborder">01/01/2007</td>
+    <td height="25" class="thinborder"><a href="ap_add_to_ledger.htm" target="_blank">DELIVERIES</a> </td>
+    <td height="25" class="thinborder">01/15/2007</td>
+    <td class="thinborder">15,000.00</td>
+    <td height="25" class="thinborder">25,000.00</td>
+    <td height="25" class="thinborder"><font color="#FF0000">10,000.00 $CURRENCY </font></td>
+    <td class="thinborder"><input name="textfield3" type="text" size="16" maxlength="16"></td>
+  </tr>
+  <tr> 
+    <td height="25" class="thinborder">02/01/2007</td>
+    <td height="25" class="thinborder"><a href="ap_add_to_ledger.htm" target="_blank">DELIVERIES</a><a href="#" target="_blank"></a></td>
+    <td height="25" class="thinborder">02/20/2007</td>
+    <td class="thinborder">5,000.00</td>
+    <td height="25" class="thinborder">25,000.00</td>
+    <td height="25" class="thinborder">15,000.00 $CURRENCY </td>
+    <td class="thinborder"><input name="textfield32" type="text" size="16" maxlength="16"></td>
+  </tr>
+  <tr>
+    <td height="25" class="thinborder">03/01/2007</td>
+    <td height="25" class="thinborder"><a href="ap_add_to_ledger.htm" target="_blank">DELIVERIES</a><a href="#" target="_blank"></a></td>
+    <td height="25" class="thinborder">03/15/2007</td>
+    <td class="thinborder">&nbsp;</td>
+    <td height="25" class="thinborder">50,000.00</td>
+    <td height="25" class="thinborder">50,000.00  $CURRENCY</td>
+    <td class="thinborder"><input name="textfield33" type="text" size="16" maxlength="16"></td>
+  </tr>
+  <tr> 
+    <td height="25" colspan="4"><font color="#FF0000"><u>NOTE:</u> <br>
+      Click on the underlined to view details <br>
+Balance in red color is overdue </font></td>
+    <td height="25" align="right"><strong>BALANCE : &nbsp;&nbsp;&nbsp;</strong></td>
+    <td height="25" colspan="2"><table width="100%" border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td height="20"><strong>$TOTAL
+          $currency1</strong></td>
+      </tr>
+      <tr>
+        <td height="20"><strong>$TOTAL
+          $currency2</strong></td>
+      </tr>
+      <tr>
+        <td height="20"><strong>$TOTAL
+          $currency3</strong></td>
+      </tr>
+      <tr>
+        <td height="20"><strong>$TOTAL
+          $currency4</strong></td>
+      </tr>
+    </table></td>
+    </tr>
+  <tr> 
+    <td height="44">&nbsp;</td>
+    <td height="44">&nbsp;</td>
+    <td height="44" align="right"><strong><br>
+    </strong></td>
+    <td height="44" colspan="2" align="right"><strong>Total Payment Requested</strong>:<strong> &nbsp;&nbsp;&nbsp;</strong> </td>
+    <td height="44" colspan="2" ><strong><u>$total_requested
+      $currency</u></strong></td>
+    </tr>
+  <tr>
+    <td height="25">Remarks : &nbsp;&nbsp;&nbsp;</td>
+    <td height="25" colspan="4"><strong>
+      <textarea name="textarea" cols="32" rows="3">For invoices due for this week. Will be charge for Interest if cant be paid within the week.</textarea>
+    </strong></td>
+    <td height="25">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" colspan="6">&nbsp;</td>
+    </tr>
+</table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+  
+  <tr>
+    <td height="25" colspan="6" align="center" bgcolor="#B4C5D6" class="thinborder"><strong><font color="#000000">:: SUMMARY A/P LEDGER OF $PAYEE_NAME :: </font></strong></td>
+    </tr>
+  <tr> 
+    <td width="13%" height="26" class="thinborder"><strong>POSTED DATE </strong></td>
+    <td width="14%" height="26" class="thinborder"><strong>PARTICULAR</strong></td>
+    <td width="14%" class="thinborder"><strong>DEBIT</strong></td>
+    <td width="25%" height="26" class="thinborder"><strong>CREDIT</strong></td>
+    <td width="13%" height="26" class="thinborder"><strong>BALANCE</strong></td>
+    <td width="21%" class="thinborder"><strong>RE<strong>Q</strong>UESTED AMOUNT </strong></td>
+  </tr>
+  <tr> 
+    <td height="25" class="thinborder">01/01/2007</td>
+    <td height="25" class="thinborder"><a href="ap_add_to_ledger.htm" target="_blank"></a> Professional Fee ($patient name) </td>
+    <td class="thinborder">5,000.00</td>
+    <td height="25" class="thinborder">20,000.00</td>
+    <td height="25" class="thinborder">15,000.00</td>
+    <td class="thinborder"><input name="textfield3" type="text" size="16" maxlength="16"></td>
+  </tr>
+  <tr> 
+    <td height="25" class="thinborder">02/01/2007</td>
+    <td height="25" class="thinborder">Professional Fee ($patient name) </td>
+    <td class="thinborder">&nbsp;</td>
+    <td height="25" class="thinborder">15,000.00</td>
+    <td height="25" class="thinborder">15,000.00  </td>
+    <td class="thinborder"><input name="textfield32" type="text" size="16" maxlength="16"></td>
+  </tr>
+  <tr>
+    <td height="25" class="thinborder">03/01/2007</td>
+    <td height="25" class="thinborder">Allowances</td>
+    <td class="thinborder">&nbsp;</td>
+    <td height="25" class="thinborder">10,000.00</td>
+    <td height="25" class="thinborder">10,000.00</td>
+    <td class="thinborder"><input name="textfield33" type="text" size="16" maxlength="16"></td>
+  </tr>
+  <tr> 
+    <td height="25" colspan="3">&nbsp;</td>
+    <td height="25" align="right"><strong>BALANCE : &nbsp;&nbsp;&nbsp;</strong></td>
+    <td height="25" colspan="2"><strong>$TOTAL
+      </strong></td>
+    </tr>
+  <tr> 
+    <td height="44">&nbsp;</td>
+    <td height="44">&nbsp;</td>
+    <td height="44" colspan="2" align="right"><strong>Total Payment Requested</strong>:<strong> &nbsp;&nbsp;&nbsp;</strong> </td>
+    <td height="44" colspan="2" ><strong><u>$total_requested</u></strong></td>
+    </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" colspan="5">&nbsp;</td>
+    </tr>
+</table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td width="12%" height="25">&nbsp;</td>
+      <td width="88%"><span style="font-size:10px;"><img src="../../../../../images/save.gif" border="0">click to SAVE entries  &nbsp;&nbsp;&nbsp;&nbsp;<img src="../../../../../images/cancel.gif" border="0">click to CANCEL/CLEAR entries </span></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" colspan="2" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+  <input type="hidden" name="print_pg">
+  <input type="hidden" name="print_stat">
+</form>
+</body>
+</html>

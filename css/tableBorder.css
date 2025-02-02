@@ -1,0 +1,118 @@
+    TABLE.thinborder {
+    border-top: solid 1px #000000;
+    border-right: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+    TABLE.thinborderALL {
+    border-top: solid 1px #000000;
+    border-left: solid 1px #000000;
+    border-right: solid 1px #000000;
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+    TD.thinborderNONE {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+
+    TD.thinborderALL {
+    border-top: solid 1px #000000;
+    border-left: solid 1px #000000;
+    border-right: solid 1px #000000;
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+    TD.thinborder {
+    border-left: solid 1px #000000;
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+
+    TD.thinborderRIGHT {
+    border-right: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderLEFT {
+    border-left: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderLEFTRIGHT {
+    border-left: solid 1px #000000;
+    border-right: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderTOPLEFTRIGHT {
+    border-top: solid 1px #000000;
+    border-left: solid 1px #000000;
+    border-right: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderTOP {
+    border-top: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderTOPBOTTOM {
+    border-top: solid 1px #000000;
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderTOPLEFTBOTTOM {
+    border-top: solid 1px #000000;
+    border-left: solid 1px #000000;
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderTOPRIGHT {
+    border-top: solid 1px #000000;
+    border-right: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderTOPLEFT {
+    border-top: solid 1px #000000;
+    border-left: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderTOPBOTTOMRIGHT {
+    border-top: solid 1px #000000;
+    border-bottom: solid 1px #000000;
+    border-right: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderBOTTOM {
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderBOTTOMRIGHT {
+    border-bottom: solid 1px #000000;
+    border-right: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderBOTTOMLEFT {
+    border-bottom: solid 1px #000000;
+    border-left: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    TD.thinborderBOTTOMLEFTRIGHT {
+    border-bottom: solid 1px #000000;
+    border-right: solid 1px #000000;
+    border-left: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }

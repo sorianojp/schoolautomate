@@ -1,0 +1,85 @@
+<%
+String strAuthIndex = (String)request.getSession(false).getAttribute("authTypeIndex");
+if(strAuthIndex != null && (strAuthIndex.equals("4") || strAuthIndex.equals("6")) ) {%>
+	<p style="font-size:14px; color:#FF0000;">Not authorized to access this page.</p>
+<%}%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link href="../../../../css/fontstyle.css" rel="stylesheet" type="text/css" />
+<link href="../../../../css/reportlink.css" rel="stylesheet" type="text/css" />
+</head>
+<body bgcolor="#D2AE72">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="2" bgcolor="#A49A6A" align="center">
+        <font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>:::: 
+          PROJECT MANAGEMENT PAGE ::::</strong></font>
+      </td>
+    </tr>
+</table>
+
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="25">&nbsp;</td>
+    <td width="15%">&nbsp;</td>
+    <td width="75%"><a href="create.jsp">Manage Project </a></td>
+  </tr>
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td width="75%"><a href="update_stat.jsp">Update Project Status </a></td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td><a href="view_details.jsp">View Project Expense Details </a></td>
+  </tr>
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td><a href="search.jsp">Search/View Project(s)</a></td>
+  </tr>
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td width="75%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="24">&nbsp;</td>
+    <td width="15%">&nbsp;</td>
+    <td width="75%">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="24">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="24">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+  <tr bgcolor="#A49A6A"> 
+    <td width="149%" height="25">&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>

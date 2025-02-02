@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+<!--
+<error-page>
+<error-code>404</error-code>
+<location>/error404.html</location>
+</error-page>
+    <servlet-mapping>
+            <servlet-name>invoker</servlet-name>
+            <url-pattern>/servlet/*</url-pattern>
+    </servlet-mapping>
+http://localhost:8080/schoolbliz_vmuf/servlet/fsServer.CommAppletServletInterface
+-->
+<!-- this is an example of auto start
+<servlet>
+  <servlet-name>AutoBackup</servlet-name>
+  <servlet-class>utility.StartupServlet</servlet-class>
+  <load-on-startup>1</load-on-startup>
+</servlet>
+-->
+   
+
+
+     <servlet>
+	<servlet-name>CommAppletServletInterface</servlet-name>
+         <servlet-class>fsServer.CommAppletServletInterface</servlet-class>
+     </servlet>
+     <servlet-mapping>
+         <servlet-name>CommAppletServletInterface</servlet-name>
+         <url-pattern>/servlet/*</url-pattern>
+     </servlet-mapping>
+
+ </web-app>

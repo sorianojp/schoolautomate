@@ -1,0 +1,94 @@
+<%@ page language="java" import="utility.CommonUtil"%>
+<%
+String[] strColorScheme = CommonUtil.getColorScheme(5);
+//strColorScheme is never null. it has value always.
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>HR Welcome Page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+.bgDynamic {
+	background-color:<%=strColorScheme[1]%>
+}
+.footerDynamic {
+	background-color:<%=strColorScheme[2]%>
+}
+</style>
+</head>
+<%
+String strUserId = (String)request.getSession(false).getAttribute("userId");
+String strName = (String)request.getSession(false).getAttribute("first_name");
+if(strName == null) strName ="<NOT FOUND>";
+
+%>
+
+<body bgcolor="#D2AE72" class="bgDynamic">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#A49A6A" class="footerDynamic"> 
+      <td height="25" colspan="3"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>:::: 
+        HUMAN RESOURCE ADMINISTRATION PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr > 
+      <td height="25" colspan="3"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong></strong></font></td>
+    </tr>
+    <tr > 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+<%
+if(strUserId == null){%>
+    <tr > 
+      <td height="24" colspan="3" align="center">
+	  <font size="3" face="Verdana, Arial, Helvetica, sans-serif">You are already logged out. Please login again.</font></td>
+    </tr>
+<%}else{%>
+    <tr > 
+      <td height="25" colspan="3"><div align="center"><strong><font size="3" face="Verdana, Arial, Helvetica, sans-serif">WELCOME 
+        <%=strName%> TO THE HUMAN RESOURCE ADMINISTRATION PAGE!</font></strong></div></td>
+    </tr>
+    <tr > 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr > 
+      <td width="8%">&nbsp;</td>
+      <td width="84%" height="25"> <div align="justify"> 
+          <font size="2" face="Verdana, Arial, Helvetica, sans-serif">Please 
+            note that every activity is monitored closely. For any problem in 
+            the system, contact System Administrator for details. Click the links 
+            under MENU to select operation. It is recommended to logout by clicking 
+            the logout button everytime you leave your PC.</font>
+          
+        <p><font size="2" face="Verdana, Arial, Helvetica, sans-serif">If you 
+          do not agree with the conditions or you are not <b> <%=strUserId%></b>, 
+          please logout</font></p>
+        </div></td>
+      <td width="8%">&nbsp;</td>
+    </tr>
+    <tr > 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr > 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr > 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr > 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+<%}%>    <tr > 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr > 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr > 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#A49A6A" class="footerDynamic"> 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>One Receipt</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+th {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+-->
+</style>
+</head>
+
+<body leftmargin="72" topmargin="0" bottommargin="0">
+<%@ page language="java" import="utility.*,enrollment.FAPayment,java.util.Vector" %>
+<%
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+
+	String strErrMsg = null;
+	String strTemp = null;
+	boolean bolIsFine = false;
+	boolean bolIsDownPmt =false;
+
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Fee Assessment & Payments-PAYMENT-Other school fees","otherschoolfees_print_receipt.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+boolean bolShowLabel = false;//for actual, set it to false;
+boolean bolIsGradeShoolPmt = false;
+
+String strStudID     = null;
+String strStudName   = null;
+String strCourse     = null;
+String strStudStatus = null;
+String strAmount     = null;
+String strBankName   = null;
+String strCheckNo    = null;
+String strDatePaid   = null;
+
+String strPaymentFor = null;
+String strPmtMode    = null;
+
+
+
+
+FAPayment faPayment = new FAPayment();
+Vector vRetResult = faPayment.viewPmtDetail(dbOP, request.getParameter("or_number"));//System.out.println(vRetResult);
+if(vRetResult == null) {
+	//may be basic payment.
+	vRetResult = new enrollment.FAElementaryPayment().viewPmtDetail(dbOP, request.getParameter("or_number"));//System.out.println(vRetResult);
+	if(vRetResult != null) {
+		bolIsGradeShoolPmt = true;
+		strStudID     = (String)vRetResult.elementAt(4);
+		strStudName   = WebInterface.formatName((String)vRetResult.elementAt(6),(String)vRetResult.elementAt(7),
+						(String)vRetResult.elementAt(8),4);
+		String[] astrConvertToEduLevel = {"Preparatory","Elementary","High School"};
+		strCourse     = astrConvertToEduLevel[Integer.parseInt((String)vRetResult.elementAt(0))];
+		strStudStatus = "";strPaymentFor = "Tuition";
+		strAmount     = (String)vRetResult.elementAt(9);
+		strPmtMode    = (String)vRetResult.elementAt(12);
+		strBankName   = (String)vRetResult.elementAt(14);
+		strCheckNo    = (String)vRetResult.elementAt(10);
+		strDatePaid   = (String)vRetResult.elementAt(11);
+	}
+	else
+		strErrMsg = faPayment.getErrMsg();
+	
+}
+else {//not basic payment.
+		strStudID     = WI.getStrValue((String)vRetResult.elementAt(25),"External Pmt");
+		//name
+		if( vRetResult.elementAt(0) != null)
+			strStudName     = (String)vRetResult.elementAt(18);
+		else
+			strStudName     = (String)vRetResult.elementAt(1);
+			
+		strCourse     = WI.getStrValue((String)vRetResult.elementAt(35),"");
+		//student status.
+		if( ((String)vRetResult.elementAt(29)).compareTo("0") == 0)
+			strStudStatus = "Old Student";
+		else
+			strStudStatus = "New Student";
+		
+		strAmount     = (String)vRetResult.elementAt(11);
+		if(vRetResult.elementAt(33) != null) 
+			strPaymentFor = (String)vRetResult.elementAt(33);
+		else if( ((String)vRetResult.elementAt(4)).compareTo("0") == 0)
+			strPaymentFor = "Tuition";
+		else
+			strPaymentFor = (String)vRetResult.elementAt(5);
+		
+		strPmtMode    = (String)vRetResult.elementAt(10);
+		strBankName   = (String)vRetResult.elementAt(34);
+		strCheckNo    = (String)vRetResult.elementAt(14);
+		strDatePaid   = WI.getStrValue(vRetResult.elementAt(15));
+}
+
+String strSchoolCode = (String)request.getSession(false).getAttribute("school_code");
+if(strSchoolCode == null)
+	strSchoolCode = "";
+if(strStudID != null && strStudID.length() > 0) 
+	strStudID = "( "+strStudID+")";
+if(strErrMsg == null){%>
+<br><br><br><br><br><br><br><br>
+<table border=0 cellspacing=0 cellpadding=0 width=619>
+  <tr> 
+    <td colspan=2 valign=top>&nbsp; </td>
+    <td colspan=2 valign=top>&nbsp;</td>
+    <td width=323 valign=top style='height:.5in'> <div align="center"> <Br>
+        <%//=WI.getStrValue(vRetResult.elementAt(15))%>
+        <%=strDatePaid%> </div></td>
+  </tr>
+  <tr> 
+    <td colspan=5 valign=top style='height:35.0pt'> <%if(bolShowLabel){%>
+      NAME 
+      <%}%> <br>
+      <br> <%
+//if user index is null, the student is ex-studetn, so display only name,
+if( vRetResult.elementAt(0) != null){%> <%//=(String)vRetResult.elementAt(18)%> <%}else{%> <%//=(String)vRetResult.elementAt(1)%> <%}%> <%=strStudName+strStudID%> :: <%=WI.getStrValue((String)vRetResult.elementAt(35),"")%> <%=WI.getStrValue((String)vRetResult.elementAt(21)," - ","","")%> </td>
+  </tr>
+  <tr> 
+    <td colspan=5 valign=top style='height:35.0pt'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      <%//=new ConversionTable().convertAmoutToFigure(Double.parseDouble((String)vRetResult.elementAt(11)),"Pesos","Centavos")%> <%=new ConversionTable().convertAmoutToFigure(Double.parseDouble(strAmount),"Pesos","Centavos")%>(<%=CommonUtil.formatFloat(strAmount,true)%>)</td>
+  </tr>
+  <tr> 
+    <td colspan=3 valign=top style='height:35.5pt'><br> <br> <br> <br> <br> <br> 
+      <br> <br> <br> </td>
+    <td valign=top> <br> <br> <br> <br> <br> <br> <br> <br> <br><br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
+      &nbsp; </td>
+    <td valign=bottom><div align="center"><%=CommonUtil.formatFloat(strAmount,true)%></div></td>
+  </tr>
+  <tr style='height:33.25pt'> 
+    <td width=91 valign=top style='height:33.25pt'>&nbsp; 
+      <br> <br> <br> <br> <br> <br> <br> <br></td>
+    <td colspan=4 valign=bottom style='height:33.25pt'><div align="center">&nbsp; 
+        <br>
+        <%=request.getParameter("or_number")%> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div></td>
+  </tr>
+  <tr style='height:35.5pt'> 
+    <td width=91 valign=top style='height:15.5pt'>&nbsp;</td>
+    <td valign="middle"><div align="right">&nbsp; <br>
+        &nbsp;&nbsp;&nbsp;&nbsp; </div></td>
+    <td valign="middle">&nbsp;</td>
+    <td valign="middle">&nbsp;</td>
+    <td valign="middle"><div align="center"><%=(String)request.getSession(false).getAttribute("userId")%></div></td>
+  </tr>
+  <tr height=0> 
+    <td width=91 style='border:none'>&nbsp;</td>
+    <td width=27 style='border:none'></td>
+    <td width=88 style='border:none'></td>
+    <td width=90 style='border:none'></td>
+    <td width=323 style='border:none'></td>
+  </tr>
+</table>
+<script language="JavaScript">
+window.setInterval("javascript:window.print();",0);
+</script>
+<%}else{//print error msg%>
+<table  width="100%" border="0" cellspacing="0" cellpadding="0">
+ 	<tr>
+      <td align="center"><%=strErrMsg%></td>
+    </tr>
+  </table>
+<%}%>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

@@ -1,0 +1,1406 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>RESIDENCY STATUS</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<%response.setHeader("Pragma","No-Cache");
+response.setDateHeader("Expires",0);
+response.setHeader("Cache-Control","no-Cache"); //HTTP 1.0
+response.setHeader("Cache-Control","no-store"); //HTTP 1.1
+%>
+</head>
+<script language="JavaScript">
+function PrintPage()
+{
+ 	var vProceed = confirm("Please keep your printer ready and click <OK> to print.if you are not ready to print, please click cancel.");
+	if(vProceed)
+		return true;
+	return false;
+}
+
+</script>
+<body>
+<%@ page language="java" import="utility.*,CurriculumMaintenance,java.util.Vector, java.util.Date" %>
+<%
+
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	String strErrMsg = null;
+	String strTemp = null;
+
+	String strCourseIndex 	= request.getParameter("ci");
+	String strCourseName 	= request.getParameter("cname");
+	String strMajorIndex 	= request.getParameter("mi");
+	String strMajorName 	= request.getParameter("mname");
+	if(strMajorName == null) strMajorName = "None";
+	String strSYFrom 		= request.getParameter("syf");
+	String strSYTo 			= request.getParameter("syt");
+
+	float iNoOfLECUnitPerSem = 0; float iNoOfLABUnitPerSem = 0;
+	float iNoOfLECUnitPerCourse = 0;float iNoOfLABUnitPerCourse = 0;
+
+	WebInterface WI = new WebInterface(request);
+//add security here.
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_veiwall.jsp","While Opening DB Con");
+
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+
+
+//end of security code.
+strErrMsg = null; //if there is any message set -- show at the bottom of the page.
+CurriculumMaintenance CM = new CurriculumMaintenance();
+if(strCourseIndex == null || strSYFrom == null || strSYTo == null)
+{
+	strErrMsg = "Can't process curriculum detail. couse, SY From , SY To information missing.";
+	dbOP.cleanUP();
+	%>
+	<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="+2">
+	<%=strErrMsg%></font></p>
+	<%
+	return;
+}
+
+//get here total year and semester of the course.
+int[][] aiYearSem = CM.getMaxYearSemester(dbOP,strCourseIndex);
+
+if(aiYearSem == null)
+{
+	dbOP.cleanUP();
+	%>
+	<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="+2">
+	<%=CM.getErrMsg()%></font></p>
+	<%
+	return;
+}
+
+%>
+<form action="../curriculum/./curriculum_maintenance_viewall_print.jsp" method="post" target="_blank" onSubmit="return PrintPage();">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+      <td height="25" ><div align="center">VIRGEN MILAGROSA UNIVERSITY FOUNDATION<br>
+          $college_name<br>
+          San Carlos City, Pangasinan</div></td>
+    </tr>
+    <tr>
+      <td width="29%" height="24" valign="bottom"><div align="center">Curriculum
+          Year: <strong><%=strSYFrom%> - <%=strSYTo%></strong></div></td>
+    </tr>
+    <tr>
+      <td height="25"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td width="15%"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Student
+        name</font> : <strong></strong></td>
+      <td width="45%"><strong><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$stud_name</font></strong></td>
+      <td width="6%"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Year
+        : </font></td>
+      <td width="32%"><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>$year</strong></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td width="2%" height="25">&nbsp;</td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Course/Major
+        : </font></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>$course
+        / $major</strong></font></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Status<font size="2" face="Verdana, Arial, Helvetica, sans-serif">:<strong>
+        </strong></font></font></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>$status</strong></font></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td height="25"  colspan="2">Total units required for this course : <strong>$total_units</strong></td>
+      <td height="25"  colspan="2">Total units taken : <strong>$total_units_taken</strong></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td  colspan="5" height="25"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td>&nbsp;</td>
+      <td colspan="5"><div align="center"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>First
+          Year </strong></font></div></td>
+    </tr>
+    <tr>
+      <td width="2%"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></td>
+      <td colspan="5"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><u>$semester
+        </u></strong>&lt;show subjects taken within this semester&gt;<strong><u>
+        </u></strong></font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td width="21%"  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td width="42%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td width="10%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td width="13%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td width="12%"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></em></div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><div align="center"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+          units per semester : $total_units</strong></font></em></div></td>
+    </tr>
+    <tr>
+      <td height="22" colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></td>
+      <td colspan="5"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><u>$semester
+        </u></strong>&lt;show subjects taken within this semester&gt;<strong><u>
+        </u></strong></font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td width="13%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></em></div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><div align="center"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+          units per semester : $total_units</strong></font></em></div></td>
+    </tr>
+    <tr>
+      <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td colspan="5"><div align="center"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Second
+          Year </strong></font></div></td>
+    </tr>
+    <tr>
+      <td><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></td>
+      <td colspan="5"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><u>$semester
+        </u></strong>&lt;show subjects taken within this semester&gt;<strong><u>
+        </u></strong></font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td width="13%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></em></div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><div align="center"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+          units per semester : $total_units</strong></font></em></div></td>
+    </tr>
+    <tr>
+      <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></td>
+      <td colspan="5"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><u>$semester
+        </u></strong>&lt;show subjects taken within this semester&gt;<strong><u>
+        </u></strong></font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td width="13%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></em></div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><div align="center"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+          units per semester : $total_units</strong></font></em></div></td>
+    </tr>
+    <tr>
+      <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td colspan="5"><div align="center"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Third
+          Year </strong></font></div></td>
+    </tr>
+    <tr>
+      <td><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></td>
+      <td colspan="5"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><u>$semester
+        </u></strong>&lt;show subjects taken within this semester&gt;<strong><u>
+        </u></strong></font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td width="13%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></em></div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><div align="center"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+          units per semester : $total_units</strong></font></em></div></td>
+    </tr>
+    <tr>
+      <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></td>
+      <td colspan="5"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><u>$semester
+        </u></strong>&lt;show subjects taken within this semester&gt;<strong><u>
+        </u></strong></font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td width="13%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></em></div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><div align="center"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+          units per semester : $total_units</strong></font></em></div></td>
+    </tr>
+    <tr>
+      <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td colspan="5"><div align="center"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Fourth
+          Year </strong></font></div></td>
+    </tr>
+    <tr>
+      <td><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></td>
+      <td colspan="5"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><u>$semester
+        </u></strong>&lt;show subjects taken within this semester&gt;<strong><u>
+        </u></strong></font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td width="13%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></em></div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><div align="center"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+          units per semester : $total_units</strong></font></em></div></td>
+    </tr>
+    <tr>
+      <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></td>
+      <td colspan="5"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><u>$semester
+        </u></strong>&lt;show subjects taken within this semester&gt;<strong><u>
+        </u></strong></font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td width="13%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></em></div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><div align="center"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+          units per semester : $total_units</strong></font></em></div></td>
+    </tr>
+    <tr>
+      <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td colspan="5"><div align="center"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Fourth
+          Year </strong></font></div></td>
+    </tr>
+    <tr>
+      <td><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></td>
+      <td colspan="5"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><u>$semester
+        </u></strong>&lt;show subjects taken within this semester&gt;<strong><u>
+        </u></strong></font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td width="13%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></em></div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><div align="center"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+          units per semester : $total_units</strong></font></em></div></td>
+    </tr>
+    <tr>
+      <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></td>
+      <td colspan="5"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><u>$semester
+        </u></strong>&lt;show subjects taken within this semester&gt;<strong><u>
+        </u></strong></font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td width="13%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></em></div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><div align="center"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+          units per semester : $total_units</strong></font></em></div></td>
+    </tr>
+    <tr>
+      <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td colspan="5"><div align="center"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Fifth
+          Year </strong></font></div></td>
+    </tr>
+    <tr>
+      <td><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></td>
+      <td colspan="5"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><u>$semester
+        </u></strong>&lt;show subjects taken within this semester&gt;<strong><u>
+        </u></strong></font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td width="13%"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></em></div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><div align="center"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+          units per semester : $total_units</strong></font></em></div></td>
+    </tr>
+    <tr>
+      <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></td>
+      <td colspan="5"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><u>$semester
+        </u></strong>&lt;show subjects taken within this semester&gt;</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td  height="19"><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_code</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$subject_desc</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lec_units</font></div></td>
+      <td><div align="left"><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif">$lab_units</font></div></td>
+      <td><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$grade</font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></em></div></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><div align="center"><em><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+          units per semester : $total_units</strong></font></em></div></td>
+    </tr>
+    <tr>
+      <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6"><font color="#000000" size="3" face="Verdana, Arial, Helvetica, sans-serif"><strong>Total
+        units for course $course: <u>$total_units_for_the_course</u></strong></font></td>
+    </tr>
+  </table>
+
+  <%
+dbOP.cleanUP();
+%>
+  <table width="100%" bgcolor="#FFFFFF" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td width="100%" colspan="2"><div align="center"> </div></td>
+    </tr>
+  </table>
+
+<input type="hidden" name="ci" value="<%=request.getParameter("ci")%>">
+<input type="hidden" name="cname" value="<%=request.getParameter("cname")%>">
+<%
+strTemp = request.getParameter("mi");
+if(strTemp == null) strTemp = "";
+%>
+<input type="hidden" name="mi" value="<%=strTemp%>">
+<input type="hidden" name="syf" value="<%=request.getParameter("syf")%>">
+<input type="hidden" name="syt" value="<%=request.getParameter("syt")%>">
+</form>
+
+</body>
+</html>

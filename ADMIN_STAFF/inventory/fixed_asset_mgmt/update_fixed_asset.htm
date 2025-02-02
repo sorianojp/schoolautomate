@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="3" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>:::: 
+          FIXED ASSETS MANAGEMENT - UPDATE ASSET (LANDS/BUILDINGS)PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td width="10%" height="25">&nbsp;</td>
+      <td width="14%" height="25">Asset Type</td>
+      <td width="76%" height="25"><select name="select2">
+          <option>Buildings</option>
+          <option>Land</option>
+        </select></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%"  cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25" colspan="5"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5">NOTE: Show this table for LAND Asset Type</td>
+    </tr>
+    <tr> 
+      <td width="4%" height="25">&nbsp;</td>
+      <td colspan="4" valign="middle">Name/Description <strong>: $name_description</strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td width="15%">Date Acquired</td>
+      <td width="33%"><strong>$date_acquired</strong></td>
+      <td width="16%">Current Assessed Value</td>
+      <td width="32%"><strong>$current_assed_value </strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Purchased Value</td>
+      <td><strong> $purchased_value</strong></td>
+      <td>Date Last Assessed</td>
+      <td><strong>$date_last_assessed</strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Purchased From</td>
+      <td><strong>$purchased_from</strong></td>
+      <td>Current Asset Status</td>
+      <td><strong>$current_asset_stat</strong></td>
+    </tr>
+    <tr bgcolor="#FFC082"> 
+      <td height="25">&nbsp;</td>
+      <td height="25"><strong><font color="#FFFFFF">:: UPDATE ::</font></strong></td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td> Assessed Value</td>
+      <td colspan="3"><input name="textfield3" type="text" size="16" maxlength="20"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Date Assessed</td>
+      <td colspan="3"><input name="textfield222" type="text" size="16" maxlength="16"> 
+        <font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"><img src="../../../images/calendar_new.gif" border="0"></a></font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td> Asset Status</td>
+      <td colspan="3"><select name="select3">
+          <option>Current</option>
+          <option>Donated</option>
+        </select></td>
+    </tr>
+  </table>
+  <table width="100%"  cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25" colspan="5"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5">NOTE: Show this table for BUILDINGS Asset Type</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="4" valign="middle">Building Name :<strong>$bldg_name</strong></td>
+    </tr>
+    <tr> 
+      <td width="4%" height="25">&nbsp;</td>
+      <td colspan="4" valign="middle">Description <strong>: $description</strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Location</td>
+      <td><strong>$location</strong></td>
+      <td width="16%">Life</td>
+      <td width="32%"><strong>$current_assed_value </strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td width="15%">Date Constructed</td>
+      <td width="33%"><strong>$no. of </strong></td>
+      <td>Yearly Depreciation</td>
+      <td><strong>$date_last_assessed</strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Contractor</td>
+      <td><strong> $purchased_value</strong></td>
+      <td>Current Asset Status</td>
+      <td><strong>$current_asset_stat</strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Cost of Building</td>
+      <td><strong>$purchased_from</strong></td>
+      <td>Status Last Updated</td>
+      <td><strong>$date_stat_last_updated</strong></td>
+    </tr>
+    <tr bgcolor="#FFC082"> 
+      <td height="29">&nbsp;</td>
+      <td height="29"><strong><font color="#FFFFFF">:: UPDATE ::</font></strong></td>
+      <td height="29">&nbsp;</td>
+      <td height="29">&nbsp;</td>
+      <td height="29">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td> Asset Status</td>
+      <td colspan="3"><select name="select3">
+          <option>Current</option>
+          <option>Donated</option>
+          <option>Abandoned</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Status Last Updated</td>
+      <td colspan="3"><input name="textfield2222" type="text" size="16" maxlength="16"> 
+        <font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"><img src="../../../images/calendar_new.gif" border="0"></a></font></td>
+    </tr>
+  </table>
+  <table width="100%"  cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="73%"><div align="center"><font size="1"><img src="../../../images/save.gif" border="0">click 
+          to save entries&nbsp;&nbsp;&nbsp; <img src="../../../images/cancel.gif" border="0">click 
+          to cancel/clear entries</font></div></td>
+    </tr>
+    <tr> 
+      <td>NOTE: Show this table when Asset Type selected are : LAND, BUILDINGS</td>
+    </tr>
+  </table>
+  <table width="100%" border="1"  cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25" colspan="9" bgcolor="#B9B292"><div align="center"><font color="#FFFFFF"><strong>:: 
+          LIST OF $SELECTED_ASSET_TYPE FIXED ASSET(S) ::</strong></font></div></td>
+    </tr>
+    <tr>
+      <td width="5%">&nbsp;</td>
+      <td width="28%" height="25"><div align="center"><font size="1"><strong>ASSET 
+          NAME/DESCRIPTION</strong></font></div></td>
+      <td width="12%"><div align="center"><font size="1"><strong>DATE ACQUIRED/ 
+          IMPROVEMENT</strong></font></div></td>
+      <td width="11%"><div align="center"><font size="1"><strong>VALUE</strong></font></div></td>
+      <td width="7%"><div align="center"><strong><font size="1">CURRENT LIFE</font></strong></div></td>
+      <td width="8%"><div align="center"><strong><font size="1">DEPRECIATION</font></strong></div></td>
+      <td width="12%"><div align="center"><font size="1"><strong>CURRENT VALUE</strong></font></div></td>
+      <td width="8%"><div align="center"><strong><font size="1">LAST UPDATED</font></strong></div></td>
+      <td width="9%"><div align="center"><font size="1"><strong>ASSET STATUS</strong></font></div></td>
+    </tr>
+    <tr>
+      <td><font size="1"><img src="../../../images/update.gif" border="0"></font></td>
+      <td height="25"><font size="1">Nursing Building</font></td>
+      <td><font size="1">09/14/2004</font></td>
+      <td><font size="1">11,123,456.78</font></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><font size="1">CURRENT</font></td>
+    </tr>
+  </table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="22">&nbsp;</td>
+      <td colspan="4" height="22">&nbsp;</td>
+      <td height="22" colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+      <td width="1%" height="25">&nbsp;</td>
+      <td colspan="4" height="25"><div align="left"><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/images/print.gif" width="58" height="26" border="0"></a><font size="1">click
+          to print list of assets</font></font></div></td>
+      <td width="1%" height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25" colspan="8">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1">
+      <td height="25" colspan="8" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

@@ -1,0 +1,448 @@
+<%@ page language="java" import="utility.*,java.util.Vector,payroll.ReportPayroll, payroll.PReDTRME" %>
+<%
+///added code for HR/companies.
+boolean bolIsSchool = false;
+if( (new CommonUtil().getIsSchool(null)).equals("1"))
+	bolIsSchool = true;
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Payroll Summary by Employee</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../css/tableBorder.css" rel="stylesheet" type="text/css"></head>
+<script language="JavaScript" src="../../../jscript/common.js"></script>
+<script language="JavaScript" src="../../../jscript/date-picker.js"></script>
+<script language="JavaScript">
+function ReloadPage()
+{
+	document.form_.print_page.value="";
+	this.SubmitOnce("form_");
+}
+
+function ViewRecords()
+{
+	document.form_.print_page.value="";	
+	document.form_.viewRecords.value="1";
+	this.SubmitOnce("form_");
+}
+
+function ViewEmpLedger(emp_id, year_of){
+
+	var pgLoc = "./employee_ledger/employee_ledger.jsp?search_employee=1&viewonly=1&emp_id="+emp_id+
+							"&start_year="+ year_of+"&end_year="+year_of;
+	var win=window.open(pgLoc,"PrintWindow",'width=900,height=600,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+
+}
+
+function PrintPg(){
+	document.form_.print_page.value="1";
+	this.SubmitOnce("form_");
+}
+
+</script>
+<%
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+	String strErrMsg = null;
+	String strTemp = null;
+	boolean bolProceed = true;
+	String strHasWeekly = null;
+	int iSearchResult = 0;
+	
+//add security here.
+if (WI.fillTextValue("print_page").length() > 0){ %>
+	<jsp:forward page="./payroll_summary_by_group_Print.jsp" />
+<% return;}
+try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Payroll-REPORTS-EmployeePayslip","payroll_slip_main.jsp");
+								
+		ReadPropertyFile readPropFile = new ReadPropertyFile();
+		strHasWeekly = readPropFile.getImageFileExtn("PAYROLL_WEEKLY","0");
+	}
+catch(Exception exp)
+	{
+		exp.printStackTrace();
+		if(strErrMsg == null)
+			strErrMsg = "Error in opening DB Connection.";
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3"><%=strErrMsg%></font></p>
+		<%
+		return;
+	}
+
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Payroll","REPORTS",request.getRemoteAddr(),
+														"payroll_summary_by_group.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+//end of authenticaion code.
+	Vector vSalaryPeriod 		= null;//detail of salary period.
+	PReDTRME prEdtrME = new PReDTRME();
+	
+	Vector vRetResult = null;
+	ReportPayroll RptPay = new ReportPayroll(request);
+	String strPayrollPeriod  = null;
+	String strTemp2 = null;
+	if(bolIsSchool)
+		strTemp = "College";
+	else
+		strTemp = "Division";
+	String[] astrSortByName    = {"Employee ID","Lastname",strTemp,"Department"};
+	String[] astrSortByVal     = {"id_number","lname","c_name","d_name"};
+
+	double dTotalBasic = 0d;
+	double dTotalAddl = 0d;
+	double dTotGross = 0d;
+	double dTotAWOLDed = 0d;
+	double dTotalDed = 0d;
+	double dTotalNet = 0d;
+	double dTotalAdjust = 0d;
+
+	if(WI.fillTextValue("viewRecords").length() > 0){
+		vRetResult = RptPay.searchPayrollSummary(dbOP);
+		if(vRetResult == null)
+			strErrMsg = RptPay.getErrMsg();
+	}
+
+if(WI.fillTextValue("year_of").length() > 0) {
+	vSalaryPeriod = prEdtrME.operateOnSalaryPeriodNew(dbOP, request, 4);
+}
+%>
+<body>
+<form name="form_" 	method="post" action="./payroll_summary_by_group.jsp">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr > 
+      <td height="25" colspan="5"><div align="center"><font color="#000000" ><strong>:::: 
+          PAYROLL: PAYROLL SUMMARY (BY GROUP) PAGE ::::</strong></font></div></td>
+    </tr>
+</table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="23" colspan="5">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Salary period for Yr</td>
+      <td colspan="3"> <select name="month_of" onChange="ReloadPage();">
+          <%=dbOP.loadComboMonth(WI.fillTextValue("month_of"))%> 
+        </select>
+        - 
+        <select name="year_of" onChange="ReloadPage();">
+          <%=dbOP.loadComboYear(WI.fillTextValue("year_of"),2,1)%> 
+        </select>
+        (Must be filled up to display salary period information)</td>
+    </tr>
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="16%">Salary Period</td>
+      <td width="82%" colspan="3"><strong>
+        <select name="sal_period_index" style="font-weight:bold;font-size:11px" onChange="ReloadPage();">
+          <%
+		String[] astrConvertMonth = {"January","February","March","April","May","June","July","August",
+									"September","October","November","December"};
+
+	 	strTemp = WI.fillTextValue("sal_period_index");		
+		
+		for(int i = 0; vSalaryPeriod != null && i < vSalaryPeriod.size(); i += 10) {
+			if(((String)vSalaryPeriod.elementAt(i+3)).equals("5")){
+				strTemp2 = (String)vSalaryPeriod.elementAt(i+9) + " - ";
+				strTemp2 += "Whole Month";
+			}else{
+				strTemp2 = (String)vSalaryPeriod.elementAt(i+9) + " - ";
+				strTemp2 += (String)vSalaryPeriod.elementAt(i + 6) +" - "+(String)vSalaryPeriod.elementAt(i + 7);			
+//				strTemp2 = astrConvertMonth[Integer.parseInt((String)vSalaryPeriod.elementAt(i + 4))] + " :: "+
+//					(String)vSalaryPeriod.elementAt(i + 6) +" - "+(String)vSalaryPeriod.elementAt(i + 7);
+			}
+		if(strTemp.equals((String)vSalaryPeriod.elementAt(i))) {
+			strPayrollPeriod = (String)vSalaryPeriod.elementAt(i + 6) +" - "+(String)vSalaryPeriod.elementAt(i + 7);
+		%>
+          <option selected value="<%=(String)vSalaryPeriod.elementAt(i)%>"> <%=strTemp2%> </option>
+          <%}else{%>
+          <option value="<%=(String)vSalaryPeriod.elementAt(i)%>"> <%=strTemp2%></option>
+          <%}//end of if condition.		  
+		 }//end of for loop.%>
+        </select>
+        </strong>
+        <% 
+				if(strHasWeekly.equals("1")){
+					strTemp = WI.fillTextValue("is_weekly");
+					if(strTemp.compareTo("1") == 0) 
+						strTemp = " checked";
+					else	
+						strTemp = "";
+				%>
+        <input type="checkbox" name="is_weekly" value="1" <%=strTemp%> onClick="ReloadPage();">
+        <font size="1">for weekly </font>
+        <%}// check if the company has weekly salary type%>      </td>
+    </tr>
+	<%if(bolIsSchool){%>
+    <tr>
+      <td height="24">&nbsp;</td>
+      <td>Status</td>
+      <td colspan="3"><select name="pt_ft" onChange="ReloadPage();">
+        <option value="">ALL</option>
+        <%if (WI.fillTextValue("pt_ft").equals("0")){%>
+        <option value="0" selected>Part - time</option>
+        <option value="1">Full - time</option>
+        <%}else if (WI.fillTextValue("pt_ft").equals("1")){%>
+        <option value="0">Part - time</option>
+        <option value="1" selected>Full - time</option>
+        <%}else{%>
+        <option value="0">Part - time</option>
+        <option value="1">Full - time</option>
+        <%}%>
+      </select></td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td>Employee Category</td>
+      <td colspan="3"><select name="employee_category" onChange="ReloadPage();">
+        <option value="">ALL</option>
+        <%if (WI.fillTextValue("employee_category").equals("0")){%>
+        <option value="0" selected>Non-Teaching</option>
+        <%}else{%>
+        <option value="0">Non-Teaching</option>
+        <%}if (WI.fillTextValue("employee_category").equals("1")){%>
+        <option value="1" selected>Teaching</option>
+        <%}else{%>
+        <option value="1">Teaching</option>
+        <%}%>
+      </select></td>
+    </tr>
+	<%}// end checking if for school%>
+    <% 
+	String strCollegeIndex = WI.fillTextValue("c_index");	
+	%>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25"><%if(bolIsSchool){%>College<%}else{%>Division<%}%></td>
+      <td height="25"><select name="c_index" onChange="ReloadPage();">
+        <option value="">N/A</option>
+        <%=dbOP.loadCombo("c_index","c_name", " from college where is_del= 0", strCollegeIndex,false)%>
+      </select></td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td height="26">Office</td>
+      <td height="26"><select name="d_index" onChange="ReloadPage();">
+          <option value="">ALL</option>
+          <%if ((strCollegeIndex.length() == 0)){%>
+          <%=dbOP.loadCombo("d_index","d_name", " from department where is_del= 0 and (c_index = 0 or c_index is null)", WI.fillTextValue("d_index"),false)%> 
+          <%}else if (strCollegeIndex.length() > 0){%>
+          <%=dbOP.loadCombo("d_index","d_name", " from department where is_del= 0 and c_index = " + strCollegeIndex , WI.fillTextValue("d_index"),false)%> 
+          <%}%>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="10">&nbsp;</td>
+      <td height="10">&nbsp;</td>
+      <td height="10" colspan="3">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="10" colspan="5">&nbsp;</td>
+    </tr>
+  </table>  
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="3%" height="29">&nbsp;</td>
+      <td>SORT BY :<strong></strong></td>
+      <td height="29"><select name="sort_by1">
+        <option value="">N/A</option>
+        <%=RptPay.constructSortByDropList(WI.fillTextValue("sort_by1"),astrSortByName,astrSortByVal)%>
+      </select></td>
+
+      <td height="29"><select name="sort_by2">
+        <option value="">N/A</option>
+        <%=RptPay.constructSortByDropList(WI.fillTextValue("sort_by2"),astrSortByName,astrSortByVal)%>
+      </select></td>
+
+      <td height="29"><select name="sort_by3">
+        <option value="">N/A</option>
+        <%=RptPay.constructSortByDropList(WI.fillTextValue("sort_by3"),astrSortByName,astrSortByVal)%>
+      </select></td>
+    </tr>
+    <tr> 
+      <td height="15">&nbsp;</td>
+      <td width="11%" height="15">&nbsp;</td>
+      <td><select name="sort_by1_con">
+        <option value="asc">Ascending</option>
+        <%
+	if(WI.fillTextValue("sort_by1_con").compareTo("desc") ==0){%>
+        <option value="desc" selected>Descending</option>
+        <%}else{%>
+        <option value="desc">Descending</option>
+        <%}%>
+      </select></td>
+      <td><select name="sort_by2_con">
+        <option value="asc">Ascending</option>
+        <%
+if(WI.fillTextValue("sort_by2_con").compareTo("desc") ==0){%>
+        <option value="desc" selected>Descending</option>
+        <%}else{%>
+        <option value="desc">Descending</option>
+        <%}%>
+      </select></td>
+      <td><select name="sort_by3_con">
+          <option value="asc">Ascending</option>
+          <%
+if(WI.fillTextValue("sort_by3_con").compareTo("desc") ==0){%>
+          <option value="desc" selected>Descending</option>
+          <%}else{%>
+          <option value="desc">Descending</option>
+          <%}%>
+        </select></td>
+    </tr>
+    <tr>
+      <td height="10">&nbsp;</td>
+      <td height="10">&nbsp;</td>
+      <td height="10" colspan="3">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="10">&nbsp;</td>
+      <td height="10">&nbsp;</td>
+      <td height="10" colspan="3">
+			<!--
+			<input name="image" type="image" onClick="ViewRecords()" src="../../../images/form_proceed.gif">
+			-->
+			<input type="button" name="proceed_btn" value=" Proceed " style="font-size:11px; height:28px;border: 1px solid #FF0000;" onClick="javascript:ViewRecords();">
+      <font size="1">click to display employee list to print.</font></td>
+    </tr>
+    <tr>
+      <td height="10" colspan="5"><hr size="1" color="#000000"></td>
+    </tr>		
+  </table>
+<%if (vRetResult != null && vRetResult.size() > 0 ){//show this only if there is result.%>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="10" ><div align="right"><a href="javascript:PrintPg()"><img src="../../../images/print.gif" width="58"border="0"></a>
+          <font size="1">click to print</font></div></td>
+    </tr>
+  </table>
+	
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0" class="thinborder">
+    <tr> 
+      <td height="24" colspan="10" class="thinborder"><div align="center"><strong><font color="#0000FF">PAYROLL 
+          SUMMARY FOR SALARY SCHEDULE : <%=WI.getStrValue(strPayrollPeriod,"")%></font></strong></div></td>
+    </tr>
+    <tr> 
+      <td width="8%" class="thinborder"><div align="center"><font size="1"><strong>EMPLOYEE ID </strong></font></div></td>
+      <td width="16%" class="thinborder"><div align="center"><font size="1"><strong>EMPLOYEE NAME</strong></font></div></td>
+      <td width="16%" class="thinborder"><div align="center"><font size="1"><strong>
+			<%if(bolIsSchool){%>COLLEGE<%}else{%>DIVISION<%}%>
+        / DEPARTMENT
+          </strong></font></div></td>
+      <td width="9%" class="thinborder"><div align="center"><font size="1"><strong>BASIC SALARY<br>
+      </strong></font></div></td>
+      <td width="9%" class="thinborder"><div align="center"><font size="1"><strong>TOTAL ADDT'L 
+          COMPNSTN &amp; INCENTIVES</strong></font></div></td>
+      <td width="9%" class="thinborder"><div align="center"><font size="1"><strong>GROSS SALARY<br>
+      </strong></font></div></td>
+      <td width="9%" class="thinborder"><div align="center"><font size="1"><strong>TOTAL DEDUCTIONS</strong></font></div></td>
+      <td width="9%" class="thinborder"><div align="center"><strong><font size="1">ADJUSTMENT</font></strong></div></td>
+      <td width="9%" class="thinborder"><div align="center"><font size="1"><strong>NET SALARY<br>
+      </strong></font></div></td>
+      <td width="6%" class="thinborder">&nbsp;</td>
+    </tr>
+    <% for(int i = 0; i < vRetResult.size(); i += 14){%>
+    <tr> 
+      <td height="33" class="thinborder"><div align="center"><font size="1"><strong><%=WI.getStrValue((String)vRetResult.elementAt(i + 1), " ")%></strong></font></div></td>
+      <td class="thinborder"><font size="1">&nbsp;<%=WI.formatName((String)vRetResult.elementAt(i+2), (String)vRetResult.elementAt(i+3),
+							(String)vRetResult.elementAt(i+4), 4)%></font></td>
+	<%if((String)vRetResult.elementAt(i + 5)== null || (String)vRetResult.elementAt(i + 6)== null){
+		strTemp = " ";			
+	  }else{
+		strTemp = " - ";
+	  }
+	%>							
+      <td class="thinborder"><font size="1">&nbsp;<%=WI.getStrValue((String)vRetResult.elementAt(i + 5)," ")%><%=strTemp%><%=WI.getStrValue((String)vRetResult.elementAt(i + 6)," ")%></font></td>
+      <% strTemp = null;
+		 	if (vRetResult!= null && vRetResult.size() > 0){
+			strTemp = (String)vRetResult.elementAt(i+7);
+			dTotalBasic+= Double.parseDouble(ConversionTable.replaceString(strTemp,",",""));
+			}
+		%>
+      <td class="thinborder"><div align="right"><font size="1"><%=WI.getStrValue(strTemp," ")%>&nbsp;</font></div></td>
+      <% strTemp = null;
+			if (vRetResult!= null && vRetResult.size() > 0){
+			strTemp = (String)vRetResult.elementAt(i+10);
+			dTotalAddl+= Double.parseDouble(ConversionTable.replaceString(strTemp,",",""));			
+			}
+		%>
+      <td class="thinborder"><div align="right"><font size="1"><%=WI.getStrValue(strTemp," ")%>&nbsp;</font></div></td>
+      <% strTemp = null;
+			if (vRetResult!= null && vRetResult.size() > 0){
+			strTemp = (String)vRetResult.elementAt(i+8);
+			dTotGross+= Double.parseDouble(ConversionTable.replaceString(strTemp,",",""));						}
+		%>
+      <td class="thinborder"><div align="right"><font size="1"><%=WI.getStrValue(strTemp," ")%>&nbsp;</font></div></td>
+      <% strTemp = null;
+			strTemp = (String)vRetResult.elementAt(i+13);
+			dTotAWOLDed+= Double.parseDouble(ConversionTable.replaceString(strTemp,",",""));			
+
+		%>
+      <% strTemp = null;
+			strTemp = (String)vRetResult.elementAt(i+11);
+			dTotalDed+= Double.parseDouble(ConversionTable.replaceString(strTemp,",",""));			
+		%>
+      <td class="thinborder"><div align="right"><font size="1"><%=WI.getStrValue(strTemp," ")%>&nbsp;</font></div></td>
+      <% strTemp = null;
+			strTemp = (String)vRetResult.elementAt(i+12);
+			dTotalAdjust+= Double.parseDouble(ConversionTable.replaceString(strTemp,",",""));			
+		%>			
+      <td class="thinborder"><div align="right"><font size="1"><%=WI.getStrValue(strTemp," ")%>&nbsp;</font></div></td>
+      <%	strTemp = null;
+			if (vRetResult!= null && vRetResult.size() > 0){
+			strTemp = (String)vRetResult.elementAt(i+9);
+			dTotalNet+= Double.parseDouble(ConversionTable.replaceString(strTemp,",",""));			
+			}
+		%>
+      <td class="thinborder"><div align="right"><font size="1"><%=WI.getStrValue(strTemp," ")%></font></div></td>
+      <td class="thinborder"><div align="center"><font size="1"> <a href='javascript:ViewEmpLedger("<%=WI.getStrValue((String)vRetResult.elementAt(i+1), " ")%>",<%=WI.fillTextValue("year_of")%>)'><img src="../../../images/view.gif" border="0" ></a></font></div></td>
+    </tr>
+    <%} // end for loop%>
+    <tr> 
+      <td height="33" colspan="3" class="thinborder"><div align="right"><font size="1"><strong>TOTAL 
+          :   </strong></font></div></td>
+      <td class="thinborder"><div align="right"><font size="1">&nbsp;<%=WI.getStrValue(CommonUtil.formatFloat(dTotalBasic,true)," ")%>&nbsp;</font></div></td>
+      <td class="thinborder"><div align="right"><font size="1">&nbsp;<%=WI.getStrValue(CommonUtil.formatFloat(dTotalAddl,true)," ")%>&nbsp;</font></div></td>
+      <td class="thinborder"><div align="right"><font size="1">&nbsp;<%=WI.getStrValue(CommonUtil.formatFloat(dTotGross,true)," ")%>&nbsp;</font></div></td>
+      <td class="thinborder"><div align="right"><font size="1">&nbsp;<%=WI.getStrValue(CommonUtil.formatFloat(dTotalDed,true)," ")%>&nbsp;</font></div></td>
+      <td class="thinborder"><div align="right"><font size="1"><%=WI.getStrValue(CommonUtil.formatFloat(dTotalAdjust,true)," ")%>&nbsp;</font></div></td>
+      <td class="thinborder"><div align="right"><font size="1">&nbsp;<%=WI.getStrValue(CommonUtil.formatFloat(dTotalNet,true)," ")%></font></div></td>
+      <td class="thinborder">&nbsp;</td>
+    </tr>
+  </table>
+<%}//end of vRetResult != null)%>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25"  colspan="3" bgcolor="#FFFFFF"><div align="right"><em><font color="#0000FF"></font></em></div></td>
+    </tr>
+  </table>
+  <input type="hidden" name="viewRecords">
+  <input type="hidden" name="print_page">  
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

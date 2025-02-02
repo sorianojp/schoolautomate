@@ -1,0 +1,167 @@
+<%@ page language="java" import="utility.*,java.util.Vector,payroll.PRLoansAdv" %>
+<%
+///added code for HR/companies.
+boolean bolIsSchool = false;
+if( (new CommonUtil().getIsSchool(null)).equals("1"))
+	bolIsSchool = true;
+String[] strColorScheme = CommonUtil.getColorScheme(6);
+//strColorScheme is never null. it has value always.
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td width="100%" height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>::::RETIREMENT 
+          - LOANS - ENCODE LOANS DATA PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25"><font size="1">&nbsp;</font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td>&nbsp;</td>
+      <td height="27"><br>
+        Employee Name :</td>
+      <td width="76%" height="27"> <font size="1"> 
+        <input name="textfield3" type="text" size="32" maxlength="32">
+        <a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/search.gif" border="0"></a> 
+        <a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/form_proceed.gif" border="0"></a> 
+        </font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td height="27">Employee ID :</td>
+      <td height="27">$emp_id</td>
+    </tr>
+    <tr>
+      <td width="3%">&nbsp;</td>
+      <td width="21%" height="27">College/Office/Dept. :</td>
+      <td height="27">$college/$office/$dept</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td height="27">Position :</td>
+      <td height="27">$position</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td height="27">Status :</td>
+      <td height="27">$status</td>
+    </tr>
+    <tr> 
+      <td height="10" colspan="3"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="27">Loan Type :</td>
+      <td height="27" colspan="3"><select name="select">
+          <option>Regular Retirement Fund</option>
+          <option>Emergency </option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td width="3%">&nbsp;</td>
+      <td width="16%" height="27">Loan Code :</td>
+      <td width="31%" height="27"> <input name="textfield" type="text" size="16" maxlength="16"></td>
+      <td height="27">Loan Bank : </td>
+      <td height="27"> <select name="select6">
+          <option>MetroBank</option>
+          <option>Equitable-PCI</option>
+          <option>BPI</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="27" colspan="5"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="27">Amount Loaned :</td>
+      <td height="27"><input name="textfield5" type="text" size="16" maxlength="16"></td>
+      <td width="17%" height="27">Interest Rate (%) : </td>
+      <td width="33%" height="27"><input name="textfield32" type="text" size="4" maxlength="4">
+        per annum </td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="27">Terms : </td>
+      <td height="27"><input name="textfield23" type="text" size="4" maxlength="4"></td>
+      <td height="27">1st Payment : </td>
+      <td height="27"><input name="textfield22" type="text" size="10"> <font size="1">&nbsp;<a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/calendar_new.gif" border="0"></a></font> 
+      </td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td height="27">Release Date :</td>
+      <td height="27"><input name="textfield2" type="text" size="10"> <font size="1">&nbsp;<a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/calendar_new.gif" border="0"></a></font></td>
+      <td height="27">&nbsp;</td>
+      <td height="27">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="10" colspan="5"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25" width="3%">&nbsp;</td>
+      <td width="28%" height="25">Active Amount, 1st year (1) : </td>
+      <td width="69%" height="25"><input name="textfield4" type="text" size="12" maxlength="12"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Active Amount, 2nd year (2) : </td>
+      <td height="25"><input name="textfield42" type="text" size="12" maxlength="12"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Active Amount, 3rd year (3) : </td>
+      <td height="25"><input name="textfield43" type="text" size="12" maxlength="12"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Active Amount, 4th year (4) : </td>
+      <td height="25"><input name="textfield44" type="text" size="12" maxlength="12"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Active Amount, 5th year (5) : </td>
+      <td height="25"><input name="textfield45" type="text" size="12" maxlength="12"></td>
+    </tr>
+    <tr> 
+      <td height="10" colspan="3"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td height="50">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/save.gif" border="0"></a>click 
+        to save entries <a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/cancel.gif" border="0"></a>click 
+        to cancel/clear entries </font></td>
+    </tr>
+    <tr> 
+      <td height="10">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="left"><font size="1"><a href="../reports/sched_ind_payments.htm" target="_blank"><img src="../../../images/view.gif" border="0"></a>click 
+          to VIEW PAYMENT SCHEDULE</font></div></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="94%" height="25">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

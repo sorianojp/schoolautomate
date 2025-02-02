@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td width="100%" height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>::::RETIREMENT 
+          - REPORTS - SCHEDULE OF INDIVIDUAL PAYMENTS PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25"><font size="1">&nbsp;</font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="27">Loan Code :</td>
+      <td height="27" colspan="3"><input name="textfield" type="text" size="16" maxlength="16">
+        <font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/images/form_proceed.gif" border="0"></a> 
+        (NOTE : If this page is called from encode loans data page, no need for 
+        encoding of loan code)</font></td>
+    </tr>
+    <tr> 
+      <td height="10" colspan="5"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td width="3%">&nbsp;</td>
+      <td width="16%" height="27">Loan Type</td>
+      <td width="31%" height="27"> $LOAN_TYPE</td>
+      <td height="27">Loan Bank : </td>
+      <td height="27"> $LOAN_BANK</td>
+    </tr>
+    <tr> 
+      <td height="27" colspan="5"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="27">Amount Loaned :</td>
+      <td height="27">$amount_loaned</td>
+      <td width="17%" height="27">Interest Rate (%) : </td>
+      <td width="33%" height="27">$interest per annum </td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="27">Terms : </td>
+      <td height="27">$terms</td>
+      <td height="27">Release Date :</td>
+      <td height="27">$release_date<font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"></a></font> 
+      </td>
+    </tr>
+    <tr> 
+      <td height="10" colspan="5"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td>&nbsp;</td>
+      <td height="27"><br>
+        Employee Name :</td>
+      <td width="76%" height="27"> $emp_name </td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td height="27">Employee ID :</td>
+      <td height="27">$emp_id</td>
+    </tr>
+    <tr>
+      <td width="3%">&nbsp;</td>
+      <td width="21%" height="27">College/Office/Dept. :</td>
+      <td height="27">$college/$office/$dept</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td height="27">Position :</td>
+      <td height="27">$position</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td height="27">Status :</td>
+      <td height="27">$status</td>
+    </tr>
+    <tr> 
+      <td height="10" colspan="3"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="1" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#99CCFF"> 
+      <td height="25" colspan="5"><div align="center"><strong>:: SCHEDULE OF SALARY 
+          DEDUCTIONS FOR LOAN PAYMENTS ::</strong></div></td>
+    </tr>
+    <tr> 
+      <td width="12%" height="25"><div align="center"><strong><font size="1">PAYROLL 
+          PERIOD</font></strong></div></td>
+      <td width="21%" height="25"><div align="center"><strong><font size="1">TOTAL 
+          PAYMENT</font></strong></div></td>
+      <td width="21%" height="25"><div align="center"><strong><font size="1">PAYMENT 
+          ON PRINCIPAL</font></strong></div></td>
+      <td width="21%"><div align="center"><strong><font size="1">PAYMENT ON INTEREST</font></strong></div></td>
+      <td width="25%"><div align="center"><strong><font size="1">PRINCIPAL BALANCE</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5">Year 1, SY $sy_from - $sy_to, &nbsp;&nbsp;&nbsp;&nbsp;Active 
+        Amount : $amount_for_1st_yr</td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">June 30, 2006</font></td>
+      <td height="25"><font size="1">2,806.02</font></td>
+      <td height="25"><font size="1">0.00</font></td>
+      <td><font size="1">2,806.02</font></td>
+      <td><font size="1">0.00</font></td>
+    </tr>
+    <tr> 
+      <td height="24"><font size="1">July 15, 2006</font></td>
+      <td height="24"><font size="1">0.00</font></td>
+      <td height="24"><font size="1">0.00</font></td>
+      <td><font size="1">0.00</font></td>
+      <td><font size="1">0.00</font></td>
+    </tr>
+    <tr> 
+      <td height="24"><font size="1">July 31,2006</font></td>
+      <td height="24"><font size="1">1,800.00</font></td>
+      <td height="24"><font size="1">0.00</font></td>
+      <td><font size="1">1,800.00</font></td>
+      <td><font size="1">0.00</font></td>
+    </tr>
+    <tr> 
+      <td height="24" colspan="5"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td height="24" colspan="5">Year 2, SY $sy_from - $sy_to, &nbsp;&nbsp;&nbsp;&nbsp;Active 
+        Amount : $amount_for_2nd_yr</td>
+    </tr>
+    <tr> 
+      <td><font size="1">June 30, 2007</font></td>
+      <td height="24"><font size="1">3,825.00</font></td>
+      <td height="24"><font size="1">2,045.00</font></td>
+      <td><font size="1">1,779.55</font></td>
+      <td><font size="1">42,954.55</font></td>
+    </tr>
+    <tr> 
+      <td><font size="1">July 15, 2007</font></td>
+      <td height="24"><font size="1">2,045.00</font></td>
+      <td height="24"><font size="1">2,045.00</font></td>
+      <td><font size="1">0.00</font></td>
+      <td><font size="1">40,909.09</font></td>
+    </tr>
+    <tr> 
+      <td><font size="1">July 31,2007</font></td>
+      <td height="24"><font size="1">3,784.09</font></td>
+      <td height="24"><font size="1">2,045.00</font></td>
+      <td><font size="1">1,738.64</font></td>
+      <td><font size="1">38,863.64</font></td>
+    </tr>
+    <tr> 
+      <td height="24" colspan="5"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td>TOTALS :</td>
+      <td height="24">&nbsp;</td>
+      <td height="24">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25"><div align="center"><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/print.gif" border="0"></a>click 
+          to print</font></div></td>
+    </tr>
+    <tr> 
+      <td width="94%" height="25">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

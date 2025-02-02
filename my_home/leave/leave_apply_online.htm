@@ -1,0 +1,556 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript" src="../../jscript/date-picker.js"></script>
+<SCRIPT LANGUAGE="JavaScript" SRC="../../jscript/td.js"></script>
+<script language="JavaScript">
+function Convert() {
+	var pgLoc =
+	"../../../commfile/conversion.jsp?called_fr_form=staff_profile&cm_field_name=height&lb_field_name=weight";
+
+	var win=window.open(pgLoc,"PrintWindow",'width=600,height=400,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+function viewInfo(){
+	document.staff_profile.page_action.value = "3";
+}
+
+function AddRecord(){
+	document.staff_profile.page_action.value="1";
+	document.staff_profile.hide_save.src = "../../../images/blank.gif";
+	document.staff_profile.submit();
+}
+
+function EditRecord(){
+
+	document.staff_profile.page_action.value="2";
+	document.staff_profile.submit();
+}
+
+function DeleteRecord(index){
+	document.staff_profile.page_action.value="0";
+	document.staff_profile.info_index.value = index;
+}
+
+function viewList(table,indexname,colname,labelname){
+	var loadPg = "../hr_updatelist.jsp?tablename=" + table + "&indexname=" + indexname + "&colname=" + colname+"&label="+labelname;
+	var win=window.open(loadPg,"myfile",'dependent=yes,width=650,height=350,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+
+function CancelRecord(strEmpID){
+	location = "./hr_personnel_profiles.jsp";
+}
+function FocusID() {
+	document.staff_profile.emp_id.focus();
+}
+function OpenSearch() {
+	var pgLoc = "../../../search/srch_emp.jsp?opner_info=staff_profile.emp_id";
+	var win=window.open(pgLoc,"PrintWindow",'width=800,height=600,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+</script>
+
+<%@ page language="java" import="utility.*,java.util.Vector,hr.HRInfoPersonalExtn"%>
+<%
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+	String strErrMsg = null;
+	String strTemp = null;
+	String strTemp2 = null;
+	String strTemp3 = null;
+	String strImgFileExt = null;
+
+
+//add security hehol.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-PERSONNEL-Education","hr_personnel_education.jsp");
+
+		ReadPropertyFile readPropFile = new ReadPropertyFile();
+		strImgFileExt = readPropFile.getImageFileExtn("imgFileUploadExt");
+
+		if(strImgFileExt == null || strImgFileExt.trim().length() ==0)
+		{
+			strErrMsg = "Image file extension is missing. Please contact school admin.";
+			dbOP.cleanUP();
+			throw new Exception();
+		}
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		if(strErrMsg == null)
+		strErrMsg = "Error in opening DB Connection.";
+		%>
+
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		  Error in opening connection </font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"HR Management","PERSONNEL",request.getRemoteAddr(),
+														"hr_personnel_education.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+Vector vRetResult = new Vector();
+Vector vEmpRec = new Vector();
+boolean bNoError = false;
+boolean bolNoRecord = false;
+String strInfoIndex = request.getParameter("info_index");
+
+HRInfoPersonalExtn hrPx = new HRInfoPersonalExtn();
+
+int iAction =  -1;
+
+iAction = Integer.parseInt(WI.getStrValue(request.getParameter("page_action"),"3"));
+
+strTemp = WI.fillTextValue("emp_id");
+
+if (strTemp.length()> 0){
+
+	enrollment.Authentication authentication = new enrollment.Authentication();
+    vEmpRec = authentication.operateOnBasicInfo(dbOP,request,"0");
+
+
+	if (vEmpRec != null && vEmpRec.size() > 0){
+		bNoError = true;
+	}else{
+		strErrMsg = "Employee has no profile.";
+		bNoError = false;
+	}
+
+	if (bNoError) {
+		if (iAction == 1 || iAction  == 2 || iAction==3)
+		vRetResult = hrPx.operateOnPersonalData(dbOP,request,iAction);
+
+		switch(iAction){
+			case 1:{ // add Record
+				if (vRetResult != null)
+					strErrMsg = " Employee personal record added successfully.";
+				else
+					strErrMsg = hrPx.getErrMsg();
+				break;
+			}
+			case 2:{ //  edit record
+				if (vRetResult != null)
+					strErrMsg = " Employee personal record edited successfully.";
+				else
+					strErrMsg = hrPx.getErrMsg();
+				break;
+			}
+			case 3:{ //  view record
+				if (vRetResult != null)
+					strErrMsg = hrPx.getErrMsg();
+				break;
+			}
+		} //end switch
+	}// end bNoError
+}
+
+//if Emp ID is empty. I have to get it from session.getAttribute("encoding_in_progress_id");
+if(strTemp.length() == 0)
+	strTemp = (String)request.getSession(false).getAttribute("encoding_in_progress_id");
+else
+	request.getSession(false).setAttribute("encoding_in_progress_id",strTemp);
+strTemp = WI.getStrValue(strTemp);
+
+
+if (vRetResult == null || vRetResult.size() < 1){
+	bolNoRecord = true;
+}
+
+%>
+<body bgcolor="#663300" onLoad="FocusID();">
+<form action="../../ADMIN_STAFF/HR/personnel/./hr_personnel_profiles.jsp" method="post" name="staff_profile">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="100%" height="25"  bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" ><strong>:::: 
+          LEAVE REQUEST ONLINE PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr> 
+      <td height="25"><strong><%=WI.getStrValue(strErrMsg)%></strong></td>
+    </tr>
+    <tr> 
+      <td height="25"><strong><font color="#FF0000">&nbsp;<font size="3">NOTE 
+        : </font></font></strong></td>
+    </tr>
+    <tr> 
+      <td height="25"><div align="center"><strong><font color="#FF0000"><font size="3">Leave 
+          Request filed online is invalid unless an application printout with 
+          approval signature(s) is filed personally in HR Office. </font></font></strong></div></td>
+    </tr>
+    <tr>
+      <td height="10"><hr size="1"></td>
+    </tr>
+  </table>
+<%
+	if (vEmpRec !=null && vEmpRec.size() > 0 && strTemp.trim().length() > 1){ %>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="5">
+    <tr> 
+      <td width="100%" height="25"><img src="../../images/sidebar.gif" width="11" height="270" align="right"> 
+        <table width="400" border="0" align="center">
+          <tr bgcolor="#FFFFFF">
+            <td width="100%" valign="middle">
+              <%strTemp = "<img src=\"../../../upload_img/"+WI.fillTextValue("emp_id").toUpperCase()+"."+strImgFileExt+"\" width=150 height=150 align=\"right\">";%>
+              <%=strTemp%> <br> <br>
+<%
+	strTemp  = WI.formatName((String)vEmpRec.elementAt(1),(String)vEmpRec.elementAt(2), (String)vEmpRec.elementAt(3),4);
+	strTemp2 = (String)vEmpRec.elementAt(15);
+
+	if((String)vEmpRec.elementAt(13) == null)
+			strTemp3 = WI.getStrValue((String)vEmpRec.elementAt(14));
+	else{
+		strTemp3 =WI.getStrValue((String)vEmpRec.elementAt(13));
+		if((String)vEmpRec.elementAt(14) != null)
+		 strTemp3 += "/" + WI.getStrValue((String)vEmpRec.elementAt(14));
+	}
+%>
+              <br>
+              <strong><%=strTemp%></strong><br> <font size="1"><%=strTemp2%></font><br>
+              <font size="1"><%=strTemp3%></font><br> </td>
+          </tr>
+        </table>
+<br>
+<table bgcolor="#FFFFFF" width="95%" border="0" cellspacing="0" cellpadding="5">
+          <%
+if(WI.fillTextValue("emp_id").length() > 0){%>
+          <tr bgcolor="#F4F4FF"> 
+            <td height="25" bgcolor="#FFFFFF">&nbsp;</td>
+            <td colspan="2"><strong><u>Available Leave</u></strong></td>
+            <td width="22%" valign="bottom">&nbsp; </td>
+            <td width="54%" valign="bottom"><strong><u>Apply for</u></strong> 
+            </td>
+          </tr>
+          <%}%>
+          <tr bgcolor="#F4F4FF"> 
+            <td height="25" bgcolor="#FFFFFF">&nbsp;</td>
+            <td width="3%">&nbsp;</td>
+            <td width="19%">Vacation Leave :</td>
+            <td valign="bottom"><strong>$vleave</strong></td>
+            <td valign="bottom"><select name="select">
+                <option>Vacation Leave</option>
+                <option>Sick Leave</option>
+                <option>Maternity Leave</option>
+                <option>Paternity Leave</option>
+                <option>Others (pls. specify)</option>
+              </select> <input name="textfield" type="text" size="32" maxlength="64"> 
+            </td>
+          </tr>
+          <tr bgcolor="#F4F4FF"> 
+            <td  width="2%" height="25" bgcolor="#FFFFFF">&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>Sick Leave : </td>
+            <td><strong>$sleave</strong></td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr bgcolor="#F4F4FF"> 
+            <td height="25" bgcolor="#FFFFFF">&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>Emergenecy Leave :</td>
+            <td colspan="2"><strong>$eleave</strong></td>
+          </tr>
+          <tr> 
+            <td height="10" colspan="5"><hr size="1"></td>
+          </tr>
+        </table>
+		<table width="95%" border="0"  cellpadding="5" cellspacing="0">
+          <tr> 
+            <td width="2%">&nbsp;</td>
+            <td width="15%" bgcolor="#F0EFF1">Date(s) of Leave</td>
+            <td width="19%" bgcolor="#F0EFF1">(FROM) </td>
+            <td colspan="2" bgcolor="#F0EFF1"><input  value="<%=strTemp%>" name="ldatefrom" type= "text" class="textbox"  id="ldatefrom"  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" size="15" readonly="true"> 
+              <a href="javascript:show_calendar('staff_profile.ldatefrom');" title="Click to select date" onmouseover="window.status='Select date';return true;" onmouseout="window.status='';return true;"><img src="../../images/calendar_new.gif" width="20" height="16" border="0"></a> 
+              Time 
+              <input  value="<%=strTemp2%>" name="hrfrom" type= "text" class="textbox"  id="hrfrom"  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" onKeypress=" if(event.keyCode<48 || event.keyCode > 57) event.returnValue=false;" size="4" maxlength="2">
+              : 
+              <input  value="<%=strTemp3%>" name="fmin" type= "text" class="textbox"  id="fmin"  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" onKeypress=" if(event.keyCode<48 || event.keyCode > 57) event.returnValue=false;" size="4" maxlength="2"> 
+              <%
+	strTemp = WI.fillTextValue("frAMPM");
+	strTemp2 = WI.fillTextValue("onedate");
+	strTemp3 = WI.fillTextValue("ldateto");
+	if (bolSetEdit && strPrepareToEdit.compareTo("1") == 0){
+		strTemp = (String)vEditResult.elementAt(11);
+		strTemp2 = (String)vEditResult.elementAt(18);
+		strTemp3 = (String)vEditResult.elementAt(12);
+	}
+	if (strTemp2 != null && strTemp2.compareTo("1") == 0) 
+		strTemp2 = "checked";
+	else
+		strTemp2 = "";
+%>
+              <select name="frAMPM" id="hrFampm">
+                <option value="0">AM</option>
+                <% if (strTemp.compareTo("1") == 0) {%>
+                <option value="1" selected>PM</option>
+                <%}else{%>
+                <option value="1">PM</option>
+                <%}%>
+              </select></td>
+          </tr>
+          <tr> 
+            <td width="2%">&nbsp;</td>
+            <td width="15%" bgcolor="#F0EFF1">&nbsp;</td>
+            <td bgcolor="#F0EFF1">&nbsp;</td>
+            <td colspan="2" bgcolor="#F0EFF1"><input name="onedate" type="checkbox" id="onedate" value="1" <%=strTemp2%>> 
+              <font size="1">Check if leave is only for a day or less</font></td>
+          </tr>
+          <tr> 
+            <td width="2%">&nbsp;</td>
+            <td width="15%" bgcolor="#F0EFF1">&nbsp;</td>
+            <td bgcolor="#F0EFF1"> (TO) </td>
+            <td colspan="2" bgcolor="#F0EFF1"><input value="<%=strTemp3%>" name="ldateto" type= "text"  class="textbox"  id="a_address423"  onfocus="style.backgroundColor='#D3EBFF'" onblur="style.backgroundColor='white'" size="15" readonly="true"> 
+              <a href="javascript:show_calendar('staff_profile.ldateto');" title="Click to select date" onmouseover="window.status='Select date';return true;" onmouseout="window.status='';return true;"><img src="../../images/calendar_new.gif" width="20" height="16" border="0"></a> 
+              Time 
+              <%
+	strTemp = WI.fillTextValue("hrto");
+	strTemp2 = WI.fillTextValue("minto");
+	strTemp3 = WI.fillTextValue("toAMPM");
+	if (bolSetEdit && strPrepareToEdit.compareTo("1") == 0){
+		strTemp = (String)vEditResult.elementAt(13);
+		strTemp2 = (String)vEditResult.elementAt(14);
+		strTemp3 = (String)vEditResult.elementAt(15);
+	}
+%>
+              <input  value="<%=strTemp%>" name="hrto" type= "text" class="textbox"  id="a_address232"  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" onKeypress=" if(event.keyCode<48 || event.keyCode > 57) event.returnValue=false;" size="4" maxlength="2">
+              : 
+              <input  value="<%=strTemp2%>" name="minto" type= "text" class="textbox" id="minto"  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" onKeypress=" if(event.keyCode<48 || event.keyCode > 57) event.returnValue=false;" size="4" maxlength="2"> 
+              <select name="toAMPM" id="toAMPM">
+                <option value="0">AM</option>
+                <% if (strTemp3.compareTo("1") == 0) {%>
+                <option value="1" selected>PM</option>
+                <%}else{%>
+                <option value="1">PM</option>
+                <%}%>
+              </select></td>
+          </tr>
+          <tr> 
+            <td height="39">&nbsp;</td>
+            <td colspan="3" valign="bottom" bgcolor="#FFFFFF"><font color="#000000">Total 
+              no. of days/hrs. applied </font><strong><font color="#FF0000">: 
+              $total &lt;days&gt;&lt;hours&gt;</font></strong></td>
+            <td width="39%" valign="bottom" bgcolor="#FFFFFF">Date Filed : 
+              <input value = "<%=strTemp3%>" name="datefiled" type= "text"  class="textbox"  id="datefiled3"  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" size="15" readonly="true"> 
+              <a href="javascript:show_calendar('staff_profile.datefiled');" title="Click to select date" onMouseOver="window.status='Select date';return true;" onMouseOut="window.status='';return true;"><img src="../../images/calendar_new.gif" width="20" height="16" border="0"></a></td>
+          </tr>
+          <tr> 
+            <td height="114">&nbsp;</td>
+            <td colspan="4" bgcolor="#FFFFFF">Explanation/Reason : <br> <textarea name="reason" cols="64" rows="3"  class="textbox"  id="reason" onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" ><%=strTemp3%></textarea></td>
+          </tr>
+          <tr>
+            <td height="25">&nbsp;</td>
+            <td height="25" colspan="4" bgcolor="#FFFFFF">Return Date : 
+              <input name="rdate" type= "text" class="textbox"  id="rdate"  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" size="15" readonly="true"> 
+              <a href="javascript:show_calendar('staff_profile.rdate');" title="Click to select date" onmouseover="window.status='Select date';return true;" onmouseout="window.status='';return true;"><img src="../../images/calendar_new.gif" width="20" height="16" border="0"></a> 
+              &nbsp;&nbsp;&nbsp;&nbsp; Return Time : 
+              <input name="rtntime" type= "text"  class="textbox"  id="rtntime"  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" size="15" readonly="true"> 
+            </td>
+          </tr>
+        </table>
+		<table width="94%" border="0" cellpadding="5" cellspacing="0">
+          <tr> 
+            <td colspan="4"><hr size="1"></td>
+          </tr>
+          <%
+	strTemp = WI.fillTextValue("caddress");
+	strTemp2 = WI.fillTextValue("tel");
+	strTemp3 = WI.fillTextValue("cell");
+	if (bolSetEdit && strPrepareToEdit.compareTo("1") == 0){
+		strTemp = (String)vEditResult.elementAt(5);
+		strTemp2 = (String)vEditResult.elementAt(6);
+		strTemp3 = (String)vEditResult.elementAt(7);
+	}
+%>
+          <tr> 
+            <td>&nbsp;</td>
+            <td colspan="3" valign="bottom"><strong><u>Contact info while on leave: 
+              </u></strong></td>
+          </tr>
+          <tr> 
+            <td width="2%">&nbsp;</td>
+            <td width="17%">Address</td>
+            <td width="81%" colspan="2"><input value="<%=strTemp%>" name="caddress" type="text" id="caddress" size="64" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" ></td>
+          </tr>
+          <tr> 
+            <td width="2%">&nbsp;</td>
+            <td>Tel. No.</td>
+            <td colspan="2"><input value="<%=strTemp2%>"  name="tel" type="text" id="tel" size="25"  class="textbox" onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" ></td>
+          </tr>
+          <tr> 
+            <td width="2%">&nbsp;</td>
+            <td>Cell No.</td>
+            <td colspan="2"><input  value="<%=strTemp3%>" name="cell" type="text" id="cell" size="25"  class="textbox" onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" ></td>
+          </tr>
+          <%
+	strTemp = WI.fillTextValue("ldatefrom");
+	strTemp2 = WI.fillTextValue("hrfrom");
+	strTemp3 = WI.fillTextValue("fmin");
+	if (bolSetEdit && strPrepareToEdit.compareTo("1") == 0){
+		strTemp = (String)vEditResult.elementAt(8);
+		strTemp2 = (String)vEditResult.elementAt(9);
+		strTemp3 = (String)vEditResult.elementAt(10);
+	}
+%>
+          <%
+	strTemp = WI.fillTextValue("duration");
+	strTemp2 = WI.fillTextValue("dIndex");
+	strTemp3 = WI.fillTextValue("reason");
+	if (bolSetEdit && strPrepareToEdit.compareTo("1") == 0){
+		strTemp = (String)vEditResult.elementAt(19);
+		strTemp2 = (String)vEditResult.elementAt(20);
+		strTemp3 = (String)vEditResult.elementAt(21);
+	}
+%>
+          <%
+	strTemp = WI.fillTextValue("substitute");
+	if (bolSetEdit && strPrepareToEdit.compareTo("1") == 0){
+		strTemp = (String)vEditResult.elementAt(22);
+	}
+%>
+          <%
+	strTemp = "&nbsp";
+	strTemp2 = "&nbsp";
+	strTemp3 = "&nbsp";
+	if (bolSetEdit && strPrepareToEdit.compareTo("1") == 0){
+		strTemp = hrLO.getApprovalStatus(dbOP,"supervisor", (String)vEditResult.elementAt(0));
+		strTemp2 = hrLO.getApprovalStatus(dbOP,"hr", (String)vEditResult.elementAt(0));
+		strTemp3 = hrLO.getApprovalStatus(dbOP,"president", (String)vEditResult.elementAt(0));
+	}
+%>
+          <%
+	strTemp2 = WI.fillTextValue("rdate");
+	strTemp3 = WI.fillTextValue("rtntime");
+	if (bolSetEdit && strPrepareToEdit.compareTo("1") == 0){
+		strTemp2 = (String)vEditResult.elementAt(23);
+		strTemp3 = (String)vEditResult.elementAt(24);
+	}
+%>
+        </table>
+		
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
+          <% strTemp = WI.fillTextValue("cstatus");
+   strTemp2 = WI.fillTextValue("pob");
+   strTemp3 = WI.fillTextValue("nationality");
+
+   if (!bolNoRecord){
+   		strTemp = WI.getStrValue((String)vRetResult.elementAt(0));
+		strTemp2 = WI.getStrValue((String)vRetResult.elementAt(1));
+		strTemp3 = WI.getStrValue((String)vRetResult.elementAt(2));
+   }
+%>
+          <% strTemp = WI.fillTextValue("religion");
+   strTemp2 = WI.fillTextValue("sss");
+   strTemp3 = WI.fillTextValue("tin");
+
+   if (!bolNoRecord){
+   		strTemp = WI.getStrValue((String)vRetResult.elementAt(3));
+		strTemp2 = WI.getStrValue((String)vRetResult.elementAt(4));
+		strTemp3 = WI.getStrValue((String)vRetResult.elementAt(5));
+   }
+%>
+          <% strTemp = WI.fillTextValue("philhealth");
+   strTemp2 = WI.fillTextValue("pag_ibig");
+   strTemp3 = WI.fillTextValue("peraa");
+
+   if (!bolNoRecord){
+   		strTemp = WI.getStrValue((String)vRetResult.elementAt(16));
+		strTemp2 = WI.getStrValue((String)vRetResult.elementAt(17));
+		strTemp3 = WI.getStrValue((String)vRetResult.elementAt(18));
+   }
+%>
+          <% strTemp = WI.fillTextValue("father");
+   strTemp2 = WI.fillTextValue("f_occ");
+   strTemp3 = WI.fillTextValue("mother");
+
+   if (!bolNoRecord){
+   		strTemp = WI.getStrValue((String)vRetResult.elementAt(6));
+		strTemp2 = WI.getStrValue((String)vRetResult.elementAt(7));
+		strTemp3 = WI.getStrValue((String)vRetResult.elementAt(8));
+   }
+%>
+          <% strTemp = WI.fillTextValue("m_occ");
+   strTemp2 = WI.fillTextValue("height");
+   strTemp3 = WI.fillTextValue("weight");
+
+   if (!bolNoRecord){
+   		strTemp = WI.getStrValue((String)vRetResult.elementAt(9));
+		strTemp2 = WI.getStrValue((String)vRetResult.elementAt(10));
+		strTemp3 = WI.getStrValue((String)vRetResult.elementAt(11));
+   }
+%>
+          <%
+   strTemp = WI.fillTextValue("blood");
+   strTemp2 = WI.fillTextValue("rh");
+
+   if (!bolNoRecord){
+   		strTemp = WI.getStrValue((String)vRetResult.elementAt(12));
+		strTemp2 = WI.getStrValue((String)vRetResult.elementAt(13));
+   }
+//System.out.println(strTemp);
+%>
+          <tr> 
+            <td width="2%" height="51">&nbsp;</td>
+            <td width="98%" valign="bottom"><div align="center"> 
+                <% if (iAccessLevel > 1){
+		if(bolNoRecord) {
+%>
+                <a href="javascript:AddRecord();"><img src="../../images/save.gif" border="0" name="hide_save"></a> 
+                <font size="1">click to save entries</font> 
+                <%}else{%>
+                <a href="javascript:EditRecord();"><img src="../../images/edit.gif" border="0"></a><font size="1">click 
+                to save changes</font><a href='javascript:CancelRecord("<%=request.getParameter("emp_id")%>")'><img src="../../images/cancel.gif" border="0"></a><font size="1">click 
+                to cancel and clear entries</font> 
+                <%}}%>
+              </div></td>
+          </tr>
+          <tr>
+            <td height="33">&nbsp;</td>
+            <td valign="bottom"><div align="right"><img src="../../images/print.gif" border="0" ><font size="1">click 
+                to print applicatio</font><font size="1">n</font></div></td>
+          </tr>
+        </table>
+      </td>
+</tr>
+</table>
+  <%}%>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="25"  colspan="3"><div align="right"></div></td>
+    </tr>
+    <tr>
+      <td height="25"  colspan="3" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+<%
+   if (!bolNoRecord){
+   		strInfoIndex = WI.getStrValue((String)vRetResult.elementAt(14));
+   }
+%>
+<input type="hidden" name="info_index" value="<%=strInfoIndex%>">
+<input type="hidden" name="page_action">
+</form>
+</body>
+</html>
+<%
+	dbOP.cleanUP();
+%>

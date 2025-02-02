@@ -1,0 +1,77 @@
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+
+td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+
+th {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+
+.bodystyle {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+
+
+/*********** For text box ****************/
+.textbox {
+	background-color: #FDFDFD;
+	border-style: inset;
+	border-width: 1px;
+	border-color: #194685;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+.textbox_bigfont {
+	background-color: #FDFDFD;
+	border-style: inset;
+	border-width: 1px;
+	border-color: #194685;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size: 18px;
+}
+.textbox_noborder {
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	border: 0; 
+	font-weight:bold;
+}
+.dtrTextArea {
+	border-color: #BCD2DE;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+.username_field {
+	border-style: inset;
+	border-width: 1px;
+	border-color: #194685;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size: 15px;
+	font-weight:bold;
+	margin: 5px; 
+	background-image: url("../images/username.gif"); 
+	background-repeat:no-repeat; 
+	background-position:2px center; 
+	padding-left: 20px;
+}
+.password_field {
+	border-style: inset;
+	border-width: 1px;
+	border-color: #194685;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size: 15px;
+	font-weight:bold;
+	margin: 5px; 
+	background-image: url("../images/password.gif"); 
+	background-repeat:no-repeat; 
+	background-position:2px center; 
+	padding-left: 20px;
+}
+/********* End of text box style *********/
+
+
+/************* start of table style.. *********/
+

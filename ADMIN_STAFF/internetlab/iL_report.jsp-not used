@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript" src="../../jscript/date-picker.js"></script>
+
+<script language="JavaScript">
+<!--
+	function viewList(){
+		var loadPg = "./cafe_updateOR.jsp";
+		var win=window.open(loadPg,"myfile",'dependent=yes,width=650,height=350,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+		win.focus();
+	}
+
+	function ViewRecords(){
+		document.dtr_op.iAction.value = 4;
+		document.dtr_op.prepareToEdit.value = 0;
+	}
+	function PrepareToEdit(index,bTimeInTimeOut){
+ 		document.dtr_op.prepareToEdit.value = 1;
+		document.dtr_op.bTimeIn.value= bTimeInTimeOut;
+		document.dtr_op.info_index.value = index;
+	}
+	function AddRecord(){
+		document.dtr_op.iAction.value = 1;
+	}
+	function EditRecord(){
+		document.dtr_op.iAction.value = 2;
+		document.dtr_op.bTimeIn.value = document.dtr_op.strStatus1.value;
+	}
+	function CancelEdit(){
+		location = "./edit_dtr.jsp?emp_id="+document.dtr_op.emp_id.value+"&requested_date="+document.dtr_op.requested_date.value;
+	}
+
+	function DeleteRecord(index){
+		document.dtr_op.iAction.value = "0";
+		document.dtr_op.info_index.value = index;
+	}
+	function ClearDate(){
+	 document.dtr_op.requested_date.value = "";
+	 //document.dtr_op.submit();
+	}
+
+	function updateWH(strIndex){
+	var loadPg = "./wh_update.jsp?emp_id=" + strIndex;
+	var win=window.open(loadPg,"myfile",'dependent=yes,width=650,height=350,top=10,left=10,scrollbars=no,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+	}
+-->
+</script>
+<body bgcolor="#D2AE72">
+<form action="../e_dtr/dtr_operations/./add_dtr.jsp" method="post" name="dtr_op">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#697A8F">
+      <td width="100%" height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" ><strong>::::
+          COMPUTER LAB REPORT PAGE::::</strong></font></div></td>
+    </tr>
+    <tr >
+      <td height="25">&nbsp; </td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="5">
+    <tr> 
+      <td width="3%" height="25">&nbsp;</td>
+      <td width="15%"><strong><font size="1" face="Verdana, Arial, Helvetica, sans-serif">DATE 
+        OF USE</font></strong></td>
+      <td colspan="3"><font size="1" face="Verdana, Arial, Helvetica, sans-serif"> 
+        <strong>FROM&nbsp; </strong> 
+        <input name="wh_index3223" type="text" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" size="15" >
+        &nbsp;<img src="../../images/calendar_new.gif" width="20" height="16">&nbsp;<strong>&nbsp;&nbsp;&nbsp;TO 
+        &nbsp;</strong> 
+        <input name="wh_index32232" type="text" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" size="15" >
+        <img src="../../images/calendar_new.gif" width="20" height="16"> </font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td><font size="1" face="Verdana, Arial, Helvetica, sans-serif"><strong>USER 
+        ID</strong></font></td>
+      <td colspan="3"><font size="1" face="Verdana, Arial, Helvetica, sans-serif"> 
+        <input name="wh_index322322" type="text" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" size="15" >
+        </font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td><font size="1" face="Verdana, Arial, Helvetica, sans-serif"><strong>NAME 
+        OF COMP.</strong></font></td>
+      <td><select name="select">
+          <option value="&quot;&quot;">Select Computer</option>
+        </select> </td>
+      <td><font size="1" face="Verdana, Arial, Helvetica, sans-serif"><strong>ATTENDANT</strong></font></td>
+      <td><font size="1" face="Verdana, Arial, Helvetica, sans-serif"> 
+        <select name="select3">
+          <option value="&quot;&quot;">Selece Employee ID</option>
+        </select>
+        (employee ID)</font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td><font size="1" face="Verdana, Arial, Helvetica, sans-serif"><strong>TIME 
+        FROM </strong></font></td>
+      <td width="27%"><font size="1" face="Verdana, Arial, Helvetica, sans-serif"> 
+        <input name="am_hr_fr" type="text" size="2" maxlength="2" value="" class="textbox"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" onKeypress=" if(event.keyCode<48 || event.keyCode > 57) event.returnValue=false;" >
+        : 
+        <input name="am_min_fr" type="text" size="2" maxlength="2" value="" class="textbox"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" onKeypress=" if(event.keyCode<48 || event.keyCode > 57) event.returnValue=false;">
+        <select name="ampm_from0" id="select13">
+          <option value="0" >AM</option>
+          <option value="1" selected>PM</option>
+        </select>
+        </font></td>
+      <td width="11%"><font size="1" face="Verdana, Arial, Helvetica, sans-serif"><strong>TIME 
+        TO </strong></font></td>
+      <td width="44%"><font size="1" face="Verdana, Arial, Helvetica, sans-serif"> 
+        <input name="am_hr_fr2" type="text" size="2" maxlength="2" value="" class="textbox"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" onKeypress=" if(event.keyCode<48 || event.keyCode > 57) event.returnValue=false;" >
+        : 
+        <input name="am_min_fr2" type="text" size="2" maxlength="2" value="" class="textbox"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" onKeypress=" if(event.keyCode<48 || event.keyCode > 57) event.returnValue=false;">
+        <select name="select2" id="select">
+          <option value="0" >AM</option>
+          <option value="1" selected>PM</option>
+        </select>
+        </font></td>
+    </tr>
+    <tr> 
+      <td height="39">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><img src="../../images/form_proceed.gif" width="81" height="21"></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="4">&nbsp;</td>
+    </tr>
+  </table>
+
+  <table width="100%" border="1" cellpadding="2" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#FFFF9F"> 
+      <td height="25" colspan="6"><div align="center"><strong><font color="#000000">LIST 
+          OF USAGE</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td width="13%"><div align="center"><strong><font size="1" face="Verdana, Arial, Helvetica, sans-serif">DATE 
+          OF USE</font></strong></div></td>
+      <td width="26%"><div align="center"><font size="1" face="Verdana, Arial, Helvetica, sans-serif"><strong>ATTENDANT 
+          NAME </strong></font></div></td>
+      <td width="17%"><div align="center"><font size="1" face="Verdana, Arial, Helvetica, sans-serif"><strong>USER 
+          ID </strong></font></div></td>
+      <td width="19%"><div align="center"><font size="1" face="Verdana, Arial, Helvetica, sans-serif"><strong>COMPUTER 
+          NAME </strong></font></div></td>
+      <td width="16%"><div align="center"><font size="1" face="Verdana, Arial, Helvetica, sans-serif"><strong>TIME</strong></font></div></td>
+      <td width="9%" height="25">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td>$DATE</td>
+      <td>&nbsp;</td>
+      <td>$USER</td>
+      <td>$COMP_NAME</td>
+      <td>$TIMEFROM - $TIMETO</td>
+      <td><img src="../../images/view.gif" width="40" height="31"> </td>
+    </tr>
+  </table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr >
+      <td width="87%" height="25"><img src="../../images/print.gif" width="58" height="26" align="right"></td>
+    </tr>
+    <tr >
+      <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+
+</form>
+</body>
+</html>

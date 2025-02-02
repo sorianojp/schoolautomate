@@ -1,0 +1,864 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+
+</head>
+<script language="JavaScript">
+function ReloadPage()
+{
+	document.formstep2.submit();
+}
+function submitonce(theform)
+{
+//if IE 4+ or NS 6+
+	//form is submitted here.
+	if (document.all||document.getElementById)
+	{
+	//screen thru every element in the form, and hunt down "submit" and "reset"
+		for (i=0;i<theform.length;i++)
+		{
+			var tempobj=theform.elements[i]
+			if(tempobj.type.toLowerCase()=="submit"||tempobj.type.toLowerCase()=="reset")
+			//disable em
+			tempobj.disabled=true
+		}
+	}
+}
+function EditInformation()
+{
+	document.formstep2.editInformation.value="1";
+}
+</script>
+
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,java.util.Vector,enrollment.PersonalInfoManagement,java.util.StringTokenizer" %>
+<%
+	WebInterface WI = new WebInterface(request);
+	DBOperation dbOP = null;
+	String strErrMsg = null;
+	String strTemp = null;
+	Vector[] vEditInfo = null;
+	Vector vCourseApplInfo = null; //note here - basic information of course.
+	String strEditMsg = "";
+
+	String[] astrConvertYr = {"","1st","2nd","3rd","4th","5th","6th"};
+	String[] astrConvertSem= {"Summer","1st Sem","2nd Sem","3rd Sem","4th Sem"};
+
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+
+PersonalInfoManagement pInfo = new PersonalInfoManagement();
+//edit only if it is submitted.
+if(request.getParameter("editInformation") != null && request.getParameter("editInformation").compareTo("1") ==0)
+{
+	if(!pInfo.editPermStudPersonalInfo(dbOP, request,false))
+		strErrMsg = pInfo.getErrMsg();
+	else
+		strErrMsg = "Student information edited successfully.";
+}
+
+
+if(strErrMsg == null)
+{
+
+	vEditInfo = pInfo.viewPermStudPersonalInfo(dbOP,request.getParameter("stud_id"));
+	if(vEditInfo == null)
+		strErrMsg = pInfo.getErrMsg();
+}
+
+dbOP.cleanUP();
+%>
+<form name="formstep2" action="../admission/./stud_personal_info_page2.jsp" method="post" onSubmit="submitonce(this);">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#A49A6A">
+      <td height="26" colspan="3"><div align="center"><font color="#FFFFFF" ><strong>::::
+          GENERAL STUDENT PERSONAL INFORMATION SHEET (GSPIS) ::::</strong></font></div></td>
+    </tr>
+    <%
+if(strErrMsg != null){%>
+    <tr>
+      <td height="10" colspan="3">&nbsp; <b><%=strErrMsg%></b></td>
+    </tr>
+    <%return;
+}%>
+
+    <tr>
+      <td width="22%" height="23">&nbsp; COURSE </td>
+      <td colspan="2"><%=WI.getStrValue(vEditInfo[0].elementAt(0))%></td>
+    </tr>
+	<tr>
+      <td width="22%" height="23">&nbsp; MAJOR </td>
+      <td colspan="2"><%=WI.getStrValue(vEditInfo[0].elementAt(2))%></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp; CURRICULUM YEAR</td>
+      <td height="25" colspan="2"><%=WI.getStrValue(vEditInfo[0].elementAt(4))%>
+        to <%=WI.getStrValue(vEditInfo[0].elementAt(5))%></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp; YEAR LEVEL/TERM</td>
+      <td><%=astrConvertYr[Integer.parseInt(((String)vEditInfo[0].elementAt(8)))]%>/
+	  <%=astrConvertSem[Integer.parseInt(((String)vEditInfo[0].elementAt(9)))]%></td>
+	  <td width="57%">SCHOOL YEAR : <%=WI.getStrValue(vEditInfo[0].elementAt(6))%>
+        to <%=WI.getStrValue(vEditInfo[0].elementAt(7))%></td>
+    </tr>
+
+  </table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#B9B292">
+      <td height="25" colspan="3"><strong><font color="#FFFFFF" size="2">&nbsp;
+        I A &#8211; PERSONAL DATA</font></strong></td>
+    </tr>
+    <tr>
+      <td width="34%" height="20" valign="bottom">&nbsp; Last Name </td>
+      <td width="32%" valign="bottom">First Name </td>
+      <td width="34%" valign="bottom">Middle Name </td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp; <input name="lname" type="text" size="32" maxlength="32" value="<%=(String)vEditInfo[0].elementAt(13)%>"></td>
+      <td><input name="fname" type="text" size="32" maxlength="32" value="<%=(String)vEditInfo[0].elementAt(11)%>"></td>
+      <td><input name="mname" type="text" size="32" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(12))%>"></td>
+    </tr>
+    <tr>
+      <td colspan="3" height="25"> &nbsp; Name in Native Language Character &nbsp;
+        <input name="native_lan" type="text" size="64" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(14))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Gender </td>
+      <td height="15" valign="bottom">Religion </td>
+      <td height="15" valign="bottom">Nationality</td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp; <select name="gender">
+          <%
+strTemp = WI.getStrValue(vEditInfo[0].elementAt(15));
+if(strTemp.compareTo("M") ==0)
+{%>
+          <option value="M" selected>Male</option>
+          <%}else{%>
+          <option value="M">Male</option>
+          <%}if(strTemp.compareTo("F") ==0)
+{%>
+          <option value="F" selected>Female</option>
+          <%}else{%>
+          <option value="F">Female</option>
+          <%}%>
+        </select></td>
+      <td height="25"><input name="religion" type="text" size="32" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(16))%>"></td>
+      <td height="25"><input name="nationality" type="text" size="32" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(17))%>"></td>
+    </tr>
+    <tr valign="bottom">
+      <td height="20">&nbsp; Date of Birth<font size="1">(mm/dd/yyyy)</font></td>
+      <td height="20">Place of Birth </td>
+      <td height="20">&nbsp;</td>
+    </tr>
+    <tr>
+<%
+StringTokenizer strToken = new StringTokenizer(WI.getStrValue(vEditInfo[0].elementAt(18)), "/");
+String strMM = "";
+String strDD = "";
+String strYYYY = "";
+if(strToken.hasMoreElements())
+	strMM =(String)strToken.nextElement();
+if(strToken.hasMoreElements())
+	strDD =(String)strToken.nextElement();
+if(strToken.hasMoreElements())
+	strYYYY =(String)strToken.nextElement();
+
+%>
+      <td height="25">&nbsp; <input name="mm" type="text" size="2" maxlength="2" value="<%=strMM%>">
+        /
+        <input name="dd" type="text" size="2" maxlength="2" value="<%=strDD%>">
+        /
+        <input name="yyyy" type="text" size="4" maxlength="4" value="<%=strYYYY%>"></td>
+      <td height="25"><input name="place_of_birth" type="text" size="32" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(19))%>">
+      </td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr valign="bottom">
+      <td height="25">&nbsp; Civil Status (If Married -&gt;) </td>
+      <td height="25">Woman : State Maiden's Name</td>
+      <td height="25">Man : Name of Spouse </td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp; <select name="civil_stat">
+          <%
+strTemp = WI.getStrValue(vEditInfo[0].elementAt(20));
+if(strTemp.compareToIgnoreCase("single") ==0)
+{%>
+          <option selected>Single</option>
+          <%}else{%>
+          <option>Single</option>
+          <%}if(strTemp.compareToIgnoreCase("Married") ==0)
+{%>
+          <option selected>Married</option>
+          <%}else{%>
+          <option>Married</option>
+          <%}if(strTemp.compareToIgnoreCase("Widow/Widower") ==0)
+{%>
+          <option selected>Widow/Widower</option>
+          <%}else{%>
+          <option>Widow/Widower</option>
+          <%}if(strTemp.compareToIgnoreCase("Divorced") ==0)
+{%>
+          <option selected>Divorced</option>
+          <%}else{%>
+          <option>Divorced</option>
+          <%}%>
+        </select></td>
+      <td height="25"><input name="maiden_name" type="text" size="32" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(21))%>"></td>
+      <td height="25"><input name="spouse_name" type="text" size="32" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(22))%>"></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp; No. of children :
+        <input name="no_of_children" type="text" size="2" value="<%=WI.getStrValue(vEditInfo[0].elementAt(23))%>">
+      </td>
+      <td  colspan="2" height="25">Email Address:
+        <input name="email" type="text" size="36" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(24))%>">
+      </td>
+	  <tr>
+      <td height="25">&nbsp; Birth Order &nbsp;&nbsp;&nbsp;&nbsp; :
+        <input name="birth_order" type="text" size="2" value="<%=WI.getStrValue(vEditInfo[0].elementAt(87))%>">
+      </td>
+      <td  colspan="2" height="25">&nbsp; </td>
+    </tr>
+  </table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#B9B292">
+      <td height="25" colspan="3"><strong><font color="#FFFFFF" size="2">&nbsp;
+        I B &#8211; ALIEN STATUS DATA (for alien/foreigner student only)</font></strong></td>
+    </tr>
+    <tr>
+      <td width="34%" height="20" valign="bottom">&nbsp; Visa Status</td>
+      <td width="32%" valign="bottom">Authorized Stay</td>
+      <td width="34%" valign="bottom">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp; <input name="visa_status" type="text" size="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(26))%>"></td>
+      <td><input name="authorized_stay" type="text" size="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(27))%>"></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Passport No.</td>
+      <td height="15" valign="bottom">Place of Issue</td>
+      <td valign="bottom">Expiration Date <font size="1">(mm/dd/yyyy)</font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp; <input name="pp_number" type="text" size="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(28))%>"></td>
+      <td height="25"><input name="place_issued" type="text" size="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(29))%>"></td>
+      <td>
+<%
+strToken = new StringTokenizer(WI.getStrValue(vEditInfo[0].elementAt(30)), "/");
+if(strToken.hasMoreElements())
+	strMM =(String)strToken.nextElement();
+else	strMM = "";
+if(strToken.hasMoreElements())
+	strDD =(String)strToken.nextElement();
+else strDD = "";
+if(strToken.hasMoreElements())
+	strYYYY =(String)strToken.nextElement();
+else strYYYY = "";
+
+%>	  <input name="poi_mm" type="text" size="2" maxlength="2" value="<%=strMM%>">
+        /
+        <input name="poi_dd" type="text" size="2" maxlength="2" value="<%=strDD%>">
+        /
+        <input name="poi_yyyy" type="text" size="4" maxlength="4" value="<%=strYYYY%>"> </td>
+    </tr>
+    <tr valign="bottom">
+      <td height="20">&nbsp; ACR NO.</td>
+      <td height="20">Date of Issue<font size="1">(mm/dd/yyyy)</font></td>
+      <td>Expiration Date <font size="1">(mm/dd/yyyy)</font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp; <input name="acr_no" type="text" size="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(31))%>"></td>
+      <td height="25">
+<%
+strToken = new StringTokenizer(WI.getStrValue(vEditInfo[0].elementAt(32)), "/");
+if(strToken.hasMoreElements())
+	strMM =(String)strToken.nextElement();
+else	strMM = "";
+if(strToken.hasMoreElements())
+	strDD =(String)strToken.nextElement();
+else strDD = "";
+if(strToken.hasMoreElements())
+	strYYYY =(String)strToken.nextElement();
+else strYYYY = "";
+
+%>	  <input name="acr_doi_mm" type="text" size="2" maxlength="2" value="<%=strMM%>">
+        /
+        <input name="acr_doi_dd" type="text" size="2" maxlength="2" value="<%=strDD%>">
+        /
+        <input name="acr_doi_yyyy" type="text" size="4" maxlength="4" value="<%=strYYYY%>"></td>
+      <td>
+<%
+strToken = new StringTokenizer(WI.getStrValue(vEditInfo[0].elementAt(33)), "/");
+if(strToken.hasMoreElements())
+	strMM =(String)strToken.nextElement();
+else	strMM = "";
+if(strToken.hasMoreElements())
+	strDD =(String)strToken.nextElement();
+else strDD = "";
+if(strToken.hasMoreElements())
+	strYYYY =(String)strToken.nextElement();
+else strYYYY = "";
+
+%>	  <input name="acr_expire_mm" type="text" size="2" maxlength="2" value="<%=strMM%>">
+        /
+        <input name="acr_expire_dd" type="text" size="2" maxlength="2" value="<%=strDD%>">
+        /
+        <input name="acr_expire_yyyy" type="text" size="4" maxlength="4" value="<%=strYYYY%>"> </td>
+    </tr>
+    <tr valign="bottom">
+      <td height="25">&nbsp; CRTS NO.</td>
+      <td height="25">Date of Issue<font size="1">(mm/dd/yyyy)</font></td>
+      <td>Expiration Date <font size="1">(mm/dd/yyyy)</font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp; <input name="crts_no" type="text" size="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(34))%>"></td>
+      <td height="25">
+<%
+strToken = new StringTokenizer(WI.getStrValue(vEditInfo[0].elementAt(35)), "/");
+if(strToken.hasMoreElements())
+	strMM =(String)strToken.nextElement();
+else	strMM = "";
+if(strToken.hasMoreElements())
+	strDD =(String)strToken.nextElement();
+else strDD = "";
+if(strToken.hasMoreElements())
+	strYYYY =(String)strToken.nextElement();
+else strYYYY = "";
+
+%>	  <input name="crts_doi_mm" type="text" size="2" maxlength="2" value="<%=strMM%>">
+        /
+        <input name="crts_doi_dd" type="text" size="2" maxlength="2" value="<%=strDD%>">
+        /
+        <input name="crts_doi_yyyy" type="text" size="4" maxlength="4" value="<%=strYYYY%>"> </td>
+      <td>
+<%
+strToken = new StringTokenizer(WI.getStrValue(vEditInfo[0].elementAt(36)), "/");
+if(strToken.hasMoreElements())
+	strMM =(String)strToken.nextElement();
+else	strMM = "";
+if(strToken.hasMoreElements())
+	strDD =(String)strToken.nextElement();
+else strDD = "";
+if(strToken.hasMoreElements())
+	strYYYY =(String)strToken.nextElement();
+else strYYYY = "";
+
+%>	  <input name="crts_expire_mm" type="text" size="2" maxlength="2" value="<%=strMM%>">
+        /
+        <input name="crts_expire_dd" type="text" size="2" maxlength="2" value="<%=strDD%>">
+        /
+        <input name="crts_expire_yyyy" type="text" size="4" maxlength="4" value="<%=strYYYY%>"> </td>
+    </tr>
+  </table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#B9B292">
+      <td height="25" colspan="2"><strong><font color="#FFFFFF" >&nbsp;
+        II &#8211; RESIDENCE DATA</font></strong></td>
+    </tr>
+    <tr>
+      <td height="20" colspan="2" valign="bottom">&nbsp;
+        <font color="#0000FF"><u>Home Address: </u></font></td>
+    </tr>
+    <tr>
+      <td width="60%" height="20" valign="bottom">&nbsp; Apartment Name/House
+        No./Street/Barangay </td>
+      <td width="40%" valign="bottom">City/Municipality </td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp; <input name="res_house_no" type="text" size="60" maxlength="128" value="<%=WI.getStrValue(vEditInfo[0].elementAt(37))%>"></td>
+      <td valign="bottom"><input name="res_city" type="text" size="40" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(38))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Province/State
+      </td>
+      <td valign="bottom">Country</td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;  <input name="res_provience" type="text" size="60" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(39))%>"></td>
+      <td valign="bottom"><input name="res_country" type="text" size="40" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(40))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Zipcode</td>
+      <td valign="bottom">Telephone Nos. </td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;  <input name="res_zip" type="text" size="60" maxlength="10" value="<%=WI.getStrValue(vEditInfo[0].elementAt(41))%>"></td>
+      <td valign="bottom"><input name="res_tel" type="text" size="40" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(42))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" colspan="2" valign="bottom">&nbsp;
+        <font color="#0000FF"><u>Current Contact Address: </u></font></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Contact
+        Person/Guardian Name </td>
+      <td valign="bottom">Relation</td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;  <input name="con_per_name" type="text" size="60" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(43))%>"></td>
+      <td valign="bottom"><input name="con_per_relation" type="text" size="40" maxlength="24" value="<%=WI.getStrValue(vEditInfo[0].elementAt(44))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Apartment
+        Name/House No./Street/Barangay </td>
+      <td valign="bottom">&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="2" height="25" valign="bottom">&nbsp;
+         <input name="con_house_no" type="text" size="100" maxlength="128" value="<%=WI.getStrValue(vEditInfo[0].elementAt(45))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; City/Municipality</td>
+      <td valign="bottom">Province/State </td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;
+        <input name="con_city" type="text" size="60" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(46))%>">
+        </td>
+      <td valign="bottom"><input name="con_provience" type="text" size="40" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(47))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Country
+      </td>
+      <td valign="bottom">Zipcode </td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;  <input name="con_country" type="text" size="60" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(48))%>"></td>
+      <td valign="bottom"><input name="con_zip" type="text" size="40" maxlength="10" value="<%=WI.getStrValue(vEditInfo[0].elementAt(49))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Telephone
+        Nos.</td>
+      <td valign="bottom">Email Address </td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;  <input name="con_tel" type="text" size="60" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(50))%>"></td>
+      <td valign="bottom"><input name="con_email" type="text" size="40" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(51))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" colspan="2" valign="bottom">&nbsp; <font color="#0000FF"><u>Emergency
+        Contact Address: (if not same as above)</u></font></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Contact
+        Person Name </td>
+      <td valign="bottom">Relation</td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;  <input name="emgn_per_name" type="text" size="60" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(52))%>"></td>
+      <td valign="bottom"><input name="emgn_per_rel" type="text" size="40" maxlength="24" value="<%=WI.getStrValue(vEditInfo[0].elementAt(53))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Apartment
+        Name/House No./Street/Barangay </td>
+      <td valign="bottom">&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="2" height="25" valign="bottom">&nbsp;
+         <input name="emgn_house_no" type="text" size="100" maxlength="128" value="<%=WI.getStrValue(vEditInfo[0].elementAt(54))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; City/Municipality</td>
+      <td valign="bottom">Province/State </td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;
+        <input name="emgn_city" type="text" size="60" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(55))%>">
+        </td>
+      <td valign="bottom"><input name="emgn_provience" type="text" size="40" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(56))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Country</td>
+      <td valign="bottom">Zipcode</td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;  <input name="emgn_country" type="text" size="60" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(57))%>"></td>
+      <td valign="bottom"><input name="emgn_zip" type="text" size="40" maxlength="10" value="<%=WI.getStrValue(vEditInfo[0].elementAt(58))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Telephone
+        Nos. </td>
+      <td valign="bottom">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;  <input name="emgn_tel" type="text" size="60" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(59))%>"></td>
+      <td valign="bottom">&nbsp;</td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#B9B292">
+      <td height="25" colspan="6"><strong><font color="#FFFFFF" size="2">&nbsp;
+        III &#8211; PHYSICAL DESCRIPTION</font></strong></td>
+    </tr>
+    <tr valign="bottom">
+      <td width="16%" height="20">&nbsp; Height(cms)</td>
+      <td width="16%">Weight(lbs)</td>
+      <td width="16%">Built</td>
+      <td width="16%">Eye color</td>
+      <td width="17%">Hair color</td>
+      <td width="19%">Complexion</td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;  <input name="height" type="text" size="10" maxlength="16" value="<%=WI.getStrValue(vEditInfo[0].elementAt(60))%>"></td>
+      <td><input name="weight" type="text" size="10" maxlength="16" value="<%=WI.getStrValue(vEditInfo[0].elementAt(61))%>"></td>
+      <td><input name="built" type="text" size="10" maxlength="16" value="<%=WI.getStrValue(vEditInfo[0].elementAt(62))%>"></td>
+      <td><input name="eye_color" type="text" size="10" maxlength="16" value="<%=WI.getStrValue(vEditInfo[0].elementAt(63))%>"></td>
+      <td><input name="hair_color" type="text" size="10" maxlength="16" value="<%=WI.getStrValue(vEditInfo[0].elementAt(64))%>"></td>
+      <td><input name="complexion" type="text" size="10" maxlength="16" value="<%=WI.getStrValue(vEditInfo[0].elementAt(65))%>"></td>
+    </tr>
+    <tr>
+      <td colspan="3" height="20">&nbsp; Other Distinguishing
+        Features </td>
+      <td colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6" height="25">&nbsp;  <input name="oth_prominent_feature" type="text" size="100" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(66))%>"></td>
+    </tr>
+    <tr>
+      <td colspan="3" height="20">&nbsp; Physical Handicap
+        or Disability (if any) </td>
+      <td colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6" height="25">&nbsp;  <input name="physical_disability" type="text" size="100" maxlength="128" value="<%=WI.getStrValue(vEditInfo[0].elementAt(67))%>"></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#B9B292">
+      <td height="25" colspan="2"><strong><font color="#FFFFFF" size="2" >&nbsp;
+        IV&#8211; FAMILY DATA</font></strong></td>
+    </tr>
+    <tr>
+      <td height="20" colspan="2" valign="bottom">&nbsp;
+        <font color="#0000FF"><u>Parents:</u></font></td>
+    </tr>
+    <tr>
+      <td width="60%" height="20" valign="bottom">&nbsp;
+        Father&#8217;s Name </td>
+      <td width="40%" valign="bottom">Occupation</td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;  <input name="f_name" type="text" size="60" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(68))%>"></td>
+      <td valign="bottom"><input name="f_occupation" type="text" size="40" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(69))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Company Name
+        </td>
+      <td valign="bottom">Telephone Nos. </td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;  <input name="f_comp_name" type="text" size="60" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(70))%>"></td>
+      <td valign="bottom"><input name="f_tel" type="text" size="40" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(71))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Company
+        Address</td>
+      <td valign="bottom">Father&#8217;s Email Address </td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp;  <input name="f_comp_addr" type="text" size="60" value="<%=WI.getStrValue(vEditInfo[0].elementAt(72))%>"></td>
+      <td valign="bottom"><input name="f_email" type="text" size="40" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(73))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Mother&#8217;s
+        Name </td>
+      <td valign="bottom">Occupation</td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp; <input name="m_name" type="text" size="60" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(74))%>"></td>
+      <td valign="bottom"><input name="m_occupation" type="text" size="40" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(75))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Company Name
+        </td>
+      <td valign="bottom">Telephone Nos. </td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp; <input name="m_comp_name" type="text" size="60" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(76))%>"></td>
+      <td valign="bottom"><input name="m_tel" type="text" size="40" maxlength="32" value="<%=WI.getStrValue(vEditInfo[0].elementAt(77))%>"></td>
+    </tr>
+    <tr>
+      <td height="20" valign="bottom">&nbsp; Company
+        Address</td>
+      <td valign="bottom">Mother&#8217;s Email Address </td>
+    </tr>
+    <tr>
+      <td height="25" valign="bottom">&nbsp; <input name="m_comp_addr" type="text" size="60" value="<%=WI.getStrValue(vEditInfo[0].elementAt(78))%>"></td>
+      <td valign="bottom"><input name="m_email" type="text" size="40" maxlength="64" value="<%=WI.getStrValue(vEditInfo[0].elementAt(79))%>"></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td width="34%" height="20">&nbsp; <font color="#0000FF">Brother(s)/Sister(s):</font></td>
+      <td width="33%">&nbsp;</td>
+      <td width="33%">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp; <u>NAME</u></td>
+      <td><u>COURSE/OCCUPATION </u></td>
+      <td><u>SCHOOL/COMPANY</u></td>
+    </tr>
+<%
+int j=0;
+for(int i=0; i<8;){
+++i;
+if(vEditInfo[1].size() > j)
+	strTemp = WI.getStrValue(vEditInfo[1].elementAt(j++));
+else
+	strTemp = "";
+%>
+
+    <tr>
+      <td height="25">&nbsp; <u></u> <input name="bsis<%=i%>_name" type="text" size="33" maxlength="64" value="<%=strTemp%>"></td>
+<%
+if(vEditInfo[1].size() > j)
+	strTemp = WI.getStrValue(vEditInfo[1].elementAt(j++));
+%>
+      <td><input name="bsis<%=i%>_occupation" type="text" size="33" maxlength="64" value="<%=strTemp%>"></td>
+<%
+if(vEditInfo[1].size() > j)
+	strTemp = WI.getStrValue(vEditInfo[1].elementAt(j++));
+++j;
+%>
+      <td><input name="bsis<%=i%>_company" type="text" size="33" maxlength="64" value="<%=strTemp%>"></td>
+    </tr>
+<%}%>
+  </table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#B9B292">
+      <td height="25" colspan="4"><strong><font color="#FFFFFF" size="2" >&nbsp;
+        V&#8211; EDUCATIONAL BACKGROUND</font></strong></td>
+    </tr>
+    <tr>
+      <td width="15%" height="25">&nbsp;</td>
+      <td width="29%"><u>NAME</u></td>
+      <td width="26%"><u>COURSE/YEAR GRADUATED</u></td>
+      <td width="30%"><u>HONORS/AWARDS</u></td>
+    </tr>
+<%
+j =0;
+if(vEditInfo[2] != null && vEditInfo[2].size() > j && ((String)vEditInfo[2].elementAt(j++)).compareToIgnoreCase("elementary") ==0){%>
+    <tr>
+      <td height="25">&nbsp; Elementary</td>
+      <td><input name="ELEM_SCH_NAME" type="text" size="32" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+      <td><input name="ELEM_COURSE_TAKEN" type="text" size="16" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>">
+	  <input name="ELEM_YEAR_GRAD" type="text" size="4" maxlength="4" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+      <td><input name="ELEM_HONOR_AWARD" type="text" size="28" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+    </tr>
+<%}else{%>
+	<tr>
+      <td height="25">&nbsp; Elementary</td>
+      <td><input name="ELEM_SCH_NAME" type="text" size="32" maxlength="64"></td>
+      <td><input name="ELEM_COURSE_TAKEN" type="text" size="16" maxlength="64">
+	  <input name="ELEM_YEAR_GRAD" type="text" size="4" maxlength="4"></td>
+      <td><input name="ELEM_HONOR_AWARD" type="text" size="28" maxlength="64"></td>
+    </tr>
+<%}if(vEditInfo[2] != null && vEditInfo[2].size() > j && ((String)vEditInfo[2].elementAt(j++)).compareToIgnoreCase("High school") ==0){%>
+
+    <tr>
+      <td height="25">&nbsp; High School</td>
+      <td><input name="HIGH_SCH_NAME" type="text" size="32" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+      <td><input name="HIGH_COURSE_TAKEN" type="text" size="16" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>">
+	  <input name="HIGH_YEAR_GRAD" type="text" size="4" maxlength="4" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+      <td><input name="HIGH_HONOR_AWARD" type="text" size="28" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+    </tr>
+<%}else{%>
+	<tr>
+      <td height="25">&nbsp; High School</td>
+      <td><input name="HIGH_SCH_NAME" type="text" size="32" maxlength="64"></td>
+      <td><input name="HIGH_COURSE_TAKEN" type="text" size="16" maxlength="64">
+	  <input name="HIGH_YEAR_GRAD" type="text" size="4" maxlength="4"></td>
+      <td><input name="HIGH_HONOR_AWARD" type="text" size="28" maxlength="64"></td>
+    </tr>
+<%}if(vEditInfo[2] != null && vEditInfo[2].size() > j && ((String)vEditInfo[2].elementAt(j++)).compareToIgnoreCase("College") ==0){%>
+    <tr>
+      <td height="25">&nbsp; College</td>
+      <td><input name="COLLEGE_NAME" type="text" size="32" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+      <td><input name="COLLEGE_COURSE_TAKEN" type="text" size="16" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>">
+	  <input name="COLLEGE_YEAR_GRAD" type="text" size="4" maxlength="4" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+      <td><input name="COLLEGE_HONOR_AWARD" type="text" size="28" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+    </tr>
+<%}else{%>
+	<tr>
+      <td height="25">&nbsp; College</td>
+      <td><input name="COLLEGE_NAME" type="text" size="32" maxlength="64"></td>
+      <td><input name="COLLEGE_COURSE_TAKEN" type="text" size="16" maxlength="64">
+	  <input name="COLLEGE_YEAR_GRAD" type="text" size="4" maxlength="4"></td>
+      <td><input name="COLLEGE_HONOR_AWARD" type="text" size="28" maxlength="64"></td>
+    </tr>
+<%}if(vEditInfo[2] != null && vEditInfo[2].size() > j && ((String)vEditInfo[2].elementAt(j++)).compareToIgnoreCase("PG") ==0){%>
+    <tr>
+      <td height="25">&nbsp; Post Graduate</td>
+      <td><input name="PG_SCH_NAME" type="text" size="32" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+      <td><input name="PG_COURSE_TAKEN" type="text" size="16" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>">
+	  <input name="PG_YEAR_GRAD" type="text" size="4" maxlength="4" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+      <td><input name="PG_HONOR_AWARD" type="text" size="28" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+    </tr>
+<%}else{%>
+<tr>
+      <td height="25">&nbsp; Post Graduate</td>
+      <td><input name="PG_SCH_NAME" type="text" size="32" maxlength="64"></td>
+      <td><input name="PG_COURSE_TAKEN" type="text" size="16" maxlength="64">
+	  <input name="PG_YEAR_GRAD" type="text" size="4" maxlength="4"></td>
+      <td><input name="PG_HONOR_AWARD" type="text" size="28" maxlength="64"></td>
+    </tr>
+<%}if(vEditInfo[2] != null && vEditInfo[2].size() > j && ((String)vEditInfo[2].elementAt(j++)).compareToIgnoreCase("Vocatinal") ==0){%>
+    <tr>
+      <td height="25">&nbsp; Vocational</td>
+      <td><input name="VOC_SCH_NAME" type="text" size="32" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+      <td><input name="VOC_COURSE_TAKEN" type="text" size="16" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>">
+	  <input name="VOC_YEAR_GRAD" type="text" size="4" maxlength="4" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+      <td><input name="VOC_HONOR_AWARD" type="text" size="28" maxlength="64" value="<%=WI.getStrValue(vEditInfo[2].elementAt(j++))%>"></td>
+    </tr>
+<%}else{%>
+<tr>
+      <td height="25">&nbsp; Vocational</td>
+      <td><input name="VOC_SCH_NAME" type="text" size="32" maxlength="64"></td>
+      <td><input name="VOC_COURSE_TAKEN" type="text" size="16" maxlength="64">
+	  <input name="VOC_YEAR_GRAD" type="text" size="4" maxlength="4"></td>
+      <td><input name="VOC_HONOR_AWARD" type="text" size="28" maxlength="64"></td>
+    </tr>
+<%}%>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#B9B292">
+      <td height="25"  colspan="2"><strong><font color="#FFFFFF" size="2" >&nbsp; VI&#8211;
+        GENERAL QUALIFICATION</font></strong></td>
+    </tr>
+    <tr>
+      <td width="10%">&nbsp;<font color="#0000FF">Languages:</font></td>
+      <td height="25"> <input name="LANGUAGE_KNOWN" type="text" size="103" value="<%=WI.getStrValue(vEditInfo[0].elementAt(80))%>"></td>
+    </tr>
+    <tr>
+      <td>&nbsp;<font color="#0000FF">Hobbies:</font></td>
+      <td height="25">
+        <input name="HOBBY" type="text" size="103" value="<%=WI.getStrValue(vEditInfo[0].elementAt(81))%>"> </td>
+    </tr>
+    <tr>
+      <td><font color="#0000FF">&nbsp;Skills:</font></td>
+      <td height="25">
+        <input name="SKILL" type="text" size="103" value="<%=WI.getStrValue(vEditInfo[0].elementAt(82))%>"></td>
+    </tr>
+    <tr>
+      <td><font color="#0000FF">&nbsp;Talents:</font></td>
+      <td height="25">
+        <input name="TALENT" type="text" size="103" value="<%=WI.getStrValue(vEditInfo[0].elementAt(83))%>"></td>
+    </tr>
+    <tr>
+      <td>&nbsp;<font color="#0000FF">Sports:</font></td>
+      <td height="25">
+        <input name="SPORT" type="text" size="103" value="<%=WI.getStrValue(vEditInfo[0].elementAt(84))%>"></td>
+    </tr>
+    <tr>
+      <td colspan="2" valign="bottom"><font color="#0000FF">&nbsp;Honors/Awards/Merits: (ex. &quot;Model
+        Student, 1990&quot;)</font> </td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td height="25">
+<input name="AWARD" type="text" size="103" value="<%=WI.getStrValue(vEditInfo[0].elementAt(85))%>"></td>
+    </tr>
+
+    <tr>
+      <td colspan="2" valign="bottom">&nbsp;<font color="#0000FF">Extra-Curricular Activities
+        : (Organizations, Clubs, etc)</font></td>
+       </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td height="25">
+<input name="EXT_CURRICULAR_ACT" type="text" size="103" value="<%=WI.getStrValue(vEditInfo[0].elementAt(86))%>"></td>
+    </tr>
+
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#B9B292">
+      <td height="25" colspan="2"><strong><font color="#FFFFFF" size="2">&nbsp;
+        VII&#8211; REFERENCES</font></strong></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="2">&nbsp;&nbsp;&nbsp;Write two or three references
+        (in VMUF or San Carlos City) who can vouch or guarantee for your total
+        behavior.</td>
+    </tr>
+    <tr>
+      <td width="35%" height="25">&nbsp;&nbsp;&nbsp;<u>NAME</u></td>
+      <td width="65%"><u>ADDRESS/TEL. NOS.</u></td>
+    </tr>
+<%//System.out.println(vEditInfo[3]);
+j = 0;
+if(vEditInfo[3].size() > j)
+	strTemp = WI.getStrValue(vEditInfo[3].elementAt(j++));
+else
+	strTemp = "";
+%>
+    <tr>
+      <td height="25">&nbsp;&nbsp; <input name="REF_NAME1" type="text" size="36" maxlength="64" value="<%=strTemp%>"></td>
+<%
+if(vEditInfo[3].size() > j)
+	strTemp = WI.getStrValue(vEditInfo[3].elementAt(j++));
+else
+	strTemp = "";
+++j;
+%>      <td><input name="REF_ADDR1" type="text" size="50" maxlength="128" value="<%=strTemp%>"></td>
+    </tr>
+    <tr>
+<%if(vEditInfo[3].size() > j)
+	strTemp = WI.getStrValue(vEditInfo[3].elementAt(j++));
+else
+	strTemp = "";
+%>      <td height="25">&nbsp;&nbsp; <input name="REF_NAME2" type="text" size="36" maxlength="64" value="<%=strTemp%>"></td>
+<%if(vEditInfo[3].size() > j)
+	strTemp = WI.getStrValue(vEditInfo[3].elementAt(j++));
+else
+	strTemp = "";
+++j;
+%>      <td><input name="REF_ADDR2" type="text" size="50" maxlength="128" value="<%=strTemp%>"></td>
+    </tr>
+<%if(vEditInfo[3].size() > j)
+	strTemp = WI.getStrValue(vEditInfo[3].elementAt(j++));
+else
+	strTemp = "";
+%>    <tr>
+      <td height="25">&nbsp;&nbsp; <input name="REF_NAME3" type="text" size="36" maxlength="64" value="<%=strTemp%>"></td>
+<%if(vEditInfo[3].size() > j)
+	strTemp = WI.getStrValue(vEditInfo[3].elementAt(j++));
+else
+	strTemp = "";
+%>      <td><input name="REF_ADDR3" type="text" size="50" maxlength="128" value="<%=strTemp%>"></td>
+    </tr>
+
+
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td width="30%">&nbsp;</td>
+      <td width="55%">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+      <td bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+<input type="hidden" name="info_index" value="<%=(String)vEditInfo[0].elementAt(10)%>">
+<input type="hidden" name="editInformation" value="0">
+</form>
+</body>
+</html>

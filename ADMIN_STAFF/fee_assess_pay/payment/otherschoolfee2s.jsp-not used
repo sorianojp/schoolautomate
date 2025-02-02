@@ -1,0 +1,397 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript">
+function ShowHideApprovalNo()
+{
+	if(document.fa_payment.payment_mode.selectedIndex == 2)
+		document.fa_payment.approval_number.disabled = false;
+	else
+		document.fa_payment.approval_number.disabled = true;
+}
+function ShowHideCheckNO()
+{
+	if(document.fa_payment.payment_type.selectedIndex == 0)
+		document.fa_payment.check_number.disabled = true;
+	else
+		document.fa_payment.check_number.disabled = false;
+}
+function ChangeFeeType()
+{
+	if(document.fa_payment.fee_type.selectedIndex ==0)
+		document.fa_payment.payment_for.value="2"; //fine type.
+	else
+		document.fa_payment.payment_for.value="1"; //tution fee type
+//	alert(document.fa_payment.payment_for.value);
+	ReloadPage();
+}
+function ReloadPage()
+{
+	document.fa_payment.submit();
+}
+function AddRecord()
+{
+	document.fa_payment.addRecord.value="1";
+}
+
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,FAPaymentUtil,FAPayment,java.util.Vector" %>
+<%
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	WebInterface WI = new WebInterface(request);
+	MessageConstant mConst = new MessageConstant();
+
+	String strErrMsg = null;
+	String strTemp = null;
+	String strStudStatus = WI.fillTextValue("stud_status");
+	
+
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_add.jsp","While Opening DB Con");
+		
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+Vector vStudInfo = null;
+
+FAPaymentUtil paymentUtil = new FAPaymentUtil();
+FAPayment faPayment = new FAPayment();
+//System.out.println(request.getParameter("payment_for"));
+strTemp = request.getParameter("addRecord");
+if(strTemp != null && strTemp.compareTo("1") ==0)
+{
+	if(faPayment.savePayment(dbOP,request,false))//always false for tution / fine payment
+	{	
+		dbOP.cleanUP();
+		response.sendRedirect(response.encodeRedirectURL("./otherschoolfees_print_receipt.jsp?or_number="+request.getParameter("or_number")));
+		return;
+	}
+	else
+		strErrMsg = faPayment.getErrMsg();
+}
+if(strStudStatus.compareTo("0") == 0)//only if student id is entered. 
+{
+	vStudInfo = paymentUtil.getStudBasicInfo(dbOP, request.getParameter("stud_id"));
+	if(vStudInfo == null) strErrMsg = paymentUtil.getErrMsg();
+	//System.out.println(strErrMsg);
+}
+if(strStudStatus == null || strStudStatus.trim().length() ==0)
+{
+	strErrMsg = "Please select student status type.";
+}
+else
+{
+	if(strStudStatus.compareTo("1") == 0)
+	{
+		if(request.getParameter("payee_name") == null  	|| request.getParameter("payee_name").trim().length() ==0 ||
+			request.getParameter("sy_from") == null || request.getParameter("sy_from").trim().length() ==0 ||
+			request.getParameter("sy_to") == null 	|| request.getParameter("sy_to").trim().length() ==0)
+		strErrMsg = "Please eneter name/school year of other fee information.";
+	}
+}
+if(strErrMsg == null) strErrMsg = "";
+%>
+<form name="fa_payment" action="./otherschoolfees.jsp" method="post">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" bgcolor="#A49A6A"><div align="center">
+	  <font color="#FFFFFF"><strong>:::: OTHER SCHOOL FEES PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25"><%=strErrMsg%></td>
+    </tr>
+	</table>
+	
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td height="25">Student Status</td>
+      <td  colspan="2"><select name="stud_status" onChange="ReloadPage();">
+          <option value="0">Student</option>
+          <%
+if(strStudStatus.compareTo("1") ==0){%>
+          <option value="1" selected>Ex-student</option>
+          <%}else{%>
+          <option value="1">Ex-student</option>
+          <%}%>
+        </select></td>
+    </tr>
+    <%if(strStudStatus.compareTo("1") != 0){%>
+    <tr > 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="14%" height="25">Student ID &nbsp; </td>
+      <td  colspan="2" width="84%"> <input name="stud_id" type="text" size="16" value="<%=WI.fillTextValue("stud_id")%>"> 
+        <font size="1">&lt;if payee is a current student&gt;</font></td>
+    </tr>
+    <%}else{%>
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td height="25">Payee Name </td>
+      <td colspan="2"><input name="payee_name" type="text" size="50" value="<%=WI.fillTextValue("payee_name")%>"> 
+        <font size="1">&lt;if payee is not a current student of the school&gt;</font></td>
+    </tr>
+   <%}%>    <tr > 
+      <td height="25">&nbsp;</td>
+      <td height="25">School year</td>
+      <td colspan="2"><input name="sy_from" type="text" size="4" value="<%=WI.fillTextValue("sy_from")%>">
+        to 
+        <input name="sy_to" type="text" size="4" value="<%=WI.fillTextValue("sy_to")%>"></td>
+    </tr>
+ 
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td colspan="2"><input name="image" type="image" src="../../../images/form_proceed.gif"></td>
+    </tr>
+  </table>
+	
+<%
+if(strErrMsg.length() == 0){ // the outer most condition.
+
+if(vStudInfo != null && vStudInfo.size() > 0)
+{%>	
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td colspan="6" height="25"><hr>
+	  <!-- enter here all hidden fields for student. -->
+	  <input type="hidden" name="stud_index" value="<%=(String)vStudInfo.elementAt(0)%>">
+	  <input type="hidden" name="year_level" value="<%=(String)vStudInfo.elementAt(4)%>">
+	  <input type="hidden" name="semester" value="<%=(String)vStudInfo.elementAt(5)%>">
+	  <input type="hidden" name="sy_from" value="<%=(String)vStudInfo.elementAt(8)%>">
+	  <input type="hidden" name="sy_to" value="<%=(String)vStudInfo.elementAt(9)%>">
+	  <input type="hidden" name="is_tempstud" value="<%=paymentUtil.isTempStudInStr()%>">
+	  </td>
+    </tr>
+    <tr> 
+      <td  width="2%" height="25">&nbsp;</td>
+      <td width="43%" height="25">Student name :<strong> <%=(String)vStudInfo.elementAt(1)%> </strong></td>
+      <td  colspan="4" height="25">Course :<strong><%=(String)vStudInfo.elementAt(2)%></strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Year :<strong><%=(String)vStudInfo.elementAt(4)%></strong> </td>
+      <td  colspan="4" height="25">Major : <strong><%=WI.getStrValue(vStudInfo.elementAt(3))%></strong></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">Term : <%=(String)vStudInfo.elementAt(5)%></td>
+      <td  colspan="4" height="25">&nbsp;</td>
+    </tr>
+  </table>
+<%}//if student info is not null
+%>	
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#B9B292"> 
+      <td width="58%" height="25" colspan="9" bgcolor="#B9B292"><div align="center">FEE 
+          DETAILS </div></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="2%" height="18">&nbsp;</td>
+      <td width="46%" valign="bottom">Fee type</td>
+      <td width="52%" valign="bottom">Fee 
+        rate</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td><select name="fee_type" onChange="ChangeFeeType();">
+	  <option value="0">Fine</option>
+<%
+ if(strStudStatus.compareTo("1") ==0)
+ 	strTemp = " from FA_OTH_SCH_FEE where is_del=0 and is_valid=1 and year_level=0 and "+
+		"sy_index=(select sy_index from FA_SCHYR where sy_from="+request.getParameter("sy_from")+" and sy_to="+
+		request.getParameter("sy_to")+") order by FEE_NAME asc";	
+ else
+ 	strTemp = " from FA_OTH_SCH_FEE where is_del=0 and is_valid=1 and (year_level=0 or year_level="+(String)vStudInfo.elementAt(4)+
+ 		") and sy_index=(select sy_index from FA_SCHYR where sy_from="+(String)vStudInfo.elementAt(8)+" and sy_to="+
+		(String)vStudInfo.elementAt(9)+") order by FEE_NAME asc";
+ %>	  
+<%=dbOP.loadCombo("OTHSCH_FEE_INDEX","FEE_NAME",strTemp, request.getParameter("fee_type"), false)%> 
+        </select></td>
+      <td><strong>
+<%
+strTemp = request.getParameter("fee_type");
+if(strTemp == null || strTemp.trim().length() ==0 || strTemp.compareTo("0") ==0)
+	strTemp = "-";
+else strTemp = dbOP.mapOneToOther("FA_OTH_SCH_FEE","OTHSCH_FEE_INDEX",strTemp,"AMOUNT",null);
+%>
+<%=strTemp%>	  
+	  </strong></td>
+    </tr>
+<%
+if(request.getParameter("fee_type") == null || request.getParameter("fee_type").trim().length() == 0 ||	
+	request.getParameter("fee_type").compareTo("0") ==0)
+{%>
+    <tr> 
+      <td height="18">&nbsp;</td>
+      <td valign="bottom">Fine imposed by&nbsp;</td>
+      <td valign="bottom">Fine 
+        description </td>
+    </tr>
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td height="25"> 
+        <input type="text" name="fine_imposedby" size="33" value="<%=WI.fillTextValue("fine_imposedby")%>">
+      <td height="25"><input name="description" type="text" size="32" value="<%=WI.fillTextValue("description")%>"></td>
+    </tr>
+    <tr > 
+      <td height="18">&nbsp; </td>
+      <td height="18" valign="bottom">Fine amount </td>
+      <td height="18">&nbsp;</td>
+    </tr>
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td height="25"><select name="is_replacement">
+          <option value="0">Amount </option>
+<%
+strTemp = WI.fillTextValue("is_replacement");
+if(strTemp.compareTo("1") ==0){%>
+          <!--<option value="1" selected>Replacement</option>-->
+ <%}else{%><!--<option value="1">Replacement</option>-->
+<%}%>        </select>
+        <input name="fine_amount" type="text" size="16" value="<%=WI.fillTextValue("fine_amount")%>">
+        <!--<font size="1">(incase of replacement enter qty)</font>--></td>
+      <td height="25">&nbsp;</td>
+    </tr>
+<%}//if fee type is fine 
+%>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25" colspan="5" bgcolor="#B9B292"><div align="center">PAYMENT 
+          DETAILS </div></td>
+    </tr>
+    <tr> 
+      <td width="1%" height="25">&nbsp;</td>
+      <td width="22%">Amount paid </td>
+      <td width="32%"><input name="amount" type="text" size="16" value="<%=WI.fillTextValue("amount")%>">
+        Php </td>
+      <td width="11%">Check #</td>
+      <td width="34%">
+	  <%
+strTemp = "";
+if(request.getParameter("payment_type") == null || 	 request.getParameter("payment_type").trim().length() ==0 ||
+	request.getParameter("payment_type").compareTo("0") == 0)
+{	
+	strTemp = "disabled";
+}%> 
+
+<input name="check_number" type="text" size="16" value="<%=WI.fillTextValue("check_number")%>" <%=strTemp%>></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>Approval no.</td>
+      <td><input name="approval_no" type="text" size="16" value="<%=WI.fillTextValue("approval_no")%>">
+      </td>
+      <td>Date paid</td>
+      <td><input name="mm" type="text" size="2" value="<%=WI.fillTextValue("mm")%>">
+        /
+        <input name="dd" type="text" size="2" value="<%=WI.fillTextValue("dd")%>">
+        /
+        <input name="yyyy" type="text" size="4" value="<%=WI.fillTextValue("yyyy")%>">
+        <font size="1">(mm/dd/yyyy) </font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Payment type</td>
+      <td> 
+        <select name="payment_type" onChange="ShowHideCheckNO();">
+          <option value="0">Cash</option>
+          <%
+ strTemp = WI.fillTextValue("payment_type");
+ if(strTemp.compareTo("1") ==0){%>
+          <option value="1" selected>Check</option>
+          <%}else{%>
+          <option value="1">Check</option>
+          <%}%>
+        </select>
+         </td>
+      <td>O.R. number</td>
+      <td><font size="1"><b>
+        <%
+	   	strTemp = paymentUtil.generateORNumber(dbOP);
+	   	if(strTemp == null)
+	   		strTemp = paymentUtil.getErrMsg();
+		else{%>
+        <input type="hidden" name="or_number" value="<%=strTemp%>">
+        <%}%>
+        <%=strTemp%> </b></font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Payment receive type</td>
+      <td>
+        <select name="pmt_receive_type" onChange="ReloadPage();">
+          <option value="Internal">Internal</option>
+          <%
+strTemp = WI.fillTextValue("pmt_receive_type");
+if(strTemp.compareTo("External") ==0){%>
+          <option value="External" selected>External</option>
+          <%}else{%>
+          <option value="External">External</option>
+          <%}%>
+        </select>
+        </td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+ <% if(strTemp.compareTo("External") ==0) //External
+{%>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Bank name</td>
+      <td>
+        <select name="bank">
+          <%=dbOP.loadCombo("AB_INDEX","AFF_BANK_NAME"," from FA_AFFILIATED_BANK where is_del=0 order by AFF_BANK_NAME asc", 
+   		request.getParameter("bank"), false)%> </select> <font size="1">(if External)</font></td>
+      <td colspan="2"></td>
+    </tr>
+<%}//only if receive type is external
+%>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr > 
+      <td height="25" colspan="9"><hr></td>
+    </tr>
+    <tr > 
+      <td width="2%" height="25">&nbsp;</td>
+      <td colspan="4" height="25">&nbsp;</td>
+      <td colspan="3" height="25"><input type="image" src="../../../images/save_icon.jpg" onClick="AddRecord();"><font size="1">click 
+        to save payment detail</font></td>
+      <td width="10%"  height="25">&nbsp;</td>
+    </tr>
+</table>
+<%
+}//if error message is null -> outer most condition.    
+%>
+   <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+	<tr>
+	<td height="25" colspan="9">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" colspan="9" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+ <input type="hidden" name="addRecord" value="0">
+<input type="hidden" name="payment_for" value="<%=WI.fillTextValue("payment_for")%>">
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

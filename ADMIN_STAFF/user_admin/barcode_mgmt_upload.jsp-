@@ -1,0 +1,113 @@
+<%@ page language="java" import="utility.*,search.SearchStudent,enrollment.Authentication, java.util.Vector" %>
+<%
+boolean bolIsSchool = false;
+if((new CommonUtil().getIsSchool(null)).equals("1"))
+	bolIsSchool = true;
+
+String strSchCode = (String)request.getSession(false).getAttribute("school_code");
+if(strSchCode == null)
+	strSchCode = "";
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Upload RFID</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../css/reportlink.css" rel="stylesheet" type="text/css">
+<link href="../../css/tableBorder.css" rel="stylesheet" type="text/css">
+</head>
+
+<script language="JavaScript" src="../../jscript/common.js"></script>
+<script language="JavaScript">
+
+</script>
+
+<body bgcolor="#D2AE72">
+<%
+
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+	String strErrMsg = null;
+	String strTemp = null;
+	Vector vRetResult = null;
+	
+
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_veiwall.jsp","While Opening DB Con");
+
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+
+strTemp = WI.fillTextValue("page_action");
+if(strTemp.length() > 0) {
+	Authentication auth = new Authentication();
+	auth.operateOnUploadRFID(dbOP, request, Integer.parseInt(strTemp));
+	strErrMsg = auth.getErrMsg();
+}
+
+
+
+%>
+<form action="./barcode_mgmt_upload.jsp" method="post" name="form_">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="4" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF"><strong>:::: RFID UPLOAD PAGE ::::</strong></font></div></td>
+    </tr>
+  </table>
+
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25" colspan="3">&nbsp;&nbsp;&nbsp;&nbsp;<font size="3"><%=WI.getStrValue(strErrMsg)%></font></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="3" style="font-size:11px; font-weight:bold; color:#0000FF">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Note : Format should be Student number  RF ID.
+	  Format is each row should have ID,RF </td>
+    </tr>
+    
+    <tr>
+      <td width="3%" height="25">&nbsp;</td>
+      <td width="52" colspan="2">
+<%
+strTemp = WI.fillTextValue("input_val");
+if(strTemp.length() == 0) 
+	strTemp = "ID Number1,RF ID1\r\nID Number2,RF ID2";
+%>
+	  <textarea name="input_val" class="textbox" style="font-size:11px;"
+	   cols="60" rows="50"><%=strTemp%></textarea>	  </td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="3%" height="25" class="thinborderBOTTOMLEFT">&nbsp;</td>
+      <td width="8%" class="thinborderBOTTOM">&nbsp;</td>
+      <td width="27%" class="thinborderBOTTOM">&nbsp;</td>
+      <td width="28%" class="thinborderBOTTOM"><input type="image" src="../../images/form_proceed.gif" border="0" onClick="document.form_.page_action.value='1'"></td>
+      <td width="34%" class="thinborderBOTTOMRIGHT">&nbsp;</td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td height="25">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+  </tr>
+</table>
+<input type="hidden" name="page_action">
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

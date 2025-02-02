@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td width="100%" height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>:::: 
+          BANK ADJUSTMENTS PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25"><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/petty_cash/petty_cash.htm"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/images/go_back.gif" border="0"></a></font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="4%" height="26">&nbsp;</td>
+      <td width="11%">College</td>
+      <td width="85%"><select name="select3">
+          <option>ALLL</option>
+          <option>Colllege of Engineering</option>
+          <option>College of Nursing</option>
+          <option>College of Arts and Sciences</option>
+        </select> </td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td>Course</td>
+      <td><select name="select">
+          <option>BS in Nursing</option>
+          <option>BS in Computer Science</option>
+        </select> </td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td>Old Accounts </td>
+      <td><select name="select4">
+          <option>Equal to</option>
+          <option>Less than</option>
+          <option>More than</option>
+        </select> <input name="textfield" type="text" size="4" maxlength="4">
+        years</td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td height="26" valign="bottom"><strong><u>SORT</u></strong> </td>
+      <td height="26" valign="bottom">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="38">&nbsp;</td>
+      <td height="38" colspan="2">1) 
+        <select name="select5">
+          <option>Student Name</option>
+          <option>Course</option>
+          <option>Last SY/Term of Attendance</option>
+        </select> <select name="select6">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select>
+        2) 
+        <select name="select2">
+          <option>Student Name</option>
+          <option>Course</option>
+          <option>Last SY/Term of Attendance</option>
+        </select> <select name="select7">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td height="38">&nbsp;</td>
+      <td height="38" colspan="2">3) 
+        <select name="select8">
+          <option>Student Name</option>
+          <option>Course</option>
+          <option>Last SY/Term of Attendance</option>
+        </select> 
+        <select name="select12">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="38"><div align="center"><font size="1"></font></div></td>
+      <td height="38">&nbsp;</td>
+      <td height="38" valign="bottom"><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/petty_cash/petty_cash.htm"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/images/form_proceed.gif" border="0"></a> 
+        </font></td>
+    </tr>
+    <tr> 
+      <td height="26" colspan="3"><div align="right"><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/images/print.gif" border="0"></a>click 
+          to PRINT list</font></div></td>
+    </tr>
+  </table>
+	  
+  <table width="100%" border="1" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#B9B292"> 
+      <td height="25" colspan="5"><div align="center"><font color="#FFFFFF"><strong>:: 
+          LIST OF STUDENTS WITH OLD ACCOUNTS - $old_accounts_specs ::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#EAEAEA"> 
+      <td height="25" colspan="5" bgcolor="#EAEAEA"><strong><font size="1">$COLLEGE 
+        </font></strong></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="3"><font size="1"><strong>TOTAL NO. OF STUDENTS 
+        : </strong></font><strong></strong></td>
+      <td height="25" colspan="2"><strong><font color="#000000" size="1">TOTAL 
+        BALANCE :</font></strong></td>
+    </tr>
+    <tr> 
+      <td width="12%" height="25"><div align="center"><strong><font size="1">STUDENT 
+          ID</font></strong></div></td>
+      <td width="33%"><div align="center"><strong><font size="1">STUDENT NAME</font></strong></div></td>
+      <td width="26%"><div align="center"><font size="1"><strong>COURSE /YEAR</strong></font></div></td>
+      <td width="16%"><div align="center"><strong><font size="1">LAST SY/TERM 
+          OF ATTENDANCE</font></strong></div></td>
+      <td width="13%"><div align="center"><strong><font size="1">AMOUNT</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#EAEAEA"> 
+      <td height="25" colspan="5"><strong><font size="1">$COLLEGE </font></strong><strong></strong></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="3"><font size="1"><strong>TOTAL NO. OF STUDENTS 
+        : </strong></font><strong></strong></td>
+      <td height="25" colspan="2"><strong><font color="#000000" size="1">TOTAL 
+        BALANCE :</font></strong><strong></strong></td>
+    </tr>
+    <tr> 
+      <td height="25"><div align="center"><strong><font size="1">STUDENT ID</font></strong></div></td>
+      <td><div align="center"><strong><font size="1">STUDENT NAME</font></strong></div></td>
+      <td><div align="center"><font size="1"><strong>COURSE /YEAR</strong></font></div></td>
+      <td><div align="center"><strong><font size="1">LAST SY/TERM OF ATTENDANCE</font></strong></div></td>
+      <td><div align="center"><strong><font size="1">AMOUNT</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5"><strong>GRAND TOTAL : $TOTAL_OF_ALL_COLLEGES</strong></td>
+    </tr>
+  </table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="66%" height="43"><div align="left"></div></td>
+      <td width="34%" height="43"><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/images/print.gif" border="0"></a>click 
+        to PRINT list</font></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" colspan="2" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

@@ -1,0 +1,11 @@
+update hm_clinic_test set test_name = substring(test_name, 0, len(test_name) - 1)
+where test_name like '%**'
+
+update hm_clinic_test set test_name = substring(test_name, 0, len(test_name))
+where test_name like '%*'
+
+
+
+insert into hm_clinic_test(group_index, test_name) values ( , '')
+
+get the group index from hm_clinic_test_group table.. 

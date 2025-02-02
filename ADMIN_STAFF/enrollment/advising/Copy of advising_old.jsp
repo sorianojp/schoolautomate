@@ -1,0 +1,866 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript" src="../../../jscript/common.js"></script>
+<script language="JavaScript">
+//if units to take is null or zero, give error.
+function VerifyNotNull(index)
+{
+	var unitToTake = eval('document.advising.ut'+index+'.value');
+	if(unitToTake.length ==0 || Number(unitToTake) <0.5)
+	{
+		alert("Please enter a unit to take.");
+		eval('document.advising.ut'+index+'.focus()');
+	}
+}
+/**
+* call this function when input box is changed.
+*/
+var inFocusInputLoadVal = 0;
+function SaveInputUnit(index)
+{
+	inFocusInputLoadVal = eval('document.advising.ut'+index+'.value');
+}
+function ChangeLoad(index)
+{
+	var maxAllowedInputLoad = eval('document.advising.total_unit'+index+'.value');
+	var inputLoad = eval('document.advising.ut'+index+'.value');
+	var maxAllowedLoad = document.advising.maxAllowedLoad.value;
+	var totalLoad = Number(document.advising.sub_load.value) - Number(inFocusInputLoadVal);
+
+	if(Number(inputLoad) > Number(maxAllowedInputLoad))
+	{
+		alert("Unit can't be more than "+maxAllowedInputLoad);
+		eval('document.advising.ut'+index+'.value='+inFocusInputLoadVal);
+		return;
+	}
+	if( eval("document.advising.checkbox"+index+".checked") )
+	{
+		document.advising.sub_load.value =Number(document.advising.sub_load.value) - Number(inFocusInputLoadVal)+Number(inputLoad);
+	}
+	inFocusInputLoadVal = inputLoad;
+}
+
+
+//this is the variable stores all the section_index stored so far.
+function checkAll()
+{
+	var maxDisp = document.advising.maxDisplay.value;
+	var totalLoad = 0;
+	//unselect if it is unchecked.
+	if(!document.advising.selAll.checked)
+	{
+		for(var i =0; i< maxDisp; ++i)
+		{
+			eval('document.advising.checkbox'+i+'.checked=false');
+			document.advising.sub_load.value = 0;
+		}
+		return;
+	}
+	for(var i =0; i< maxDisp; ++i)
+	{
+		if(	eval('document.advising.sec'+i+'.value.length')> 0)
+		{
+			//totalLoad += Number(eval('document.advising.checkbox'+i+'.value'));
+			totalLoad += Number(eval('document.advising.ut'+i+'.value'));
+		}
+	}
+	if(totalLoad > eval(document.advising.maxAllowedLoad.value) )
+	{
+		alert("Student can't take more than allowed load <"+document.advising.maxAllowedLoad.value+">.Please re-adjust load.");
+		return;
+	}
+	else if(totalLoad == 0)
+	{
+		alert("Please sechedule to select student load.");
+		return;
+	}
+	//this is the time I will check all.
+	for(var i =0; i< maxDisp; ++i)
+	{
+		if(	eval('document.advising.sec'+i+'.value.length')> 0)
+		{
+			eval('document.advising.checkbox'+i+'.checked = true');
+		}
+	}
+	document.advising.sub_load.value = totalLoad;
+
+}
+function ShowList()
+{
+	document.advising.showList.value = 1;
+	document.advising.autoAdvise.value = 0;
+	//document.advising.submit();
+	ReloadPage();
+}
+function AutoAdvise()
+{
+	document.advising.autoAdvise.value = 1;
+	document.advising.showList.value = 0;
+	ReloadPage();//document.advising.submit();
+}
+function ViewAllAllowedList()
+{
+	document.advising.viewAllAllowedList.value = 1;
+	ReloadPage();//document.advising.submit();
+}
+
+function AddRecord()
+{
+	document.advising.addRecord.value = 1;
+	ReloadPage();//document.advising.submit();
+}
+function ViewCurriculumEval() {
+	var pgLoc = "../../registrar/residency/stud_cur_residency_eval.jsp?stud_id="+escape(document.advising.stud_id.value)+
+	"&online_advising="+document.advising.online_advising.value;
+	var win=window.open(pgLoc,"PrintWindow",'width=800,height=600,left=0,top=0,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+function ViewCurriculum()
+{
+	var pgLoc = "";
+	if(document.advising.mn.value.length > 0)
+		pgLoc = "../../admission/curriculum_page1.jsp?ci="+document.advising.ci.value+"&cname="+
+			escape(document.advising.cn.value)+"&mi="+document.advising.mi.value+"&mname="+escape(document.advising.mn.value)+"&syf="+
+			document.advising.syf.value+"&syt="+document.advising.syt.value+"&goNextPage=1&degree_type="+document.advising.degree_type.value;
+	else
+		pgLoc = "../../admission/curriculum_page1.jsp?ci="+document.advising.ci.value+"&cname="+escape(document.advising.cn.value)+
+			"&syf="+document.advising.syf.value+"&syt="+document.advising.syt.value+"&goNextPage=1&degree_type="+document.advising.degree_type.value;
+	pgLoc += "&online_advising="+document.advising.online_advising.value;
+	var win=window.open(pgLoc,"PrintWindow",'width=800,height=600,left=0,top=0,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+function ViewResidency()
+{
+	if(document.advising.stud_id.value.length ==0)
+	{
+		alert("Please enter student ID.");
+		return;
+	}
+	var pgLoc = "../../registrar/residency/residency_status.jsp?stud_id="+escape(document.advising.stud_id.value)+
+	"&online_advising="+document.advising.online_advising.value;
+	var win=window.open(pgLoc,"PrintWindow",'width=800,height=600,left=0,top=0,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+/**
+*	This displays Total load of the subjects seleced so far
+*/
+function AddLoad(index,subLoad)
+{
+//alert(subLoad+",,, "+document.advising.sub_load.value);
+	//add if clicked and if not clicked remove it.
+	if( eval("document.advising.checkbox"+index+".checked") )
+	{
+		document.advising.sub_load.value = Number(eval('document.advising.ut'+index+'.value')) +Number(document.advising.sub_load.value);
+		//before --> document.advising.sub_load.value = Number(document.advising.sub_load.value) + Number(subLoad);
+		if( Number(document.advising.sub_load.value) > Number(document.advising.maxAllowedLoad.value))
+		{
+			alert("Student can't take more than allowed load <"+document.advising.maxAllowedLoad.value+">.Please re-adjust load.");
+			document.advising.sub_load.value = eval(document.advising.sub_load.value) - eval(subLoad);
+			eval("document.advising.checkbox"+index+".checked=false");
+		}
+	}
+	else //subtract.
+		document.advising.sub_load.value =Number(document.advising.sub_load.value) - Number(eval('document.advising.ut'+index+'.value'));
+		//before -- document.advising.sub_load.value = Number(document.advising.sub_load.value) - Number(subLoad);
+
+	if( Number(document.advising.sub_load.value) < 0)
+		document.advising.sub_load.value = 0;
+
+}
+//set is_lab_only parameter
+function SetIsLabOnly(strIndex) {
+	if( eval('document.advising.is_lab_only'+strIndex+'.checked') ) 
+		eval('document.advising.IS_LAB_ONLY'+strIndex+'.value=1');
+	else	
+		eval('document.advising.IS_LAB_ONLY'+strIndex+'.value=0');
+}
+
+//set NO_CONFLICT parameter
+function SetIsNoConflict(strIndex) {
+	if( eval('document.advising.no_conflict'+strIndex+'.checked') ) 
+		eval('document.advising.NO_CONFLICT'+strIndex+'.value=1');
+	else	
+		eval('document.advising.NO_CONFLICT'+strIndex+'.value=0');
+}
+
+function LoadPopup(secName,sectionIndex, strCurIndex, strSubIndex, strIndex) //curriculum index is different for all courses.
+{
+//this will check conflict with the schedule of other subjects taken. pass user id, all the sub_section_index,
+//if check box is not checked - it is considered as not selected.
+	var subSecList        = "";
+	var strLabList        = "";
+	var strNoConflictList = "";
+	var strSemester;
+
+	if(document.advising.online_advising.value == "1") 
+		strSemester = document.advising.semester.value;
+	else
+		strSemester = document.advising.semester[document.advising.semester.selectedIndex].value;
+	for(var i = 0; i< document.advising.maxDisplay.value; ++i)
+	{
+		if( eval('document.advising.checkbox'+i+'.checked') )
+		{
+			if(subSecList.length ==0)
+				subSecList =eval('document.advising.sec_index'+i+'.value');
+			else
+				subSecList =subSecList+","+eval('document.advising.sec_index'+i+'.value');
+		}
+		//for lab
+		if( eval('document.advising.checkbox'+i+'.checked') )
+		{
+			if(strLabList.length ==0)
+				strLabList =eval('document.advising.IS_LAB_ONLY'+i+'.value');
+			else
+				strLabList =strLabList+","+eval('document.advising.IS_LAB_ONLY'+i+'.value');
+		}
+		//for is no conflict.
+		if( eval('document.advising.checkbox'+i+'.checked') )
+		{
+			if(strNoConflictList.length ==0)
+				strNoConflictList =eval('document.advising.NO_CONFLICT'+i+'.value');
+			else
+				strNoConflictList =strNoConflictList+","+eval('document.advising.NO_CONFLICT'+i+'.value');
+		}
+	}
+	if(subSecList.length == 0) subSecList = "0";
+
+	var loadPg = "./subject_schedule.jsp?form_name=advising&cur_index="+strCurIndex+
+		"&sub_index="+strSubIndex+"&sec_name="+secName+"&sec_index_name="+sectionIndex+
+		"&syf="+document.advising.sy_from.value+"&syt="+document.advising.sy_to.value+"&semester="+strSemester+
+		"&sec_index_list="+subSecList+"&course_index="+document.advising.ci.value+
+		"&major_index="+document.advising.mi.value+"&degree_type="+document.advising.degree_type.value+
+		"&online_advising="+document.advising.online_advising.value+
+		"&IS_FOR_LAB="+eval('document.advising.IS_LAB_ONLY'+strIndex+'.value')+
+		"&lab_list="+strLabList+"&NO_CONFLICT="+
+		eval('document.advising.NO_CONFLICT'+strIndex+'.value')+"&no_conflict_list="+
+		strNoConflictList;
+
+	//var win=window.open(loadPg,"myfile",'dependent=yes,width=900,height=350,screenX=200,screenY=300,scrollbars=yes,,toolbar=yes,location=yes,directories=yes,status=no,menubar=yes');
+	var win=window.open(loadPg,"myfile",'dependent=yes,width=900,height=350,top=10,left=10,scrollbars=yes,,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+function Validate()
+{
+	if( Number(document.advising.sub_load.value) > Number(document.advising.maxAllowedLoad.value))
+	{
+		alert("Student can't take more than allowed load <"+document.advising.maxAllowedLoad.value+">.Please re-adjust load. Please check the load referece on top of this page.");
+		return false;
+	}
+	document.advising.action="./gen_advised_schedule.jsp";
+	document.advising.submit();
+	return true;
+}
+function ReloadPage()
+{
+	document.advising.action="./advising_old.jsp";
+	document.advising.submit();
+}
+function BlockSection()
+{
+	var strMajorIndCon = document.advising.mi.value;
+	if(strMajorIndCon.length == 0)
+		strMajorIndCon = "";
+	else
+		strMajorIndCon="&mi="+strMajorIndCon;
+	var loadPg = "./block_section.jsp?form_name=advising&max_disp="+document.advising.maxDisplay.value+"&ci="+
+		document.advising.ci.value+strMajorIndCon+"&syf="+document.advising.syf.value+
+	 	"&syt="+document.advising.syt.value+"&sy_from="+document.advising.sy_from.value+"&sy_to="+document.advising.sy_to.value+
+	 	"&offering_sem="+document.advising.semester.value+
+	 	"&year_level="+document.advising.year_level.value+"&semester="+document.advising.semester.value+
+		"&cn="+escape(document.advising.cn.value)+"&mn="+escape(document.advising.mn.value);
+	var win=window.open(loadPg,"myfile",'dependent=yes,width=800,height=350,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+function focusID() {
+	document.advising.stud_id.focus();
+}
+
+</script>
+<%@ page language="java" import="utility.*,enrollment.Advising,java.util.Vector " buffer="16kb" %>
+<%
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+
+	String strErrMsg = null;
+	String strTemp = null;String strTemp2 = null;
+	String strStudID = WI.fillTextValue("stud_id");
+	int iMaxDisplayed = 0;
+	boolean bolFatalErr = false;
+
+	String strDegreeType = null;
+
+	Vector[] vAutoAdvisedList = new Vector[2];
+	String[] astrSchYrInfo = {(String)request.getSession(false).getAttribute("cur_sch_yr_from"),
+								(String)request.getSession(false).getAttribute("cur_sch_yr_to"),
+								(String)request.getSession(false).getAttribute("cur_sem")};
+	String[] astrConvertSem = {"Summer","1st Semester","2nd Semester","3rd Semester"};
+	boolean bolIsCalledFrOnlineRegdStud = false;
+	if(WI.fillTextValue("online_advising").compareTo("1") ==0)
+		bolIsCalledFrOnlineRegdStud = true;
+
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Enrollment-advising-old","advising_old.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Enrollment","ADVISING & SCHEDULING",request.getRemoteAddr(),
+														"advising_old.jsp");
+
+//if it is called from the online advising page of parent student, do not block,, force it to iAccessLevel = 2;
+	if(bolIsCalledFrOnlineRegdStud)
+		iAccessLevel = 2;
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+//I have to give an option to set do not check conflict incase user is super user.
+boolean bolIsSuperUser = comUtil.IsSuperUser(dbOP,(String)request.getSession(false).getAttribute("userId"));
+//end of authenticaion code.
+
+String strMaxAllowedLoad = "0"; // this is the first field of the vAdvisingList
+String strOverLoadDetail = null;//Overload detail if there is any.
+
+boolean bolAutoAdvise = false;
+boolean bolShowAdviseList = false;
+Vector vAdviseList = new Vector();
+Vector vStudInfo = new Vector();
+
+Advising advising = new Advising();
+
+if(astrSchYrInfo == null)//db error
+{
+	strErrMsg = "You are logged out.Please login again.";
+	bolFatalErr = true;
+}
+if(!bolFatalErr && strStudID.length() > 0)
+{
+	vStudInfo = advising.getOldStudInfo(dbOP,strStudID,WI.fillTextValue("sy_from"),WI.fillTextValue("sy_to"),WI.fillTextValue("semester"));
+	if(vStudInfo == null)
+	{
+		bolFatalErr = true;
+		strErrMsg = advising.getErrMsg();
+	}
+	if(!bolFatalErr)
+	{
+		Vector vMaxLoadDetail = advising.getMaxAllowedUnit(dbOP,strStudID,(String)vStudInfo.elementAt(2),(String)vStudInfo.elementAt(3),
+			WI.fillTextValue("sy_from"),WI.fillTextValue("sy_to"),(String)vStudInfo.elementAt(6),WI.fillTextValue("semester"),(String)vStudInfo.elementAt(4),
+			(String)vStudInfo.elementAt(5));//System.out.println(vMaxLoadDetail);
+		if(vMaxLoadDetail == null)
+		{
+			bolFatalErr = true;
+			strErrMsg = advising.getErrMsg();
+		}
+		else
+		{
+			strMaxAllowedLoad = (String)vMaxLoadDetail.elementAt(0);
+			if(vMaxLoadDetail.size() > 1)
+				strOverLoadDetail = "Maximum load in curriculum for this sem "+(String)vMaxLoadDetail.elementAt(1)+
+				" overloaded load "+(String)vMaxLoadDetail.elementAt(0)+" (approved on :"+(String)vMaxLoadDetail.elementAt(2)+")";
+		}
+	}
+	if(!bolFatalErr && WI.fillTextValue("showList").compareTo("1") ==0) // show list.
+	{
+		bolShowAdviseList = true;
+		vAdviseList = advising.getAdvisingListForOLD(dbOP,strStudID, request.getParameter("ci"),request.getParameter("mi"),false,
+						request.getParameter("sy_from"),request.getParameter("sy_to"), request.getParameter("syf"),
+						request.getParameter("syt"),request.getParameter("year_level"),request.getParameter("semester"));
+		//System.out.println(vAdviseList);
+		if(vAdviseList ==null)
+		{
+			bolFatalErr = true;
+			strErrMsg = advising.getErrMsg();
+		}
+	}
+	/*if(!bolFatalErr && WI.fillTextValue("block_sec").length()>0) // Block section is called - show the block section only for the year/sem the section is having block section.
+	{
+		strBlockSection = request.getParameter("block_sec");//because this is a block section, i can use any cur index -> (String)vAdviseList.elementAt(0), all the section are same.
+		strBlockSecIndex = advising.getSubSecIndex(dbOP,(String)vAdviseList.elementAt(0),strBlockSection,
+							request.getParameter("sy_from"),request.getParameter("sy_to"),request.getParameter("semester"));
+		if(strBlockSecIndex == null)
+		{
+			bolFatalErr = true;
+			strErrMsg = advising.getErrMsg();
+		}
+	}*/
+	if(!bolFatalErr && WI.fillTextValue("autoAdvise").compareTo("1") ==0)
+	{
+		bolAutoAdvise = true;bolShowAdviseList = true;
+		vAutoAdvisedList = advising.autoAdviseForOLD(dbOP,strStudID,request.getParameter("ci"),request.getParameter("mi"),
+							request.getParameter("sy_from"), request.getParameter("sy_to"),
+							request.getParameter("syf"),request.getParameter("syt"),request.getParameter("year_level"),
+							request.getParameter("semester"),request.getParameter("semester"));
+		if(vAutoAdvisedList == null) strErrMsg = advising.getErrMsg();
+		else
+		{	
+			vAdviseList = vAutoAdvisedList[0];
+		}
+	}
+}
+
+if(strErrMsg == null)
+	strErrMsg = "";
+
+if(vStudInfo != null && vStudInfo.size() > 0)
+{
+	strDegreeType = dbOP.mapOneToOther("course_offered", "course_index",
+                                       (String)vStudInfo.elementAt(2), "degree_type",
+                                       " and is_valid=1 and is_del=0");
+
+	if(strDegreeType == null)
+		strErrMsg = "Error in getting course degree type.";
+	else
+	{
+		if(strDegreeType.compareTo("1") == 0)
+		{
+			dbOP.cleanUP();
+			response.sendRedirect(response.encodeRedirectURL("./advising_masters_doctoral.jsp?stud_id="+strStudID+"&sy_from="+WI.fillTextValue("sy_from")+
+			"&sy_to="+WI.fillTextValue("sy_to")+"&semester="+WI.fillTextValue("semester")));
+
+			return;
+		}
+		else if(strDegreeType.compareTo("2") == 0)
+		{
+			dbOP.cleanUP();
+			response.sendRedirect(response.encodeRedirectURL("./advising_medicine.jsp?stud_id="+strStudID+"&sy_from="+WI.fillTextValue("sy_from")+
+			"&sy_to="+WI.fillTextValue("sy_to")+"&semester="+WI.fillTextValue("semester")));
+
+			return;
+		}
+	}
+}
+String strAuthTypeIndex = WI.getStrValue(request.getSession(false).getAttribute("authTypeIndex"),"0");
+
+if(strAuthTypeIndex.compareTo("4") !=0){//student logged in for online advising %>
+<body bgcolor="#D2AE72" onLoad="focusID();">
+<%}else{%>
+<body bgcolor="#9FBFD0">
+<%}%>
+<form name="advising" action="" method="post">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+<%
+if(strAuthTypeIndex.compareTo("4") ==0){//student logged in for online advising %>
+    <tr bgcolor="#47768F">
+<%}else{%>
+    <tr bgcolor="#A49A6A">
+<%}%>      <td height="25" colspan="8" align="center"><strong> <font color="#FFFFFF"> 
+        :::: <%=WI.fillTextValue("pgDisp")%> STUDENT ADVISING PAGE :::: </font></strong></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="8">&nbsp;&nbsp;&nbsp;&nbsp;<font size="3"><strong><%=strErrMsg%></strong></font></td>
+    </tr>
+	</table>
+<%
+if(bolFatalErr)
+{
+	dbOP.cleanUP();
+	return;
+}
+
+if(!bolIsCalledFrOnlineRegdStud) {//show input only if it is not called from online registration of student.%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td width="1%" height="25">&nbsp;</td>
+      <td width="20%" height="25">Enter Student ID </td>
+      <td width="26%" height="25">
+	  <input name="stud_id" type="text" size="16" value="<%=WI.fillTextValue("stud_id")%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+      </td>
+      <td width="35%" height="25"><a href="javascript:ReloadPage();"><img src="../../../images/form_proceed.gif" border="0"></a>
+      </td>
+      <td width="18%" colspan="2">&nbsp; </td>
+    </tr>
+    <tr>
+      <td width="1%" height="25">&nbsp;</td>
+      <td width="20%" height="25">School Year/Term </td>
+      <td height="25" colspan="2"> 
+        <%
+	  strTemp = WI.fillTextValue("sy_from");
+	  if(strTemp.length() ==0) strTemp = astrSchYrInfo[0];
+	  %>
+        <input name="sy_from" type="text" size="4" maxlength="4" value="<%=strTemp%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"
+	  onKeypress=" if(event.keyCode<48 || event.keyCode > 57) event.returnValue=false;"
+	  onKeyUp='DisplaySYTo("advising","sy_from","sy_to")'> 
+        <%
+	  strTemp = WI.fillTextValue("sy_to");
+	  if(strTemp.length() ==0) strTemp = astrSchYrInfo[1];
+	  %>
+        - 
+        <input name="sy_to" type="text" size="4" maxlength="4" value="<%=strTemp%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"
+	  readonly="yes"> 
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <select name="semester" onChange="ReloadPage();">
+          <option value="0">Summer</option>
+          <%
+strTemp = WI.fillTextValue("semester");
+if(strTemp.length() ==0)
+	strTemp = astrSchYrInfo[2];
+if(strTemp.compareTo("1") ==0){%>
+          <option value="1" selected>1st Sem</option>
+          <%}else{%>
+          <option value="1">1st Sem</option>
+          <%}if(strTemp.compareTo("2") == 0){%>
+          <option value="2" selected>2nd Sem</option>
+          <%}else{%>
+          <option value="2">2nd Sem</option>
+          <%}if(strTemp.compareTo("3") == 0){%>
+          <option value="3" selected>3rd Sem</option>
+          <%}else{%>
+          <option value="3">3rd Sem</option>
+          <%}%>
+        </select> <input type="hidden" name="offering_sem_name" value="<%=astrConvertSem[Integer.parseInt(strTemp)]%>"> 
+      </td>
+      <td colspan="2">&nbsp; </td>
+    </tr>
+  </table>
+<%}else {//show now fixed information of student%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="1%" height="25">&nbsp;</td>
+      <td width="20%" height="25">Student ID</td>
+      <td height="25"> <strong><font size="3"><%=strStudID%></font></strong> 
+	  <input type="hidden" name="stud_id" value="<%=strStudID%>"></td>
+      <td width="18%" colspan="2"><a href="javascript:ReloadPage();"><img src="../../../images/refresh.gif" border="0"></a> 
+      </td>
+    </tr>
+    <tr> 
+      <td width="1%" height="25">&nbsp;</td>
+      <td width="20%" height="25">School Year/Term </td>
+      <td height="25"> <font size="3"><strong><%=astrSchYrInfo[0]%> - <%=astrSchYrInfo[1]%> 
+        (<%=astrConvertSem[Integer.parseInt(astrSchYrInfo[2])]%>)</strong></font> 
+        <input type="hidden" name="sy_from" value="<%=astrSchYrInfo[0]%>"> 
+		<input type="hidden" name="sy_to" value="<%=astrSchYrInfo[1]%>"> 
+        <input type="hidden" name="semester" value="<%=astrSchYrInfo[2]%>"> </td>
+      <td colspan="2">&nbsp; </td>
+    </tr>
+  </table>
+<%}//end of showing fixed information.%>
+
+<% if(vStudInfo != null && vStudInfo.size() > 0){
+//check if student is having outstanding balance.
+strTemp = dbOP.mapUIDToUIndex(WI.fillTextValue("stud_id"));
+if(strTemp != null) {
+	enrollment.FAFeeOperation fOperation = new enrollment.FAFeeOperation();
+	fOperation.checkIsEnrolling(dbOP,strTemp, WI.fillTextValue("sy_from"),WI.fillTextValue("sy_to"),
+								WI.fillTextValue("semester"));
+	float fOutstanding= fOperation.calOutStandingOfPrevYearSem(dbOP, strTemp);
+	if(fOutstanding > 0.1f || fOutstanding < -0.1f){
+%>
+  <table width="100%" bgcolor="#FFFFFF"><tr><td>
+  <table width="50%" bgcolor="#000000"><tr><td height="25" bgcolor="#FFFFFF">
+	  <font size="4" color="red"><strong>OLD ACCOUNT 
+        : <%=CommonUtil.formatFloat(fOutstanding,true)%></strong></font></td></tr></table>
+</td></tr></table>
+<%}}%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td colspan="5" height="25"><hr size="1"></td>
+    </tr>
+    <tr>
+      <td width="1%" height="25">&nbsp;</td>
+      <td width="62%" height="25">Student name (first,middle,last) :<strong>
+        <%=(String)vStudInfo.elementAt(1)%>
+        <input name="stud_name" value="<%=(String)vStudInfo.elementAt(1)%>" type="hidden">
+        </strong></td>
+      <td  colspan="3" height="25">Year level: <strong><%=WI.getStrValue(vStudInfo.elementAt(6),"N/A")%></strong></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="4">Course/Major :<strong><%=(String)vStudInfo.elementAt(7)%>
+        <%
+		if(vStudInfo.elementAt(8) != null){%>
+		/ <%=(String)vStudInfo.elementAt(8)%>
+		<%}%>
+		</strong></td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td height="26">Curriculum SY :<strong><%=(String)vStudInfo.elementAt(4)%>
+        - <%=(String)vStudInfo.elementAt(5)%></strong></td>
+      <td  colspan="2" height="26">&nbsp;</td>
+      <td width="9%" height="26">&nbsp;</td>
+    </tr>
+  </table>
+
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td colspan="3" height="25"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td width="1%" height="25">&nbsp;</td>
+      <td  width="49%" height="25"><a href="javascript:ViewCurriculum();"><img src="../../../images/view.gif" width="40" height="31" border="0"></a><font size="1">click 
+        to view student's course curriculum</font></td>
+      <td width="50%" height="25"> 
+        <!--
+	  <a href="javascript:ViewResidency();"><img src="../../../images/view.gif" width="40" height="31" border="0"></a><font size="1">click 
+        to view student's residency status</font>
+		-->
+        <a href="javascript:ViewCurriculumEval();"><img src="../../../images/view.gif" width="40" height="31" border="0"></a><font size="1">click 
+        to view residency evaluation page</font></td>
+    </tr>
+    <%
+//I have to check here the downpayment rules. -- check READ_PROPERTY_FILE table.
+boolean bolAllowAfterCheckDPRule = 
+ advising.shouldWeAdviseCheckOnDownPmt(dbOP, (String)vStudInfo.elementAt(10),(String)vStudInfo.elementAt(0),
+ WI.fillTextValue("sy_from"), WI.fillTextValue("sy_to"), WI.fillTextValue("semester"));
+ if(!bolAllowAfterCheckDPRule) {
+ 	bolShowAdviseList = false;
+  }else{%>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td><a href="javascript:ShowList();"><img src="../../../images/show_list.gif" width="57" height="34" border="0"></a><font size="1">click 
+        to show list of subjects student may take for the semester</font></td>
+      <td><a href="javascript:AutoAdvise();"><img src="../../../images/advise.gif" width="42" height="37" border="0"></a><font size="1">click 
+        to generate auto advise subjects</font></td>
+    </tr>
+ <%}%>
+    <tr> 
+      <td width="1%" height="25">&nbsp;</td>
+      <td colspan="2"><font size="3"><%=strErrMsg%></font></td>
+    </tr>
+  </table>
+<%
+if(bolShowAdviseList && vAdviseList != null && vAdviseList.size() > 0){%>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <!-- For new it is not required.
+    <tr>
+      <td width="1%" height="25">&nbsp;</td>
+      <td  colspan="" width="24%" height="25">&nbsp;</td>
+      <td colspan="6" height="25"><a href="javascript:ViewAllAllowedList();"><font size="1"><img src="../../../images/view.gif" width="40" height="31" border="0"></font></a><font size="1">click
+        to view other subejcts without pre-requisite if student is still under
+        load </font></td>
+    </tr> -->
+    <tr bgcolor="#B9B292">
+      <td height="25" colspan="4"><div align="center">LIST OF SUBJECTS THE STUDENT
+          MAY TAKE</div></td>
+    </tr>
+<%
+if(strOverLoadDetail != null){%>
+    <tr>
+      <td  height="25">&nbsp;</td>
+      <td colspan="3" height="25"><font size="1">Overload detail : <%=strOverLoadDetail%></font></td>
+    </tr>
+<%}%>
+    <tr>
+      <td width="2%"  height="25">&nbsp;</td>
+      <td height="25">Max units the student can take : <strong><%=strMaxAllowedLoad%></strong></td>
+      <td width="32%" height="25" >Total student load:
+        <input type="text" name="sub_load" value="0" readonly="yes" size="5" style="border: 0; font-weight:bold;font-family:Verdana, Arial, Helvetica, sans-serif;"></td>
+      <td width="30%">
+	  <a href="javascript:BlockSection();"><img src="../../../images/bsection.gif" width="62" height="24" border="0"></a>
+	  <font size="1">click for block sectioning</font></td>
+    </tr>
+  </table>
+  <table width="100%" border="1" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="7%" height="25" align="center"><font size="1"><strong>YEAR</strong></font></td>
+      <td width="7%" height="25" align="center"><font size="1"><strong>TERM</strong></font></td>
+      <td width="12%" height="25" align="center"><font size="1"><strong>SUBJECT 
+        CODE</strong></font></td>
+      <td width="23%" align="center"><font size="1"><strong>SUBJECT TITLE </strong></font></td>
+      <td width="10%" align="center"><font size="1"><strong>LEC/LAB UNITS</strong></font></td>
+      <td width="9%" align="center"><font size="1"><strong>TOTAL UNITS</strong></font></td>
+      <td width="6%" align="center"><font size="1"><strong>UNITS TO TAKE</strong></font></td>
+      <td width="6%" align="center"><font size="1"><strong>IS ONLY LAB</strong></font></td>
+      <td width="12%" align="center"><font size="1"><strong>SECTION</strong></font></td>
+      <td width="6%" align="center"><strong><font size="1">SELECT 
+        ALL</font></strong> <br>
+        <input type="checkbox" name="selAll" value="0" onClick="checkAll();">
+      </td>
+<%if(bolIsSuperUser){%>
+      <td width="6%" align="center"><font size="1"><b>NO CONFLICT</b></font></td>
+<%}%>
+      <td width="8%" align="center"><font size="1"><strong>ASSIGN SECTION</strong></font></td>
+    </tr>
+    <% int iTemp = 0;
+String strBlockSection = WI.fillTextValue("block_sec");
+//System.out.println(vAdviseList);
+for(int i = 0,j=0 ; i< vAdviseList.size() ; ++i,++j,++iMaxDisplayed)
+{
+	strTemp = ""; strTemp2 = "";
+	if(vAutoAdvisedList[1] != null && (iTemp = vAutoAdvisedList[1].indexOf(vAdviseList.elementAt(i+6))) != -1)
+	{
+		strTemp = (String)vAutoAdvisedList[1].elementAt(iTemp-2); //section index.
+		strTemp2 = (String)vAutoAdvisedList[1].elementAt(iTemp-1);//section name.
+	}
+	else if(strBlockSection.length() > 0)//check if block section is called.if so - then display the section information only if the block section available for the year and the section
+	{
+		//check if year and sem are same as it is for block sections.
+		if(WI.fillTextValue("year_level").compareTo((String)vAdviseList.elementAt(i+1)) == 0 &&
+			WI.fillTextValue("semester").compareTo((String)vAdviseList.elementAt(i+2)) == 0)//matching ;-)
+		{
+			strTemp2 = strBlockSection;
+			strTemp = advising.getSubSecIndex(dbOP,(String)vAdviseList.elementAt(i),strBlockSection,request.getParameter("sy_from"),
+							request.getParameter("sy_to"),request.getParameter("semester"),strDegreeType);
+			if(strTemp == null)
+			{strTemp2 = "";strTemp="";}
+		}
+
+	}
+%>
+    <tr> 
+      <td height="25" align="center"> 
+        <!-- all the hidden fileds are here. -->
+        <input type="hidden" name="year_level<%=j%>" value="<%=WI.getStrValue(vAdviseList.elementAt(i+1))%>"> 
+        <input type="hidden" name="sem<%=j%>" value="<%=(String)vAdviseList.elementAt(i+2)%>"> 
+        <input type="hidden" name="sub_code<%=j%>" value="<%=(String)vAdviseList.elementAt(i+6)%>"> 
+        <input type="hidden" name="sub_name<%=j%>" value="<%=(String)vAdviseList.elementAt(i+7)%>"> 
+        <input type="hidden" name="lab_unit<%=j%>" value="<%=(String)vAdviseList.elementAt(i+4)%>"> 
+        <input type="hidden" name="lec_unit<%=j%>" value="<%=(String)vAdviseList.elementAt(i+3)%>"> 
+        <input type="hidden" name="total_unit<%=j%>" value="<%=(String)vAdviseList.elementAt(i+5)%>"> 
+        <input type="hidden" name="cur_index<%=j%>" value="<%=(String)vAdviseList.elementAt(i)%>"> 
+        <%=WI.getStrValue(vAdviseList.elementAt(i+1),"N/A")%></td>
+      <td align="center"><%=WI.getStrValue(vAdviseList.elementAt(i+2),"N/A")%></td>
+      <td><%=(String)vAdviseList.elementAt(i+6)%> <%if(((String)vAdviseList.elementAt(i+6)).indexOf("NSTP") != -1){%> <select name="nstp_val<%=j%>" style="font-weight:bold;">
+          <%=dbOP.loadCombo("distinct NSTP_VAL","NSTP_VAL"," from NSTP_VALUES order by NSTP_VAL asc", WI.fillTextValue("nstp_val"), false)%> </select> <%}//only if subject is NSTP %> </td>
+      <td><%=(String)vAdviseList.elementAt(i+7)%></td>
+      <td align="center"><%=(String)vAdviseList.elementAt(i+3)%>/<%=(String)vAdviseList.elementAt(i+4)%></td>
+      <td align="center"><%=(String)vAdviseList.elementAt(i+5)%></td>
+      <td align="center">
+	  <input type="text" value="<%=Float.parseFloat((String)vAdviseList.elementAt(i+5))-Float.parseFloat((String)vAdviseList.elementAt(i+8))%>" name="ut<%=j%>" size="3" maxlength="3" class="textbox"
+	  onFocus="style.backgroundColor='#D3EBFF'; javascript:SaveInputUnit(<%=j%>);" onBlur="style.backgroundColor='white'; javascript:VerifyNotNull(<%=j%>);"
+	  onKeypress=" if(event.keyCode<46 || event.keyCode== 47 || event.keyCode > 57) event.returnValue=false;" onKeyUp='ChangeLoad("<%=j%>");'></td>
+      <td align="center">
+        <%
+	  if(vAdviseList.elementAt(i+4) != null && Float.parseFloat((String)vAdviseList.elementAt(i+4)) > 0f &&
+	     vAdviseList.elementAt(i+3) != null && Float.parseFloat((String)vAdviseList.elementAt(i+3)) > 0f /**&&
+		 Float.parseFloat((String)vAdviseList.elementAt(i+8)) > 0f**/ ){%>
+        <input type="checkbox" value="1" name="is_lab_only<%=j%>" onClick="SetIsLabOnly(<%=j%>);">
+        <%}else{%>
+        <!--<img src="../../../images/x.gif">-->&nbsp;
+        <%}%>
+        <input type="hidden" name="IS_LAB_ONLY<%=j%>" value="0"></td>
+      <td> <input type="text" value="<%=strTemp2%>" name="sec<%=j%>" size="12" readonly="yes" style="border: 0; font-weight:bold;font-family:Verdana, Arial, Helvetica, sans-serif;"> 
+        <input type="hidden" value="<%=strTemp%>" name="sec_index<%=j%>"> 
+      </td>
+      <td align="center"> <input type="checkbox" name="checkbox<%=j%>"
+	  value="<%=Float.parseFloat((String)vAdviseList.elementAt(i+5))-Float.parseFloat((String)vAdviseList.elementAt(i+8))%>"
+	  onClick='AddLoad("<%=j%>","<%=Float.parseFloat((String)vAdviseList.elementAt(i+5))-Float.parseFloat((String)vAdviseList.elementAt(i+8))%>")'> 
+
+<input type="hidden" name="NO_CONFLICT<%=j%>" value="0">      </td>
+<%if(bolIsSuperUser){%>
+      <td align="center"> 
+	  <input type="checkbox" value="1" name="no_conflict<%=j%>" onClick="SetIsNoConflict(<%=j%>);"></td>
+<%}%>
+
+      <td align="center"><a href='javascript:LoadPopup("sec<%=j%>","sec_index<%=j%>","<%=(String)vAdviseList.elementAt(i)%>","<%=(String)vAdviseList.elementAt(i+9)%>","<%=j%>");'><img src="../../../images/schedule.gif" width="55" height="30" border="0"></a></td>
+    </tr>
+    <% i = i+9;}%>
+  </table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="25" colspan="8"><div align="right"></div></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="8"><div align="center"> <a href="javascript:Validate();"><img src="../../../images/form_proceed.gif" border="0"></a></div></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="8">&nbsp; </td>
+    </tr>
+    <tr>
+<%
+if(strAuthTypeIndex.compareTo("4") ==0){//student logged in for online advising %>
+    <tr bgcolor="#47768F">
+<%}else{%>
+    <tr bgcolor="#A49A6A">
+<%}%>      <td height="25" colspan="8">&nbsp;</td>
+    </tr>
+  </table>
+ <%}//end of displaying the advise list if bolShowAdviseList is TRUE
+ %>
+ <%
+ //print error message if vAdviseList is null or not having any information.
+ if(vAdviseList == null || vAdviseList.size() ==0)
+ {
+ strTemp = advising.getErrMsg();
+ if(strTemp == null && (WI.fillTextValue("showList").compareTo("1") ==0 || WI.fillTextValue("autoAdvise").compareTo("1") ==0))
+ 	strTemp = "Please try again. If same Error continues please contact system admin to check error status.";
+ if(strTemp == null) strTemp = "";
+ %>
+ <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td colspan="6" height="25">&nbsp;</td>
+    </tr>
+    <tr>
+      <td colspan="6" height="25"><strong><font size="3"><%=strTemp%></font></strong></td>
+    </tr>
+  </table>
+ <%} // shows error message.%>
+
+
+
+<!-- the hidden fields only if temp user exist -->
+<input type="hidden" name="cn" value="<%=(String)vStudInfo.elementAt(7)%>">
+<input type="hidden" name="ci" value="<%=(String)vStudInfo.elementAt(2)%>">
+<input type="hidden" name="mn" value="<%=WI.getStrValue(vStudInfo.elementAt(8))%>">
+<input type="hidden" name="mi" value="<%=WI.getStrValue(vStudInfo.elementAt(3))%>">
+<input type="hidden" name="syf" value="<%=(String)vStudInfo.elementAt(4)%>">
+<input type="hidden" name="syt" value="<%=(String)vStudInfo.elementAt(5)%>">
+<input type="hidden" name="maxDisplay" value="<%=iMaxDisplayed%>"><!-- max number of entries displayed.-->
+<input type="hidden" name="year_level" value="<%=WI.getStrValue(vStudInfo.elementAt(6))%>">
+<input type="hidden" name="stud_type" value="<%=(String)vStudInfo.elementAt(10)%>">
+
+
+<%} // end of display - if student id is valid
+%>
+
+<input type="hidden" name="reloadPage" value="0">
+<input type="hidden" name="addRecord" value="0">
+<input type="hidden" name="showList" value="<%=WI.fillTextValue("showList")%>">
+<input type="hidden" name="autoAdvise" value="<%=WI.fillTextValue("autoAdvise")%>">
+<input type="hidden" name="viewAllAllowedLoad" value="<%=WI.fillTextValue("viewAllAllowedLoad")%>">
+<input type="hidden" name="maxAllowedLoad" value="<%=strMaxAllowedLoad%>">
+<input type="hidden" name="block_sec"><!-- contains value for block section.-->
+<%
+strTemp = WI.fillTextValue("accumulatedLoad");
+if(strTemp.length() ==0)
+	strTemp = "0";
+%>
+<input type="hidden" name="accumulatedLoad" value="<%=strTemp%>">
+<input type="hidden" name="degree_type" value="<%=strDegreeType%>">
+
+
+
+<!-- for online registration i have to keep this information -->
+<input type="hidden" name="online_advising" value="<%=WI.fillTextValue("online_advising")%>">
+
+</form>
+
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

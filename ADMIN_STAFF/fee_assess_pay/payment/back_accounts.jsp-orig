@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+</head>
+<SCRIPT LANGUAGE="JavaScript" SRC="../../../jscript/td.js"></script>
+<script src="../../../jscript/date-picker.js"></script>
+<script language="JavaScript">
+function focusID() {
+	document.form_.stud_id.focus();
+}
+function ShowHideCheckNO()
+{
+	if(document.form_.payment_type.selectedIndex == 1)
+		document.form_.CHECK_NO.disabled = false;
+	else
+		document.form_.CHECK_NO.disabled = true;
+	//show or hide emp ID input fields.
+	if(document.form_.payment_type.selectedIndex == 2)
+	{
+		showLayer('_empID');
+		showLayer('_empID1');
+	}
+	else
+	{
+		document.form_.SD_EMP_ID.value = "";
+		hideLayer('_empID');
+		hideLayer('_empID1');
+	}
+
+}
+function ReloadPage()
+{
+	document.form_.addRecord.value="";
+	document.form_.submit();
+}
+function AddRecord()
+{
+	document.form_.addRecord.value="1";
+	document.form_.hide_save.src = "../../../images/blank.gif";
+	document.form_.submit();
+	
+}
+</script>
+<body bgcolor="#D2AE72" onLoad="focusID();">
+<%@ page language="java" import="utility.*,enrollment.FAPayment,enrollment.FAPaymentUtil,java.util.Vector" %>
+<%
+	DBOperation dbOP = null;
+	String strTemp = null;
+	String strErrMsg = null;
+	WebInterface WI = new WebInterface(request);
+	
+	if(WI.fillTextValue("print_pg").compareTo("1") == 0){%>
+		<jsp:forward page="./back_account_print.jsp" />
+	<%return;
+	}
+
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Fee Assessment & Payments-PAYMENT-Back account","back_account.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Fee Assessment & Payments","PAYMENT",request.getRemoteAddr(),
+														"back_account.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+//end of authenticaion code.
+
+FAPayment faPayment = new FAPayment();
+Vector vRetResult = new Vector();Vector vBasicInfo = null;
+
+FAPaymentUtil paymentUtil = new FAPaymentUtil();
+
+strTemp = WI.fillTextValue("addRecord");
+if(strTemp.length() > 0) {
+		enrollment.FABackAccountPmt backAcc = new enrollment.FABackAccountPmt();
+		if(backAcc.savePayment(dbOP, request)) {
+			//forward to printing receipt.
+			dbOP.cleanUP();
+			response.sendRedirect(response.encodeRedirectURL("./install_assessed_fees_print_receipt.jsp?view_status=0&or_number="+
+			request.getParameter("or_number")+"&pmt_schedule="+request.getParameter("pmt_schedule")+"&pmt_for_=Back%20Account"));
+			return;
+		}
+		else {
+			strErrMsg = backAcc.getErrMsg();
+		}
+			
+}
+if(WI.fillTextValue("stud_id").length() > 0){
+	vBasicInfo = paymentUtil.getStudBasicInfoOLD(dbOP, request.getParameter("stud_id"));
+	if(vBasicInfo == null) //may be it is the teacher/staff
+		strErrMsg = paymentUtil.getErrMsg();
+}
+
+
+String[] astrConvertTerm = {"Summer","1st Sem","2nd Sem","3rd Sem"};
+String[] astrConvertYR = {"N/A","1st yr","2nd yr","3rd yr","4th yr","5th yr","6th yr","7th yr"};
+%>
+<form name="form_" method="post" action="./back_accounts.jsp">  
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr bgcolor="#A49A6A"> 
+    <td height="25" colspan="4" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" ><strong>:::: 
+        BACK ACCOUNTS PAYMENT PAGE ::::</strong></font></div></td>
+  </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr > 
+      <td height="25" colspan="4">&nbsp;&nbsp;&nbsp; <strong><font size="3"><%=WI.getStrValue(strErrMsg)%></font></strong></td>
+    </tr>
+    <tr > 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="21%">Enter Student ID</td>
+      <td width="26%"><input name="stud_id" type="text" size="16" value="<%=WI.fillTextValue("stud_id")%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onblur="style.backgroundColor='white'"></td>
+      <td width="51%" height="25"> <%//get here cutoff time information.
+	  Vector vTempCO = new enrollment.FADailyCashCollectionDtls().getCurrentCutoffStat(dbOP);//System.out.println(vTempCO);
+	  if(vTempCO != null){%> <table width="90%" class="thinborderALL" cellpadding="0" cellspacing="0">
+          <tr> 
+            <td height="20" align="right"> <%
+		  strTemp = "Time :: "+(String)vTempCO.elementAt(0);
+		  if(vTempCO.elementAt(1) != null) {//cut off time is set.
+		  	if( ((String)vTempCO.elementAt(2)).compareTo("1") == 0)
+				strTemp += "<br><font color=red>Cut off :: "+(String)vTempCO.elementAt(1)+"</font>";
+			else	
+				strTemp += "<br>Cut off :: "+(String)vTempCO.elementAt(1);		  
+		  }%> <strong><%=strTemp%></strong> </td>
+          </tr>
+        </table>
+        <%}//only if cutoff time is set.%> </td>
+    </tr>
+    <tr > 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><a href="javascript:ReloadPage();"><img src="../../../images/form_proceed.gif" border="0"></a></td>
+      <td height="25"></a> </td>
+    </tr>
+    <tr > 
+      <td height="25" colspan="4"><hr size="1"></td>
+    </tr>
+  </table>
+<%
+if(vBasicInfo != null && vBasicInfo.size() > 0){%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td  width="2%" height="25">&nbsp;</td>
+      <td width="37%" height="25">Student name :<strong> <%=(String)vBasicInfo.elementAt(1)%></strong></td>
+      <td width="61%" height="25"  colspan="4">Last Year/Term of Attendance :<strong> 
+        <%=astrConvertYR[Integer.parseInt(WI.getStrValue(vBasicInfo.elementAt(4),"0"))]%>, 
+		<%=(String)vBasicInfo.elementAt(8) + " - "+(String)vBasicInfo.elementAt(9)%> (<%=astrConvertTerm[Integer.parseInt((String)vBasicInfo.elementAt(5))]%>)</strong> 
+		<input type="hidden" name="sy_from" value="<%=(String)vBasicInfo.elementAt(8)%>">
+		<input type="hidden" name="sy_to" value="<%=(String)vBasicInfo.elementAt(9)%>">
+		<input type="hidden" name="semester" value="<%=(String)vBasicInfo.elementAt(5)%>">
+		<input type="hidden" name="year_level" value="<%=(String)vBasicInfo.elementAt(4)%>">
+		
+		</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="5">Course/Major :<strong> <%=(String)vBasicInfo.elementAt(2)%> 
+        <%
+	  if(vBasicInfo.elementAt(3) != null){%>
+        /<%=WI.getStrValue(vBasicInfo.elementAt(3))%> 
+        <%}%>
+        </strong></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="5">Old Account : 
+<%
+	enrollment.FAFeeOperation fOperation = new enrollment.FAFeeOperation();
+	fOperation.isEnrolling(true);
+	float fOutstanding= fOperation.calOutStandingOfPrevYearSem(dbOP, (String)vBasicInfo.elementAt(0),true,true);
+%><font size="2"><strong><%=CommonUtil.formatFloat(new Double(fOutstanding).doubleValue(),true)%></strong></font>
+</td>
+    </tr>
+  </table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+<%
+if(fOutstanding > 0f) {%>
+    <tr> 
+      <td height="25" colspan="5" bgcolor="#B9B292"><div align="center">PAYMENT 
+          DETAILS </div></td>
+    </tr>
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="16%">Amount paid </td>
+      <td width="29%"> 
+<%
+strTemp = WI.fillTextValue("AMOUNT");
+if(strTemp.length() == 0) 
+	strTemp = Float.toString(fOutstanding);
+%>	  <input name="AMOUNT" type="text" size="12" value="<%=strTemp%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onblur="style.backgroundColor='white'"
+	  onKeypress=" if(event.keyCode<46 || event.keyCode== 47 || event.keyCode > 57) event.returnValue=false;">
+        Php </td>
+      <td width="15%">Check #</td>
+      <td width="38%"> <%
+strTemp = "";
+if(request.getParameter("payment_type") == null || 	 request.getParameter("payment_type").trim().length() ==0 ||
+	request.getParameter("payment_type").compareTo("0") == 0)
+{
+	strTemp = "disabled";
+}%> <input name="CHECK_NO" type="text" size="16" value="<%=WI.fillTextValue("CHECK_NO")%>" <%=strTemp%> class="textbox"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"> 
+       </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Date paid</td>
+      <td> <%
+strTemp = WI.fillTextValue("date_of_payment");
+if(strTemp.length() ==0)
+	strTemp = WI.getTodaysDate(1);
+%> <input name="DATE_PAID" type="text" size="12" maxlength="12" readonly="yes" value="<%=WI.fillTextValue("DATE_PAID")%>" class="textbox"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"> 
+        <a href="javascript:show_calendar('form_.DATE_PAID');" title="Click to select date" onMouseOver="window.status='Select date';return true;" onMouseOut="window.status='';return true;"><img src="../../../images/calendar_new.gif" border="0"></a></td>
+      <td>Reference number</td>
+      <td>
+       <input name="or_number" type="text" size="18" value="<%=paymentUtil.generateORNumber(dbOP,(String)request.getSession(false).getAttribute("userId"))%>" class="textbox_bigfont"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+	</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td valign="top">Payment type</td>
+      <td valign="top"><font size="1"> 
+        <select name="payment_type" onChange="ShowHideCheckNO();">
+          <option value="0">Cash</option>
+          <%
+strTemp = WI.fillTextValue("payment_type");
+if(strTemp.compareTo("1") ==0){%>
+          <option value="1" selected>Check</option>
+          <%}else{%>
+          <option value="1">Check</option>
+          <%}if(strTemp.compareTo("2") ==0){%>
+          <option value="2" selected>Salary deduction</option>
+          <%}else{%>
+          <option value="2">Salary deduction</option>
+          <%}%>
+        </select>
+        <br>
+        <input name="text" type="text" class="textbox_noborder" id="_empID" value="Emp ID:" size="6" readonly="yes">
+        <input type="text" name="SD_EMP_ID" value="<%=WI.fillTextValue("SD_EMP_ID")%>" size="12" id="_empID1" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onblur="style.backgroundColor='white'">
+        </font>
+<script language="JavaScript">
+ShowHideCheckNO();
+</script>
+		</td>
+      <td colspan="2" valign="top"><font size="1">&nbsp;</font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp; </td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25" width="19%">&nbsp;</td>
+      <td colspan="2"><a href="javascript:AddRecord();"><img name="hide_save" src="../../../images/save.gif" border="0"></a> 
+        <font size="1">click to save entries </font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td width="31%" valign="middle">&nbsp;</td>
+      <td width="50%" valign="middle">&nbsp;</td>
+	  </tr>
+    <%}//only if fOutstanding is > 0f
+else {%>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td colspan="2" valign="middle"><strong><font size="4">Back account should be > 0</font></strong></td>
+    </tr>
+    <%}%>
+  </table>
+<%}//only if stud info is not null.%>
+<table width="100%" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+</table>
+<input type="hidden" name="addRecord">
+</form>
+</body>
+</html>

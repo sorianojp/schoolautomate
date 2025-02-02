@@ -1,0 +1,599 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+
+td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+
+th {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+
+-->
+</style>
+</head>
+
+<body>
+<%@ page language="java" import="utility.*,Advising,FAPaymentUtil,FAPayment,FAFeeOperation,CurriculumMaintenance,FAAssessment,SubjectSection,java.util.Vector" %>
+<%
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	MessageConstant mConst = new MessageConstant();
+	WebInterface WI = new WebInterface(request);
+
+	String strErrMsg = null;
+	String strTemp = null;
+	String strSubSecIndex = null;
+	String strDegreeType  = null;
+
+	Vector vLabSched      = null;
+
+	String[] astrSchYrInfo = null;
+	String[] astrConvertSem = {"Summer","1st Semester","2nd Semester","3rd Semester"};
+
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Fee Assessment & Payments-PAYMENT-assessedfees print(enrollment)","assessedfees_print.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+astrSchYrInfo = dbOP.getCurSchYr();
+if(astrSchYrInfo == null)//db error
+{
+	%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		<%=dbOP.getErrMsg()%></font></p>
+	<%
+	dbOP.cleanUP();
+	return;
+}
+Vector vStudInfo = null;
+Vector vMiscFeeInfo = null;
+Vector vTemp = null;
+
+float fTutionFee  		= 0f;
+float fCompLabFee 		= 0f;
+float fMiscFee    		= 0f;
+float fOutstanding     	= 0f;
+float fTotalPayableAmt 	= 0f;
+String 	strCollegeName 	= null;
+
+SubjectSection SS = new SubjectSection();
+FAPaymentUtil paymentUtil = new FAPaymentUtil();
+FAPayment faPayment = new FAPayment();
+FAFeeOperation fOperation = new FAFeeOperation();
+FAAssessment FA = new FAAssessment();
+Advising advising = new Advising();
+
+Vector vAssessedSubDetail = null;
+vStudInfo = advising.getStudInfo(dbOP,request.getParameter("stud_id"), astrSchYrInfo[0],astrSchYrInfo[1],astrSchYrInfo[2]);
+if(vStudInfo == null) strErrMsg = advising.getErrMsg();
+else
+{
+	paymentUtil.setTempUser((String)vStudInfo.elementAt(10));
+	vMiscFeeInfo = paymentUtil.getMiscFeeDetail(dbOP,(String)vStudInfo.elementAt(2),(String)vStudInfo.elementAt(3),
+								(String)vStudInfo.elementAt(6),astrSchYrInfo[0],astrSchYrInfo[1]);
+
+	strCollegeName = new CurriculumMaintenance().getCollegeName(dbOP,(String)vStudInfo.elementAt(2));
+	if(vMiscFeeInfo == null)
+		strErrMsg = paymentUtil.getErrMsg();
+}
+if(strErrMsg == null) //collect fee details here.
+{
+	fTutionFee = fOperation.calTutionFee(dbOP, (String)vStudInfo.elementAt(0),paymentUtil.isTempStud(),
+					astrSchYrInfo[0],astrSchYrInfo[1],(String)vStudInfo.elementAt(6),astrSchYrInfo[2]);
+	if(fTutionFee > 0)
+	{
+		fMiscFee 	= fOperation.calMiscFee(dbOP, (String)vStudInfo.elementAt(0),paymentUtil.isTempStud(),
+					astrSchYrInfo[0],astrSchYrInfo[1],(String)vStudInfo.elementAt(6),astrSchYrInfo[2]);
+		fCompLabFee = fOperation.calHandsOn(dbOP, (String)vStudInfo.elementAt(0),paymentUtil.isTempStud(),
+					astrSchYrInfo[0],astrSchYrInfo[1],(String)vStudInfo.elementAt(6),astrSchYrInfo[2]);
+		fOutstanding= fOperation.calOutStandingOfPrevYearSem(dbOP, (String)vStudInfo.elementAt(0));
+
+		strDegreeType = dbOP.mapOneToOther("course_offered", "course_index",(String)vStudInfo.elementAt(2), "degree_type"," and is_valid=1 and is_del=0");
+		vAssessedSubDetail = FA.getAssessedSubDetail(dbOP,(String)vStudInfo.elementAt(0),paymentUtil.isTempStud(),
+					astrSchYrInfo[0],astrSchYrInfo[1],(String)vStudInfo.elementAt(6),astrSchYrInfo[2],strDegreeType);
+		if(vAssessedSubDetail == null || vAssessedSubDetail.size() ==0)
+			strErrMsg = FA.getErrMsg();
+	}
+	else
+		strErrMsg = fOperation.getErrMsg();
+}
+//if no error, get the misc fee details having hands on without computer subjects.
+if(strErrMsg == null)
+{
+	vTemp = paymentUtil.getMiscFeeDetailForHandsOnNotComputer(dbOP,(String)vStudInfo.elementAt(0),paymentUtil.isTempStud(),
+					astrSchYrInfo[0],astrSchYrInfo[1],(String)vStudInfo.elementAt(6),astrSchYrInfo[2]);
+	if(vTemp == null)
+		strErrMsg = paymentUtil.getErrMsg();
+	else
+		vMiscFeeInfo.addAll(vTemp);
+}%>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr >
+      <td height="25"><div align="center"><font size="2">
+      <strong><%=SchoolInformation.getSchoolName(dbOP,true,false)%></strong><br>
+        <font size="1"><%=SchoolInformation.getAddressLine1(dbOP,false,false)%></font></font><br>
+        <!--TIN - 004-005-307-000-NON-VAT-->
+        <%=SchoolInformation.getInfo1(dbOP,false,false)%><br>
+        <br>
+          <%=strCollegeName%></div></td>
+    </tr>
+    <tr >
+      <td height="20" ><div align="center"><strong>STUDENT ASSESSMENT SLIP<br>
+        </strong></div></td>
+    </tr>
+	</table>
+<% if(strErrMsg != null){%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+
+    <tr >
+      <td height="35" ><div align="center">
+	  <strong><%=strErrMsg%></strong></div></td>
+    </tr>
+	</table>
+<%
+	dbOP.cleanUP();
+	return;
+}
+
+if(vStudInfo != null && vStudInfo.size() > 0){%>
+
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+  <tr> 
+    <td width="11%" height="18">Student ID </td>
+    <td width="35%" height="18"><strong><%=request.getParameter("stud_id")%></strong></td>
+    <td  colspan="3" height="18">Course/Major</td>
+    <td><strong><%=(String)vStudInfo.elementAt(7)%> 
+      <%if(vStudInfo.elementAt(8) != null){%>
+      / <%=WI.getStrValue(vStudInfo.elementAt(8))%> 
+      <%}%>
+      </strong></td>
+  </tr>
+  <tr> 
+    <td height="18">Student Name </td>
+    <td height="18"><strong><%=(String)vStudInfo.elementAt(1)%></strong></td>
+    <td  colspan="3" height="18">Year/Term</td>
+    <td width="38%"><strong><%=WI.getStrValue(vStudInfo.elementAt(6),"N/A")%> 
+      / <%=astrConvertSem[Integer.parseInt(astrSchYrInfo[2])]%></strong></td>
+  </tr>
+</table>
+<%
+if(vAssessedSubDetail != null && vAssessedSubDetail.size() > 0)
+{%>
+  
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <%
+	float fTotalLoad = 0;float fUnitsTaken = 0f;
+	float fTotalSubFee = 0;
+	float fTotalUnit = 0;
+	float fSubTotalRate = 0 ; //unit * rate per unit.
+	
+	String strOfferingDur = null;//this is for caregiver and other times schedule with offering_dur;-)
+
+String strSchedule = null;
+String strRoomAndSection = null;
+	String strRatePerUnit = null;
+	Vector vSubSecDtls = new Vector();
+	String strFeeTypeCatg = null; //0=>per unit,1= per lec/lab, 2=per subject,3=total tuition fee.
+
+	float fNSTPUNIT  = 1.5f;
+
+	for(int i = 0; i< vAssessedSubDetail.size() ; ++i)
+	{
+		if(strFeeTypeCatg == null)	strFeeTypeCatg = (String)vAssessedSubDetail.elementAt(8);
+
+		fTotalUnit = Float.parseFloat((String)vAssessedSubDetail.elementAt(i+3))+Float.parseFloat((String)vAssessedSubDetail.elementAt(i+4));
+		fTotalLoad += fTotalUnit;
+		fUnitsTaken += Float.parseFloat((String)vAssessedSubDetail.elementAt(i+9));
+		strSubSecIndex = (String)vAssessedSubDetail.elementAt(i);
+		//if( Float.parseFloat((String)vSubjectDtls.elementAt(i+6)) == 0 && Float.parseFloat((String)vSubjectDtls.elementAt(i+7)) == 0)
+		if(strFeeTypeCatg.compareTo("0") ==0)//per unit
+		{
+			strRatePerUnit = (String)vAssessedSubDetail.elementAt(i+5);
+			//fSubTotalRate = fTotalUnit * Float.parseFloat(strRatePerUnit);
+			if(((String)vAssessedSubDetail.elementAt(i+1)).startsWith("NSTP"))
+				fSubTotalRate = fNSTPUNIT * Float.parseFloat(strRatePerUnit);//units taken
+			else
+				fSubTotalRate = Float.parseFloat((String)vAssessedSubDetail.elementAt(i+9)) * Float.parseFloat(strRatePerUnit);//units taken
+		}
+		//else
+		else if(strFeeTypeCatg.compareTo("1") ==0)//per unit
+		{
+			strRatePerUnit = (String)vAssessedSubDetail.elementAt(i+6) +"/lec "+(String)vAssessedSubDetail.elementAt(i+7)+"/lab";
+			if(((String)vAssessedSubDetail.elementAt(i+1)).startsWith("NSTP"))
+				fSubTotalRate = fNSTPUNIT * Float.parseFloat(strRatePerUnit);//units taken
+			else
+				fSubTotalRate  = Float.parseFloat((String)vAssessedSubDetail.elementAt(i+3)) * Float.parseFloat((String)vAssessedSubDetail.elementAt(i+3))
+							+Float.parseFloat((String)vAssessedSubDetail.elementAt(i+6)) * Float.parseFloat((String)vAssessedSubDetail.elementAt(i+7));
+		}
+		else if(strFeeTypeCatg.compareTo("2") ==0)//per subject
+		{
+			strRatePerUnit = (String)vAssessedSubDetail.elementAt(i+5)+"/subject";
+			fSubTotalRate = Float.parseFloat((String)vAssessedSubDetail.elementAt(i+5));
+		}
+		else if(strFeeTypeCatg.compareTo("3") == 0)
+		{
+			strRatePerUnit = "&nbsp;";
+			fSubTotalRate = 0;
+		}
+		//get schedule here.
+		vSubSecDtls = SS.getRoomScheduleDetailInMWF(dbOP, strSubSecIndex);
+		vLabSched   = SS.getLabSched(dbOP,strSubSecIndex);
+		strOfferingDur = WI.getStrValue(dbOP.mapOneToOther("E_SUB_SECTION","SUB_SEC_INDEX",strSubSecIndex,"offering_dur",null));
+		if(strOfferingDur.length()> 0)
+			strOfferingDur += "<br>";
+		if(vSubSecDtls == null || vSubSecDtls.size() ==0)
+		{
+			strErrMsg = SS.getErrMsg();
+			break;
+		}
+		for(int b=0; b<vSubSecDtls.size(); ++b)
+		{
+			if(strRoomAndSection == null)
+			{
+				strRoomAndSection = (String)vSubSecDtls.elementAt(b)+"/"+(String)vSubSecDtls.elementAt(b+1);
+				strSchedule = (String)vSubSecDtls.elementAt(b+2);
+			}
+			else
+			{
+				strRoomAndSection += "<br>"+(String)vSubSecDtls.elementAt(b+1);
+				strSchedule += "<br>"+(String)vSubSecDtls.elementAt(b+2);
+			}
+			b = b+2;
+		}
+		if(vLabSched != null)
+		{
+		  for (int p = 0; p < vLabSched.size(); ++p) 
+		  {
+		    strSchedule += "<br>"+(String)vLabSched.elementAt(p+2) + "(lab)";
+			strRoomAndSection += "<br>" + (String) vLabSched.elementAt(p + 1) + "(lab)";
+			p = p+ 2;
+		  }
+		}
+%>
+  <% i = i+9;
+strRoomAndSection = null;
+strSchedule = null;
+}%>
+  <tr > 
+    <td width="100%" height="18"> 
+      <%if(strErrMsg != null){%>
+      <%=strErrMsg%> 
+      <%}else{%>
+      <div align="left"><strong>TOTAL LOAD UNITS :</strong><strong><%=fUnitsTaken%></strong> 
+        <%}%>
+      </div></td>
+  </tr>
+</table>
+<%}//if vAssessedSubDetail no null
+if(vMiscFeeInfo != null && vMiscFeeInfo.size() > 0 && fTutionFee > 0)
+{
+	//get here payment detail payment method detail.
+	Vector[] vRetResult = faPayment.viewTutionFeePaymentDetail(dbOP,(String)vStudInfo.elementAt(0),astrSchYrInfo[0],
+							astrSchYrInfo[1],(String)vStudInfo.elementAt(6),astrSchYrInfo[2],paymentUtil.isTempStudInStr(), "0");
+
+	if(vRetResult == null)
+	{
+	strErrMsg = faPayment.getErrMsg();%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+  <tr>
+    <td align="center"><strong><font size="2"><br><%=strErrMsg%></font></strong></td>
+  </tr>
+</table>
+<%}else{%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+  <tr bgcolor="#FFFFFF"> 
+    <td colspan="4"><div align="center"><font color="#000000"><strong>:: 
+        FEE DETAILS ::</strong></font></div></td>
+    <td height="14" colspan="3"><div align="center"><font color="#000000"><strong>:: 
+        PAYMENT DETAILS ::</strong></font></div></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" > 
+    <td height="15" colspan="3"><font color="#000000">TUITION 
+      FEE </font></td>
+    <td width="18%" height="15"><font color="#000000" size="1"><strong><%=CommonUtil.formatFloat(fTutionFee,true)%></strong></font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td width="22%" height="15"><font color="#000000">PAYEE 
+      TYPE</font></td>
+    <td width="29%" height="15"><font color="#000000"><strong><%=(String)vRetResult[0].elementAt(1)%></strong></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" > 
+    <td height="15" colspan="3"><font color="#000000">COMP. 
+      LAB. FEE</font></td>
+    <td height="15"><font color="#000000" size="1"><strong><%=CommonUtil.formatFloat(fCompLabFee,true)%></strong></font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">PAYEE NAME </font></td>
+    <td height="15"> <font color="#000000"><strong><%=WI.getStrValue(vRetResult[0].elementAt(2))%></strong></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" > 
+    <td height="15" colspan="4"><font color="#000000">MISCELLANEOUS 
+      FEES</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">PAYMENT MODE </font></td>
+    <td height="15"><font color="#000000"><strong> <%=(String)vRetResult[0].elementAt(3)%></strong></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" > 
+    <td width="1%" height="15"><font color="#000000">&nbsp;</font></td>
+    <td width="1%" height="15"><font color="#000000">&nbsp;</font></td>
+    <td width="20%" height="15"><font color="#000000" size="1"><%=(String)vMiscFeeInfo.elementAt(0)%></font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 1){%>
+      <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(1),true)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">ASSISTANCE TYPE</font></td>
+    <td height="15"><font color="#000000"><strong> <%=WI.getStrValue(vRetResult[0].elementAt(4))%></strong></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" > 
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 2){%>
+      <%=(String)vMiscFeeInfo.elementAt(2)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 3){%>
+      <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(3),true)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">AMOUNT PAID</font></td>
+    <td height="15"><font color="#000000"><strong><%=CommonUtil.formatFloat((String)vRetResult[1].elementAt(5),true)%></strong></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" > 
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 4){%>
+      <%=(String)vMiscFeeInfo.elementAt(4)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 4){%>
+      <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(5),true)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">APPROVAL NO.</font></td>
+    <td height="15"><font color="#000000"><strong><%=WI.getStrValue(vRetResult[1].elementAt(3))%></strong></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" > 
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 6){%>
+      <%=(String)vMiscFeeInfo.elementAt(6)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 6){%>
+      <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(7),true)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">PAYMENT RECEIVE TYPE</font></td>
+    <td height="15"> <font color="#000000"><strong><%=(String)vRetResult[1].elementAt(1)%></strong></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" > 
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 8){%>
+      <%=(String)vMiscFeeInfo.elementAt(8)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 8){%>
+      <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(9),true)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">BANK NAME </font></td>
+    <td height="15"> <font color="#000000"><strong><%=WI.getStrValue(vRetResult[1].elementAt(2))%></strong></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" > 
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 10){%>
+      <%=(String)vMiscFeeInfo.elementAt(10)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 10){%>
+      <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(11),true)%> 
+      <%}%>
+      </font></td>
+    <td width="9%" height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">DATE PAID</font></td>
+    <td height="15"><font color="#000000"><strong><%=(String)vRetResult[1].elementAt(8)%></strong></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 12){%>
+      <%=(String)vMiscFeeInfo.elementAt(12)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 12){%>
+      <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(13),true)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">PAYMENT TYPE</font></td>
+    <td height="15"><font color="#000000"><strong> <%=(String)vRetResult[1].elementAt(4)%></strong></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 14){%>
+      <%=(String)vMiscFeeInfo.elementAt(14)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 14){%>
+      <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(15),true)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">CHECK #</font></td>
+    <td height="15"> <font color="#000000"><strong><%=WI.getStrValue(vRetResult[1].elementAt(6))%></strong></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 16){%>
+      <%=(String)vMiscFeeInfo.elementAt(16)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000" size="1"> 
+      <%if(vMiscFeeInfo.size() > 16){%>
+      <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(17),true)%> 
+      <%}%>
+      </font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">O.R. NUMBER</font></td>
+    <td height="15"> <font color="#000000"><strong><%=(String)vRetResult[1].elementAt(7)%></strong></font></td>
+  </tr>
+  <%
+for(int i = 18; i< vMiscFeeInfo.size(); ++i){%>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000" size="1"><%=(String)vMiscFeeInfo.elementAt(i++)%></font></td>
+    <td height="15"><font color="#000000" size="1"><%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(i),true)%></font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+  </tr>
+  <%}%>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">TOTAL MISC</font></td>
+    <td height="15"><font color="#000000" size="1"><strong><%=CommonUtil.formatFloat(fMiscFee,true)%></strong></font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font></td>
+    <td height="15"><font color="#000000">&nbsp;</font> </td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="21" colspan="4"><hr size="1"></td>
+    <td><font color="#000000">&nbsp;</font></td>
+    <td colspan="2"><font color="#000000"><strong>PAYMENT SCHEDULE:</strong></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="20" colspan="3"><font color="#000000"><strong>TOTAL 
+      TUTION FEE :</strong></font></td>
+    <td><font color="#000000" size="1"><strong>Php <%=CommonUtil.formatFloat(fTutionFee+fCompLabFee+fMiscFee,true)%></strong></font></td>
+    <td><font color="#000000">&nbsp;</font></td>
+    <td colspan="2"><div align="left"><font color="#000000">Amount 
+        due this PRELIM EXAMINATION : <%=CommonUtil.formatFloat(fFirstInstalAmt,true)%>&nbsp;&nbsp;</font></div></td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="20" colspan="3"><font color="#000000"><strong>OUTSTANDING 
+      BALANCE</strong></font></td>
+    <td><font color="#000000" size="1"><strong>Php <%=CommonUtil.formatFloat(fOutstanding,true)%></strong></font></td>
+    <td><font color="#000000">&nbsp;</font></td>
+    <td colspan="2"><font color="#000000">Amount due this PRELIM 
+      EXAMINATION : <%=CommonUtil.formatFloat(fFirstInstalAmt,true)%></font></td>
+  </tr>
+  <%
+ fTotalPayableAmt = fTutionFee+fCompLabFee+fMiscFee + fOutstanding ;
+ float fAmtPaidDurEnrl = Float.parseFloat((String)vRetResult[1].elementAt(5));
+ float fFirstInstalAmt = 0f;
+ int iEnrlSetting      = FA.getEnrollemntInstallmentSetting();
+ int iInstalCount      = FA.getNoOfInstallment(dbOP);
+ if(iEnrlSetting ==0)//1= (total due-first payment)/iInstalCount, 0=total due/iInstallCount - first installment.
+ 	fFirstInstalAmt = fTotalPayableAmt/iInstalCount - fAmtPaidDurEnrl;
+ else
+ 	fFirstInstalAmt = (fTotalPayableAmt - fAmtPaidDurEnrl)/iInstalCount;
+
+
+ %>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="20" colspan="3"><font color="#000000"><strong>TOTAL 
+      AMOUNT DUE</strong></font></td>
+    <td><font color="#000000" size="1"><strong>Php <%=CommonUtil.formatFloat(fTutionFee+fCompLabFee+fMiscFee + fOutstanding,true)%></strong></font></td>
+    <td><font color="#000000">&nbsp;</font></td>
+    <td colspan="2"><font color="#000000">Amount due this PRELIM 
+      EXAMINATION : <%=CommonUtil.formatFloat(fFirstInstalAmt,true)%></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="20" colspan="3"><font color="#000000"><strong>TOTAL 
+      BALANCE DUE</strong></font></td>
+    <td><font color="#000000" size="1"><strong>Php <%=CommonUtil.formatFloat(fTotalPayableAmt - fAmtPaidDurEnrl,true)%></strong></font></td>
+    <td><font color="#000000">&nbsp;</font></td>
+    <td colspan="2"><font color="#000000">Amount due this PRELIM 
+      EXAMINATION : <%=CommonUtil.formatFloat(fFirstInstalAmt,true)%></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="20" colspan="3">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td><font color="#000000">&nbsp;</font></td>
+    <td colspan="2"><font color="#000000">&nbsp;</font></td>
+  </tr>
+</table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr bgcolor="#FFFFFF" > 
+    <td height="20" colspan="4" ><font color="#000000">&nbsp;</font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" > 
+    <td height="25" colspan="2" ><font color="#000000">&nbsp;</font></td>
+    <td height="25" ><div align="left"><font color="#000000">Assessment printed 
+        by:</font></div></td>
+    <td height="25" ><font color="#000000"><u>&nbsp;<%=CommonUtil.getName(dbOP,(String)request.getSession(false).getAttribute("userId"),1)%>&nbsp;&nbsp;</u></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" > 
+    <td width="24%" height="25" ><font color="#000000">&nbsp;</font></td>
+    <td width="25%" height="25" ><font color="#000000">&nbsp;</font></td>
+    <td width="15%" height="25" ><div align="center"><font color="#000000"></font></div></td>
+    <td width="36%" height="25" ><font color="#000000"><em>Assessment In-charge</em></font></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" >
+    <td height="25" colspan="4" >&nbsp;</td>
+  </tr>
+  <tr bgcolor="#FFFFFF" > 
+    <td height="25" colspan="4" ><font color="#000000"><strong>NOTE: Total fee 
+      charges may change when adjustments are implemented. </strong></font></td>
+  </tr>
+</table>
+<%		}//if payment detail and payment mode not null;
+	}//if student information exists.
+}//if miscellaneous fee information exists.
+dbOP.cleanUP();
+
+if(strErrMsg == null && request.getParameter("view_status") != null && request.getParameter("view_status").compareTo("0") == 0 ){%>
+<script language="JavaScript">
+window.setInterval("javascript:window.print();",0);
+</script>
+<%}%>
+</body>
+</html>

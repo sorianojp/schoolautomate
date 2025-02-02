@@ -1,0 +1,56 @@
+<html>
+
+<head>
+<title>IP FILTER HELP</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<p align="center"><strong> IP FILTER HELP</strong></p>
+<p align="justify">This module allows or blocks one IP or a set of IPs from accessing 
+  a module and/or sub-module. If sub-module is not selected or listed, IP filter 
+  is applicable to the complete module including its sub-modules by default. There 
+  are two types of IP Filter. </p>
+<p align="justify"><strong>(a) Page level IP Filter</strong>
+<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Page level IP Filter implements secured 
+  IP Filter to a specific page. IP filter security can only be implemented on 
+  the pages with .jsp extension. IP Filter security can't be implemented on html 
+  pages or other type of static or active pages. Please contact the vendor for 
+  activating ip filter security to specific pages other than .jsp pages.</p>
+<p align="justify"> <strong>(b) Module/Sub-module IP Filter</strong><br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Module/Sub-module IP Filter is implemented 
+  on a complete module or a sub-module that belongs to a module. All the sub-modules 
+  under a module is listed when a specific module is selected. If &quot;ALL&quot; 
+  option is selected under Module dropdown list, IP Filter is implemented on all 
+  the SCHOOLBLIZ modules, and if &quot;ALL&quot; option is selected under Sub-modules 
+  dropdown list, IP Filter is implemented on the selected module and all the submodules 
+  under it. If there are additional sub-module required to be added under a module, 
+  please request the vendor.</p>
+<p align="justify">There are 4 types of IP Filtering in implementation.</p>
+<p align="justify"><strong>(a) Allow one IP</strong> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The selected module/sub-module is accessible 
+  to this IP only. For example if 192.0.0.7 IP is allowed, no client with IP other 
+  than 192.0.0.7 can access this module. The IP provied should be a valid IP format 
+  (xxx.xxx.xxx.xxx is a valid IP format). This does not accept invalid IP format.</p>
+<p align="justify"><strong>(b) Allow all IP starts With</strong><br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The selected module/sub-module is accessible 
+  to all the IPs start with the speficied IP. For example if 192.0.0 IP is allowed, 
+  192.0.0.xxx and 192.0.0xx.xxx are the set of IPs allowed. To allow only 192.0.0.xxx 
+  IP sets, instead of specifying <strong>192.0.0</strong><strong></strong> , type 
+  <strong>192.0.0.</strong> (DOT at the end of IP). </p>
+<p align="justify"><strong>(c) Block one IP</strong><br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The selected module/sub-module is not accessible 
+  to the specified IP. For example if 192.0.0.7 IP is not allowed, 192.0.0.7 is 
+  blocked to access the specified module/sub module or a page. The IP provied 
+  should be a valid IP format (xxx.xxx.xxx.xxx is a valid IP format). This does 
+  not accept invalid IP format.</p>
+<p align="justify"><strong>(d) Block all IPs start with</strong><br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The selected module/sub-module is not accessible 
+  to all the IPs start with the speficied IP. For example if 192.0.0 IP is blocked, 
+  192.0.0.xxx and 192.0.0xx.xxx are the set of IPs not allowed. To block only 
+  192.0.0.xxx IP sets, instead of specifying <strong>192.0.0</strong><strong></strong> 
+  , type <strong>192.0.0.</strong> (DOT at the end of IP). </p>
+</body>
+</html>

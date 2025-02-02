@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/lms_redesigned/css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#DEC9CC">
+<form name="form1" method="post" action="">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#A8A8D5"> 
+      <td height="25" colspan="8" bgcolor="#A8A8D5"><div align="center"><font color="#FFFFFF" ><strong>:::: 
+          CATALOGING - FILTERS SPECIFICATIONS PAGE ::::</strong></font></div></td>
+    </tr>
+	</table>
+	  
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr > 
+      <td height="25" colspan="4"><font size="1">NOTE: When selecting Publishing 
+        Year , default is ALL. Show From ..To only when SELECT is specified<br>
+        When Specifying Material Type, default is INCLUDE ALL MATERIAL TYPES,and 
+        all the list boxes is checked. When SELECT MATERIAL TYPES, remove all 
+        check from the check boxes.</font
+        ></td>
+    </tr>
+    <tr > 
+      <td width="1%" height="25"></td>
+      <td width="14%">Publishing Year</td>
+      <td width="17%"> <select name="select">
+          <option>ALL</option>
+          <option>SELECT</option>
+        </select></td>
+      <td width="68%">From 
+        <input name="textfield" type="text" size="4" maxlength="4">
+        To 
+        <input name="textfield2" type="text" size="4" maxlength="4"></td>
+    </tr>
+    <tr > 
+      <td height="25"></td>
+      <td>Material Types</td>
+      <td><select name="select2">
+          <option>Include All Material Types</option>
+          <option>Select Material Types</option>
+        </select></td>
+      <td><img src="file:///D|/ApacheTomcat4.1.31/webapps/lms_redesigned/images/form_proceed.gif" ></td>
+    </tr>
+  </table>
+  <table width="84%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="18%" height="25" valign="bottom">&nbsp;</td>
+      <td width="3%" valign="bottom"> <input name="checkbox" type="checkbox" value="checkbox" checked></td>
+      <td width="79%" valign="bottom">Books</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td><input name="checkbox2" type="checkbox" value="checkbox" checked></td>
+      <td>Computer Files/Electronic Resource</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td><input name="checkbox3" type="checkbox" value="checkbox" checked></td>
+      <td valign="bottom">Cartographic Material (Maps, Globes, Atlases)</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td valign="bottom"><input name="checkbox4" type="checkbox" value="checkbox" checked></td>
+      <td valign="bottom">Kit</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td width="3%" valign="bottom"> <input name="checkbox" type="checkbox" value="checkbox" checked></td>
+      <td valign="bottom">Continuing Resources/Serials</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td><input name="checkbox2" type="checkbox" value="checkbox" checked></td>
+      <td valign="bottom">Mixed Materials (Archival Collection)</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td><input name="checkbox3" type="checkbox" value="checkbox" checked></td>
+      <td valign="bottom">Manuscript Language Material</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td valign="bottom"><input name="checkbox4" type="checkbox" value="checkbox" checked></td>
+      <td valign="bottom">Visual Materials - 2D nonprojectable graphic (pictures, 
+        study print, photographs, chart,technical drawings.)</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td width="3%" valign="bottom"> <input name="checkbox" type="checkbox" value="checkbox" checked></td>
+      <td valign="bottom">Visual Materials - 3D artifact/object</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td><input name="checkbox2" type="checkbox" value="checkbox" checked></td>
+      <td valign="bottom">Sound Recording (Non-musical)</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td><input name="checkbox3" type="checkbox" value="checkbox" checked></td>
+      <td valign="bottom">Sound Recording (Musical)</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td valign="bottom"><input name="checkbox4" type="checkbox" value="checkbox" checked></td>
+      <td valign="bottom">Motion Picture (Film, Film Reel,etc)</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td valign="bottom"><input name="checkbox42" type="checkbox" value="checkbox" checked></td>
+      <td valign="bottom">Videorecording (Videocartridge, Videodisc, Videocassette,etc.)</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td valign="bottom">&nbsp;</td>
+      <td valign="bottom">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" valign="bottom">&nbsp;</td>
+      <td valign="bottom">&nbsp;</td>
+      <td valign="bottom">&nbsp;</td>
+    </tr>
+  </table>
+  </form>
+	
+</body>
+</html>

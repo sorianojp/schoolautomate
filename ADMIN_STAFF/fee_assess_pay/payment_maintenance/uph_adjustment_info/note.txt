@@ -1,0 +1,6 @@
+1. Subject exempted.
+2. Student do not have subject exemption rules.
+3. Automatic apply of discounts to certain course.
+
+these 3 features to be taken care here.
+--->> 

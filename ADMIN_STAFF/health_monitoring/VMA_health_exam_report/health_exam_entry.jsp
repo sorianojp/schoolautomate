@@ -1,0 +1,1521 @@
+<%@ page language="java" import="utility.*,health.HealthReport,java.util.Vector " %>
+<%
+	///added code for HR/companies.
+	boolean bolIsSchool = false;
+	if( (new CommonUtil().getIsSchool(null)).equals("1"))
+		bolIsSchool = true;
+	String[] strColorScheme = CommonUtil.getColorScheme(8);
+	//strColorScheme is never null. it has value always.
+	
+	boolean bolIsEdit = false;
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../css/reportlink.css" rel="stylesheet" type="text/css">
+<link href="../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+.bgDynamic {
+	background-color:<%=strColorScheme[1]%>
+}
+.footerDynamic {
+	background-color:<%=strColorScheme[2]%>
+}
+</style>
+</head>
+<script language="javascript" src="../../../Ajax/ajax.js"></script>
+<script language="javascript" src="../../../jscript/common.js"></script>
+<script language="javascript" src="../../../jscript/date-picker.js"></script>
+<script language="javascript">
+
+function SaveEntry(){
+	document.form_.save_entry.value = '1';
+	document.form_.submit();
+}
+
+function ReloadPage(){
+	/**document.form_.save_entry.value = '1';
+	document.form_.print_page.value = "1";
+	document.form_.prepareToEdit.value = "1";
+	document.form_.view_fields.value = "1";
+	document.form_.page_action.value = "0";*/
+	
+	document.form_.view_fields.value = "";
+	document.form_.page_action.value = "";
+	document.form_.prepareToEdit.value = "";
+	document.form_.info_index.value = "";
+	document.form_.print_page.value = "";
+	document.form_.submit();
+}
+
+function PrintPg(strInfoIndex){
+	document.form_.info_index.value = strInfoIndex;
+	document.form_.print_page.value = "1";
+	document.form_.submit();
+}
+
+function FocusID() {
+	document.form_.stud_id.focus();
+}
+
+function PrepareToEdit(strInfoIndex) {
+	document.form_.view_fields.value = "1";
+	document.form_.page_action.value = "";
+	document.form_.prepareToEdit.value = "1";
+	document.form_.info_index.value = strInfoIndex;
+	document.form_.submit();
+}
+
+function DeleteRecord(strInfoIndex){
+	if(!confirm("Are you sure you want to delete this record?"))
+		return;
+	document.form_.prepareToEdit.value="";
+	document.form_.info_index.value = strInfoIndex;
+	document.form_.page_action.value = "0";
+	document.form_.submit();
+}
+
+function UpdateRecord(){
+	document.form_.prepareToEdit.value="";
+	document.form_.page_action.value = "1";
+	document.form_.submit();
+}
+
+function EditRecord(strInfoIndex){		
+	document.form_.info_index.value = strInfoIndex;
+	document.form_.page_action.value = "2";
+	document.form_.submit();
+}
+	
+function StudSearch() {
+	var pgLoc = "../../../search/srch_stud.jsp?opner_info=form_.stud_id";
+	var win=window.open(pgLoc,"PrintWindow",'width=800,height=600,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+
+function RefreshPage(strViewFields){
+	document.form_.view_fields.value = strViewFields;
+	document.form_.page_action.value = "";
+	document.form_.prepareToEdit.value = "";
+	document.form_.info_index.value = "";
+	document.form_.submit();
+}
+	
+function AjaxMapName(strPos) {
+		var strCompleteName;
+			strCompleteName = document.form_.stud_id.value;
+
+		if(strCompleteName.length <=2)
+			return;
+
+		var objCOAInput = document.getElementById("coa_info");
+
+		this.InitXmlHttpObject(objCOAInput, 2);//I want to get innerHTML in this.retObj
+  		if(this.xmlHttp == null) {
+			alert("Failed to init xmlHttp.");
+			return;
+		}
+		var strURL = "../../../Ajax/AjaxInterface.jsp?is_faculty=-1&methodRef=2&search_id=1&name_format=4&complete_name="+
+			escape(strCompleteName)+ "&is_faculty=1";
+		this.processRequest(strURL);
+}
+function UpdateID(strID, strUserIndex) {
+	document.form_.stud_id.value = strID;
+	document.form_.stud_id.focus();
+	document.getElementById("coa_info").innerHTML = "";
+}
+function UpdateName(strFName, strMName, strLName) {
+
+}
+function UpdateNameFormat(strName) {
+	//do nothing..
+}</script>
+<body bgcolor="#8C9AAA" onLoad="FocusID();" class="bgDynamic">
+<%
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+	String strErrMsg = null;
+	String strTemp = null; String strTemp2 = null;
+	
+	if (WI.fillTextValue("print_page").length() > 0){%>
+		<jsp:forward page="./health_exam_print.jsp" />
+	<% 
+		return;}
+
+	
+	String strPrepareToEdit = WI.getStrValue(WI.fillTextValue("prepareToEdit"),"0");
+	String strViewFields = WI.getStrValue(WI.fillTextValue("view_fields"),"0");
+
+	//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Health Monitoring-Health Examination Record","health_exam_entry.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+	//authenticate this user.
+	CommonUtil comUtil = new CommonUtil();
+	int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+															"Health Monitoring","Health Examination Record",request.getRemoteAddr(),
+															"health_exam_entry.jsp");
+	if(iAccessLevel == -1)//for fatal error.
+	{
+		dbOP.cleanUP();
+		request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+		request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+		response.sendRedirect("../../../commfile/fatal_error.jsp");
+		return;
+	}
+	else if(iAccessLevel == 0)//NOT AUTHORIZED.
+	{
+		dbOP.cleanUP();
+		response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+		return;
+	}
+	//end of authenticaion code.	
+Vector vRetResult = new Vector();
+Vector vBasicInfo = new Vector();
+Vector vRecords   = new Vector();
+Vector vEditInfo  = new Vector();
+
+HealthReport HR = new HealthReport();
+
+
+
+
+strTemp = WI.fillTextValue("page_action");
+if(strTemp.length() > 0){
+	if(HR.operateOnHealthRecord(dbOP, request, Integer.parseInt(strTemp)) == null)
+		strErrMsg = HR.getErrMsg();
+	else{
+		if(strTemp.equals("0"))
+			strErrMsg = "Entry Succesfully Deleted.";
+		if(strTemp.equals("1"))
+			strErrMsg = "Entry Succesfully Saved.";
+		if(strTemp.equals("2"))
+			strErrMsg = "Entry Succesfully Updated.";
+		strPrepareToEdit = "0";
+		strViewFields = "0";	
+			
+	}
+}
+
+
+
+
+if(strPrepareToEdit.equals("1")){
+	vEditInfo = HR.operateOnHealthRecord(dbOP, request, 3);	
+	if(vEditInfo == null)
+		strErrMsg = HR.getErrMsg();
+}
+String strCourse = "";
+if(WI.fillTextValue("stud_id").length() > 0){
+	vBasicInfo = HR.operateOnHealthRecord(dbOP, request, 5);
+	if(vBasicInfo == null)
+		strErrMsg = HR.getErrMsg();
+	else{
+		vRecords = HR.operateOnHealthRecord(dbOP, request, 6);	
+		strCourse = (String)vBasicInfo.elementAt(4);	
+	}
+}
+
+
+//vBasicInfo. 4 = course_code
+boolean bolShowAll = false;
+boolean bolShowChest = false;
+boolean bolShowHearing = false;
+boolean bolShowHBSag = false;
+boolean bolShowCBC = false;
+boolean bolShowStool = false;
+boolean bolShowIshihara = false;
+boolean bolShowUrinalyisis = false;
+boolean bolShowHepaB = false;
+if(strCourse.equals("BSMT") || strCourse.equals("BSMarE"))
+	bolShowAll = true;
+if(strCourse.equals("SC/SC") || strCourse.equals("BSHRM")){
+	bolShowChest = true;
+	bolShowHearing = true;
+	bolShowHBSag = true;
+	bolShowCBC = true;
+	bolShowStool = true;
+	bolShowIshihara = false;
+	bolShowUrinalyisis = true;
+	bolShowHepaB = true;
+}
+if(!strCourse.equals("SC/SC") && !strCourse.equals("BSHRM") && !strCourse.equals("BSMT") && !strCourse.equals("BSMarE")){
+	bolShowCBC = true;
+	bolShowChest = true;
+	bolShowStool = true;
+	bolShowUrinalyisis = true;
+}
+
+String[] strConvertLetter = {"","A","B","C","D","E","F","G","H","I","J","K","L"};
+int iCount = 1;
+	
+%>
+<form action="health_exam_entry.jsp" method="post" name="form_">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+	<tr>
+		<td height="28" colspan="6" bgcolor="#697A8F" class="footerDynamic"><div align="center">
+			<font color="#FFFFFF" ><strong>:::: HEALTH EXAMINATION ::::</strong></font></div></td>
+	</tr>
+	<tr>
+		<td height="25" colspan="6">&nbsp;&nbsp;&nbsp;&nbsp;
+			<strong><font size="3"><%=WI.getStrValue(strErrMsg)%></font></strong></td>
+	</tr>
+</table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+	<tr>
+		<td width="2%">&nbsp;</td>
+		<td width="15%">Enter ID No. :</td>
+		<td width="20%">
+			<input name="stud_id" type="text" size="16" value="<%=WI.fillTextValue("stud_id")%>" class="textbox"
+				onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"
+				 onKeyUp="AjaxMapName('1');"></td>
+		<td colspan="2" >
+			
+				<a href="javascript:StudSearch();"><img src="../../../images/search.gif" border="0" ></a>
+					<font size="1">Click to search for student </font>			
+		<label id="coa_info" style="font-size:11px;"></label>	
+		</td>
+		<td width="3%" valign="top" >&nbsp;</td>
+	</tr>
+	<tr>
+		<td height="15" colspan="6">&nbsp;</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td colspan="1"><a href="javascript:RefreshPage('');"><img src="../../../images/form_proceed.gif" border="0"></a></td>	
+		<td colspan="3" ><a href="javascript:RefreshPage('1');">Click to create new record.</a></td>	
+	</tr>
+</table>
+
+<table width="100%" border="0" bgcolor="#FFFFFF" cellpadding="0" cellspacing="0">
+	<tr>
+		<td height="15"><hr size="1"></td>
+	</tr>
+</table>
+
+<%if(vBasicInfo != null && vBasicInfo.size() > 0){%>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">	
+	<tr>
+		<td width="3%">&nbsp;</td>
+		<td height="25" width="17%">Student Name : </td>
+		<td colspan="3"><%=vBasicInfo.elementAt(0)%></td>
+	</tr>
+	
+	<tr>
+		<td width="3%">&nbsp;</td>
+		<td height="25">Address : </td>
+		<td  colspan="3">
+			<%=WI.getStrValue((String)vBasicInfo.elementAt(6))%> <%=WI.getStrValue((String)vBasicInfo.elementAt(7))%>
+			<%=WI.getStrValue((String)vBasicInfo.elementAt(8))%> <%=WI.getStrValue((String)vBasicInfo.elementAt(9))%> <%=WI.getStrValue((String)vBasicInfo.elementAt(10))%>
+		</td>
+	</tr>
+	<tr>
+		<td height="25">&nbsp;</td>
+		<td>Course : <%=WI.getStrValue((String)vBasicInfo.elementAt(4))%></td>
+		<td>Year : <%=WI.getStrValue((String)vBasicInfo.elementAt(5))%></td>
+		<%
+		//1 = temporary; 0 = enrolled
+		strTemp = (String)vBasicInfo.elementAt(12);
+		if(strTemp.equals("1"))
+			strTemp = "Not Enrolled";
+		else
+			strTemp = "Enrolled";
+		%>		
+		<td colspan="2">Status : <%=strTemp%></td>
+	</tr>
+	
+	<tr>
+		<td height="25">&nbsp;</td>
+		<td>Sex : <%=WI.getStrValue((String)vBasicInfo.elementAt(2))%></td>
+		<td>Age : <%=WI.getStrValue((String)vBasicInfo.elementAt(1))%></td>
+		<td>Civil Status : <%=WI.getStrValue((String)vBasicInfo.elementAt(3))%></td>
+		<td>Tel. No. : <%=WI.getStrValue((String)vBasicInfo.elementAt(11))%></td>
+	</tr>
+	<tr><td colspan="10">&nbsp;</td></tr>
+</table>
+
+<%if(strViewFields.equals("1")){%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+	<tr>
+		<td>&nbsp;</td>
+		<%
+			if(vEditInfo != null && vEditInfo.size() > 0)
+				strTemp = (String)vEditInfo.elementAt(1);
+			else			
+				strTemp = WI.fillTextValue("date_recorded");				
+				
+			if(strTemp.length() == 0)
+				strTemp = WI.getTodaysDate(1);
+		%>
+		<td colspan="6">Date Recorded : <input name="date_recorded" type="text" size="12" maxlength="12" readonly="yes" value="<%=strTemp%>" 
+					class="textbox" onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+        		<a href="javascript:show_calendar('form_.date_recorded');" title="Click to select date" 
+					onMouseOver="window.status='Select date';return true;" onMouseOut="window.status='';return true;">
+				<img src="../../../images/calendar_new.gif" width="20" height="16" border="0"></a></font></td>
+	</tr>
+	<tr><td colspan="10">&nbsp;</td></tr>
+	<tr><td height="25" colspan="10"><strong> II. PHYSICAL EXAMINATION</strong></td></tr>
+	
+	<tr>
+		<td height="25" width="3%">&nbsp;</td>
+		<td width="17%">HEIGHT : </td>
+		<%
+		strTemp = WI.fillTextValue("field_1");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(2);
+		%>
+		<td><input type="text" name="field_1" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+		<td width="15%">WEIGHT : </td>
+		<%
+		strTemp = WI.fillTextValue("field_2");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(3);
+		%>
+		<td><input type="text" name="field_2" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+		<td width="15%">BLOOD PRESSURE : </td>
+		<%
+		strTemp = WI.fillTextValue("field_3");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(4);
+		%>
+		<td><input type="text" name="field_3" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+	</tr>
+	
+	<tr>
+		<td height="25" width="3%">&nbsp;</td>
+		<td width="15%">PULSE : </td>
+		<%
+		strTemp = WI.fillTextValue("field_4");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(5);
+		%>
+		<td><input type="text" name="field_4" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+		<td width="15%">RESPIRATION : </td>
+		<%
+		strTemp = WI.fillTextValue("field_5");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(6);
+		%>
+		<td><input type="text" name="field_5" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+		<td width="15%">BODY BUILT : </td>
+		<%
+		strTemp = WI.fillTextValue("field_6");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(7);
+		%>
+		<td><input type="text" name="field_6" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+	</tr>
+	
+	<tr>
+		<td height="25" width="3%">&nbsp;</td>
+		<td width="15%">VISUAL ACUITY : </td>
+		<%
+		strTemp = WI.fillTextValue("field_7");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(8);
+		%>
+		<td><input type="text" name="field_7" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+		<td width="15%">FAR VISION : </td>
+		<%
+		strTemp = WI.fillTextValue("field_8");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(9);
+		%>
+		<td><input type="text" name="field_8" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+		<td width="15%">NEAR VISION : </td>
+		<%
+		strTemp = WI.fillTextValue("field_9");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(10);
+		%>
+		<td><input type="text" name="field_9" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+	</tr>
+	
+	<tr>
+		<td height="25" width="3%">&nbsp;</td>
+		<td width="15%">ISHIHARA COLOR VISION : </td>
+		<%
+		strTemp = WI.fillTextValue("field_10");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(11);
+		%>
+		<td><input type="text" name="field_10" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+		<td width="15%">CLARITY OF SPEECH : </td>
+		<%
+		strTemp = WI.fillTextValue("field_11");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(12);
+		%>
+		<td colspan="3"><input type="text" name="field_11" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+	</tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+</table>
+
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">	
+	<tr>
+		<td class="thinborder" height="25">&nbsp;</td>
+		<td class="thinborder" colspan="2" align="center">Normal?</td>
+		<td class="thinborder" align="center">Remarks</td>
+		
+		<td class="thinborder" align="center" height="25">&nbsp;</td>
+		<td class="thinborder" align="center" colspan="2">Normal?</td>
+		<td class="thinborder">Remarks</td>
+	</tr>
+	
+	<tr>
+		<td class="thinborder" height="25">&nbsp;</td>
+		<td class="thinborder" align="center">Yes</td>
+		<td class="thinborder" align="center">No</td>
+		<td class="thinborder">&nbsp;</td>
+		
+		<td class="thinborder" height="25">&nbsp;</td>
+		<td class="thinborder" align="center">Yes</td>
+		<td class="thinborder" align="center">No</td>
+		<td class="thinborder">&nbsp;</td>
+	</tr>
+	<!---ENTRY HERE--->
+	<tr>
+		<td class="thinborder" height="25" width="20%">Skin</td>
+		<%
+		strTemp = WI.fillTextValue("field_12");		
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(13);		
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_12" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_12" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_13");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(14);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_13" value="<%=WI.getStrValue(strTemp)%>"  class="textbox"/></td>
+		
+		
+		<td class="thinborder" height="25" width="20%">Heart</td>
+		<%
+		strTemp = WI.fillTextValue("field_14");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(15);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_14" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_14" value="0" <%=strErrMsg%> ></td>
+		<%
+		strTemp = WI.fillTextValue("field_15");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(16);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_15" value="<%=WI.getStrValue(strTemp)%>"  class="textbox"/></td>
+	</tr>
+	
+	<tr>
+		<td class="thinborder" height="25" width="20%">Head neck scalp</td>
+		<%
+		strTemp = WI.fillTextValue("field_16");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(17);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_16" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_16" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_17");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(18);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_17" value="<%=WI.getStrValue(strTemp)%>"  class="textbox"/></td>
+		
+		<td class="thinborder" height="25" width="20%">Abdomen</td>
+		<%
+		strTemp = WI.fillTextValue("field_18");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(19);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_18" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_18" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_19");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(20);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_19" value="<%=WI.getStrValue(strTemp)%>"  class="textbox"/></td>
+	</tr>
+	
+	<tr>
+		<td class="thinborder" height="25" width="20%">Eyes external</td>
+		<%
+		strTemp = WI.fillTextValue("field_20");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(21);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_20" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_20" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_21");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(22);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_21" value="<%=WI.getStrValue(strTemp)%>"  class="textbox" /></td>
+		
+		<td class="thinborder" height="25" width="20%">Back</td>
+		<%
+		strTemp = WI.fillTextValue("field_22");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(23);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_22" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_22" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_23");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(24);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_23" value="<%=WI.getStrValue(strTemp)%>"  class="textbox" /></td>
+	</tr>
+	
+	<tr>
+		<td class="thinborder" height="25" width="20%">Pupil Ophthalmoscopic</td>
+		<%
+		strTemp = WI.fillTextValue("field_24");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(25);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_24" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_24" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_25");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(26);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_25" value="<%=WI.getStrValue(strTemp)%>"  class="textbox"/></td>
+		
+		<td class="thinborder" height="25" width="20%">Anus-Rectum</td>
+		<%
+		strTemp = WI.fillTextValue("field_26");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(27);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_26" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_26" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_27");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(28);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_27" value="<%=WI.getStrValue(strTemp)%>"  class="textbox"/></td>
+	</tr>
+	
+	<tr>
+		<td class="thinborder" height="25" width="20%">Ears</td>
+		<%
+		strTemp = WI.fillTextValue("field_28");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(29);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_28" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_28" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_29");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(30);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_29" value="<%=WI.getStrValue(strTemp)%>"  class="textbox" /></td>
+		
+		<td class="thinborder" height="25" width="20%">GU System</td>
+		<%
+		strTemp = WI.fillTextValue("field_30");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(31);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_30" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_30" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_31");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(32);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_31" value="<%=WI.getStrValue(strTemp)%>"  class="textbox" /></td>
+	</tr>
+	
+	<tr>
+		<td class="thinborder" height="25" width="20%">Nose, Sinuses</td>
+		<%
+		strTemp = WI.fillTextValue("field_32");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(33);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_32" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_32" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_33");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(34);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_33" value="<%=WI.getStrValue(strTemp)%>"  class="textbox"/></td>
+		
+		<td class="thinborder" height="25" width="20%">Inguinals, Genitals</td>
+		<%
+		strTemp = WI.fillTextValue("field_34");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(35);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_34" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_34" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_35");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(36);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_35" value="<%=WI.getStrValue(strTemp)%>"  class="textbox" /></td>
+	</tr>
+	
+	<tr>
+		<td class="thinborder" height="25" width="20%">Mouth, Throat</td>
+		<%
+		strTemp = WI.fillTextValue("field_36");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(37);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_36" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_36" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_37");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(38);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_37" value="<%=WI.getStrValue(strTemp)%>"  class="textbox"/></td>
+		
+		<td class="thinborder" height="25" width="20%">Reflexes</td>
+		<%
+		strTemp = WI.fillTextValue("field_38");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(39);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_38" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_38" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_39");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(40);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_39" value="<%=WI.getStrValue(strTemp)%>"  class="textbox"/></td>
+	</tr>
+	
+	<tr>
+		<td class="thinborder" height="25" width="20%">Neck, L.N., Thyroid</td>
+		<%
+		strTemp = WI.fillTextValue("field_40");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(41);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_40" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_40" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_41");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(42);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_41" value="<%=WI.getStrValue(strTemp)%>"  class="textbox"/></td>
+		
+		<td class="thinborder" height="25" width="20%">Extremities</td>
+		<%
+		strTemp = WI.fillTextValue("field_42");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(43);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_42" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_42" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_43");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(44);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_43" value="<%=WI.getStrValue(strTemp)%>"  class="textbox" /></td>
+	</tr>
+	
+	<tr>
+		<td class="thinborder" height="25" width="20%">Chest-Breast-Axilla</td>
+		<%
+		strTemp = WI.fillTextValue("field_44");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(45);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_44" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_44" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_45");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(46);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_45" value="<%=WI.getStrValue(strTemp)%>"  class="textbox" /></td>
+		
+		<td class="thinborder" height="25" width="20%">Dental(Teeth)</td>
+		<%
+		strTemp = WI.fillTextValue("field_46");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(47);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_46" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_46" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_47");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(48);
+		%>
+		<td class="thinborder" width="20%"><input type="text" name="field_47" value="<%=WI.getStrValue(strTemp)%>"  class="textbox" /></td>
+	</tr>
+	
+	<tr>
+		<td class="thinborder" height="25" width="20%">Lung LMP</td>
+		<%
+		strTemp = WI.fillTextValue("field_48");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(49);
+		if(strTemp.equals("1") || strTemp.length() == 0)
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_48" value="1" <%=strErrMsg%>></td>
+		<%		
+		if(strTemp.equals("0"))
+			strErrMsg = "checked";
+		else
+			strErrMsg = "";
+		%>
+		<td class="thinborder" align="center" width="5%"><input type="radio" name="field_48" value="0" <%=strErrMsg%>></td>
+		<%
+		strTemp = WI.fillTextValue("field_49");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(50);
+		%>
+		<td height="25" colspan="5" class="thinborder"><input type="text" name="field_49" value="<%=WI.getStrValue(strTemp)%>"  class="textbox" /></td>
+	</tr>	
+</table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+	<tr><td colspan="8">&nbsp;</td></tr>
+	<tr>
+		<%
+		strTemp = WI.fillTextValue("field_50");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(51);
+		%>
+		<td height="25" colspan="8">Other Remarks : <textarea name="field_50" class="textbox" style="width:50%"><%=WI.getStrValue(strTemp)%></textarea></td>
+	</tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+</table>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+	<tr><td height="25" colspan="10"><strong>III. LABORATORY EXAMINATION</strong></td></tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+<%if(bolShowChest || bolShowAll){%>
+	<tr><td height="25" width="2%"><strong><%=strConvertLetter[iCount++]%>.</strong></td><td colspan="3"><strong>CHEST X-RAY</strong></td></tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+	<tr>
+		<td>&nbsp;</td>
+		<%
+		strTemp = WI.fillTextValue("field_51");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(52);
+		%>
+		<td>CHEST PA REMARKS : &nbsp; <input type="text" name="field_51" value="<%=WI.getStrValue(strTemp)%>"  class="textbox"/></td>
+		<%
+		strTemp = WI.fillTextValue("field_52");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(53);
+		%>
+		<td>LORDOTIC VIEW REMARKS : &nbsp; <input type="text" name="field_52" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td>
+	</tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+<%}
+if(bolShowHearing  || bolShowAll){%>	
+	<tr><td height="25" width="2%"><strong><%=strConvertLetter[iCount++]%>.</strong></td><td colspan="3"><strong>HEARING TEST</strong></td></tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+	<tr>
+		<td>&nbsp;</td>
+		<%
+		strTemp = WI.fillTextValue("field_53");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(54);
+		%>
+		<td>RIGHT EAR HTL : &nbsp; <input type="text" name="field_53" value="<%=WI.getStrValue(strTemp)%>"  class="textbox"/></td>
+		<%
+		strTemp = WI.fillTextValue("field_54");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(55);
+		%>
+		<td>LEFT EAR HTL : &nbsp; <input type="text" name="field_54" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<%
+		strTemp = WI.fillTextValue("field_55");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(56);
+		%>
+		<td colspan="2">Remarks : <input type="text" name="field_55" style="width:70%" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td></tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+<%}
+if(bolShowHBSag || bolShowAll){
+%>	
+	<tr><td height="25" width="2%"><strong><%=strConvertLetter[iCount++]%>.</strong></td><td colspan="3"><strong>HBs AG (Qualitative)</strong></td></tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+	<tr>
+		<td>&nbsp;</td>
+		<%
+		strTemp = WI.fillTextValue("field_56");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(57);
+		%>
+		<td colspan="2">Method : &nbsp; <input type="text" name="field_56" style="width:70%" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td>		
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<%
+		strTemp = WI.fillTextValue("field_57");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(58);
+		%>		
+		<td colspan="2">Result : &nbsp; &nbsp; <input type="text" name="field_57" style="width:70%" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td></tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+<%}
+if(bolShowUrinalyisis || bolShowAll){
+%>	
+	<tr><td height="25" width="2%"><strong><%=strConvertLetter[iCount++]%>.</strong></td><td colspan="3"><strong>URINE TEST</strong></td></tr>	
+	<tr><td colspan="8">&nbsp;</td></tr>
+<%}%>
+</table>	
+<%if(bolShowStool || bolShowAll){%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">	
+	
+	<tr><td height="25" width="2%"><strong><%=strConvertLetter[iCount++]%>.</strong></td><td colspan="10"><strong>STOOL EXAMINATION</strong></td></tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+	
+	
+	<tr>
+		<td>&nbsp;</td>
+		<td colspan="2"><u>MICROSCOPIC EXAMINATION</u></td>
+		<td colspan="2"><u>PARASITES</u></td>
+		<td colspan="2"><u>FLAGELLATES</u></td>
+	</tr>
+	
+	<tr>
+		<td width="2%">&nbsp;</td>
+		<td width="15%">Color</td>
+		<%
+		strTemp = WI.fillTextValue("field_58");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(59);
+		%>
+		<td width="17%"><input type="text" name="field_58" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+		<td width="15%">Ascaris</td>
+		<%
+		strTemp = WI.fillTextValue("field_59");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(60);
+		%>
+		<td width="17%"><input type="text" name="field_59" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+		<td width="15%">G. Lambia</td>
+		<%
+		strTemp = WI.fillTextValue("field_60");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(61);
+		%>
+		<td><input type="text" name="field_60" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+	</tr>
+	
+	<tr>
+		<td>&nbsp;</td>
+		<td width="15%">Consistency</td>
+		<%
+		strTemp = WI.fillTextValue("field_61");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(62);
+		%>
+		<td><input type="text" name="field_61" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+		<td width="15%">Hookworm</td>
+		<%
+		strTemp = WI.fillTextValue("field_62");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(63);
+		%>
+		<td><input type="text" name="field_62" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+		<td width="15%">T. hominis</td>
+		<%
+		strTemp = WI.fillTextValue("field_63");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(64);
+		%>
+		<td><input type="text" name="field_63" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+	</tr>
+	
+	<tr>
+		<td>&nbsp;</td>
+		<td width="15%">Helminths</td>
+		<%
+		strTemp = WI.fillTextValue("field_64");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(65);
+		%>
+		<td><input type="text" name="field_64" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+		<td width="15%">Trichuris</td>
+		<%
+		strTemp = WI.fillTextValue("field_65");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(66);
+		%>
+		<td colspan="3"><input type="text" name="field_65" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+	</tr>
+	
+	<tr>
+		<td>&nbsp;</td>
+		<td colspan="2">&nbsp;</td>
+		<td width="15%">Strongyloides</td>
+		<%
+		strTemp = WI.fillTextValue("field_66");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(67);
+		%>
+		<td colspan="3"><input type="text" name="field_66" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+	</tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+	
+	<tr>
+		<td>&nbsp;</td>
+		<%
+		strTemp = WI.fillTextValue("field_67");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(68);
+		%>
+	  <td colspan="10">Remarks : <input type="text" name="field_67" 
+				 style="width:70%" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td>
+	</tr>
+	
+	<tr>
+		<td>&nbsp;</td>
+		<%
+		strTemp = WI.fillTextValue("field_68");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(69);
+		%>
+		<td colspan="10">Nurse's Notes : <input type="text" name="field_68" 
+				 style="width:60%" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td>
+	</tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+</table>
+<%}
+if(bolShowIshihara || bolShowAll){
+%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">	
+	<tr>
+		<td height="25" width="2%"><strong><%=strConvertLetter[iCount++]%>.</strong></td>
+		<td><strong>ISHIHARA TEST</strong></td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<%
+		strTemp = WI.fillTextValue("field_86");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(87);
+		%>		
+		<td colspan="2">Result : &nbsp; &nbsp; <input type="text" name="field_86" style="width:70%" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td></tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+</table>
+<%}
+if(bolShowHepaB || bolShowAll){
+%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">	
+	<tr>
+		<td height="25" width="2%"><strong><%=strConvertLetter[iCount++]%>.</strong></td>
+		<%
+		strTemp = WI.fillTextValue("field_87");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(88);
+		%>
+		<td><strong>HEPA B VACCINE</strong>    &nbsp; &nbsp; &nbsp;
+		<input name="field_87_date" type="text" size="12" maxlength="12" readonly="yes" value="<%=strTemp%>" 
+					class="textbox" onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+        		<a href="javascript:show_calendar('form_.field_87_date');" title="Click to select date" 
+					onMouseOver="window.status='Select date';return true;" onMouseOut="window.status='';return true;">
+				<img src="../../../images/calendar_new.gif" width="20" height="16" border="0"></a>
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>			
+		<td colspan="2">
+			<table width="80%" align="center" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+				<tr>
+					<td width="24%" height="18" class="thinborder">Hepa B Vaccine</td>
+					<td width="19%" class="thinborder">1<sup>st</sup> dose</td>
+					<td width="19%" class="thinborder">2<sup>nd</sup> dose</td>
+					<td width="19%" class="thinborder">3<sup>rd</sup> dose</td>
+					<td width="19%" class="thinborder">Booster</td>
+				</tr>
+				<tr>
+					<%
+					strTemp = WI.fillTextValue("field_88");
+					if(vEditInfo != null && vEditInfo.size() > 0)
+						strTemp = (String)vEditInfo.elementAt(89);
+					%>
+					<td class="thinborder"><input type="text" name="field_88" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+					<%
+					strTemp = WI.fillTextValue("field_89");
+					if(vEditInfo != null && vEditInfo.size() > 0)
+						strTemp = (String)vEditInfo.elementAt(90);
+					%>
+					<td class="thinborder"><input type="text" name="field_89" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+					<%
+					strTemp = WI.fillTextValue("field_90");
+					if(vEditInfo != null && vEditInfo.size() > 0)
+						strTemp = (String)vEditInfo.elementAt(91);
+					%>
+					<td class="thinborder"><input type="text" name="field_90" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+					<%
+					strTemp = WI.fillTextValue("field_91");
+					if(vEditInfo != null && vEditInfo.size() > 0)
+						strTemp = (String)vEditInfo.elementAt(92);
+					%>
+					<td class="thinborder"><input type="text" name="field_91" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+					<%
+					strTemp = WI.fillTextValue("field_92");
+					if(vEditInfo != null && vEditInfo.size() > 0)
+						strTemp = (String)vEditInfo.elementAt(93);
+					%>
+					<td class="thinborder"><input type="text" name="field_92" value="<%=WI.getStrValue(strTemp)%>" class="textbox"></td>
+				</tr>
+			</table>
+		</td></tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+</table>
+<%}
+if(bolShowCBC || bolShowAll){
+%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+	<tr>
+		<td height="25" width="2%"><strong><%=strConvertLetter[iCount++]%>.</strong></td>
+		<td><strong>HEMATOLOGY</strong></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2"><u><strong>CBC Blood Count</strong></u></td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	
+	<tr>
+	<%
+		strTemp = WI.fillTextValue("field_69");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(70);
+		%>
+		<td height="25" colspan="2">Hematocrit (Normal Count: Male: 0.40 – 0.54 L/L, Female: 0.37-0.47 L/L ) : 
+		<input type="text" name="field_69" value="<%=WI.getStrValue(strTemp)%>" class="textbox" />	</td>
+	</tr>
+	
+	<tr><%
+		strTemp = WI.fillTextValue("field_70");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(71);
+		%>
+		<td height="25" colspan="2">Hemoglobin (Normal Count: Male: 130 -180 g/L, Female: 120-160 g/L ) :
+		<input type="text" name="field_70" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td>
+	</tr>
+	
+	<tr><%
+		strTemp = WI.fillTextValue("field_71");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(72);
+		%>
+		<td height="25" colspan="2">RBC Count (Normal Count: 4.5 – 5.5 x 10 /L) : 
+		<input type="text" name="field_71" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td>
+	</tr>
+	
+	<tr><%
+		strTemp = WI.fillTextValue("field_72");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(73);
+		%>
+		<td height="25" colspan="2">WBC Count (Normal Count: 4.5 -11 x 10 /L) :
+		<input type="text" name="field_72" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td>
+	</tr>
+	
+	<tr><%
+		strTemp = WI.fillTextValue("field_73");
+		if(vEditInfo != null && vEditInfo.size() > 0)
+			strTemp = (String)vEditInfo.elementAt(74);
+		%>
+		<td height="25" colspan="2">Platelet Count (Normal Count: 150 -400 x 10 /L) :
+		<input type="text" name="field_73" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td>
+	</tr>
+
+	<tr><td colspan="2">&nbsp;</td></tr>
+	
+	<tr><td colspan="2"><u><strong>Differential Count</strong></u></td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>	
+<%
+strTemp = WI.fillTextValue("field_74");
+if(vEditInfo != null && vEditInfo.size() > 0)
+	strTemp = (String)vEditInfo.elementAt(75);
+%>
+	<tr><td height="25" colspan="2">Neutrophils (Normal: 50-70%) : <input type="text" name="field_74" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td></tr>	
+	<%
+strTemp = WI.fillTextValue("field_75");
+if(vEditInfo != null && vEditInfo.size() > 0)
+	strTemp = (String)vEditInfo.elementAt(76);
+%>
+	<tr><td height="25" colspan="2">Lymphocytes (25-35%) : <input type="text" name="field_75" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td></tr>	
+	<%
+strTemp = WI.fillTextValue("field_76");
+if(vEditInfo != null && vEditInfo.size() > 0)
+	strTemp = (String)vEditInfo.elementAt(77);
+%>
+	<tr><td height="25" colspan="2">Monocytes (4-8%) : <input type="text" name="field_76" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td></tr>	
+	<%
+strTemp = WI.fillTextValue("field_77");
+if(vEditInfo != null && vEditInfo.size() > 0)
+	strTemp = (String)vEditInfo.elementAt(78);
+%>
+	<tr><td height="25" colspan="2">Eosinophils (1-5%) : <input type="text" name="field_77" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td></tr>	
+	<%
+strTemp = WI.fillTextValue("field_78");
+if(vEditInfo != null && vEditInfo.size() > 0)
+	strTemp = (String)vEditInfo.elementAt(79);
+%>
+	<tr><td height="25" colspan="2">Basophils : <input type="text" name="field_78" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td></tr>	
+	<%
+strTemp = WI.fillTextValue("field_79");
+if(vEditInfo != null && vEditInfo.size() > 0)
+	strTemp = (String)vEditInfo.elementAt(80);
+%>
+	<tr><td height="25" colspan="2">Metamyelocyte : <input type="text" name="field_79" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td></tr>	
+	<%
+strTemp = WI.fillTextValue("field_80");
+if(vEditInfo != null && vEditInfo.size() > 0)
+	strTemp = (String)vEditInfo.elementAt(81);
+%>
+	<tr><td height="25" colspan="2">Myelocyte : <input type="text" name="field_80" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td></tr>	
+	<%
+strTemp = WI.fillTextValue("field_81");
+if(vEditInfo != null && vEditInfo.size() > 0)
+	strTemp = (String)vEditInfo.elementAt(82);
+%>
+	<tr><td height="25" colspan="2">Blood Type : <input type="text" name="field_81" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td></tr>	
+	<%
+strTemp = WI.fillTextValue("field_82");
+if(vEditInfo != null && vEditInfo.size() > 0)
+	strTemp = (String)vEditInfo.elementAt(83);
+%>
+	<tr><td height="25" colspan="2">Remarks : <input type="text" name="field_82" style="width:70%" class="textbox" 	value="<%=WI.getStrValue(strTemp)%>" /></td></tr>	
+	<%
+strTemp = WI.fillTextValue("field_83");
+if(vEditInfo != null && vEditInfo.size() > 0)
+	strTemp = (String)vEditInfo.elementAt(84);
+%>
+	<tr><td height="25" colspan="2">Recommendations : <input type="text" name="field_83" style="width:70%" class="textbox"	value="<%=WI.getStrValue(strTemp)%>" /></td></tr>
+	
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<%}%>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+
+	<tr>
+		<td height="25" width="10%">&nbsp;</td>
+		<td width="40%">Examining Physician</td>
+		<td>Examining Nurse</td>
+	</tr>
+	
+	<tr>
+		<td height="25" width="10%">&nbsp;</td>
+		<%
+strTemp = WI.fillTextValue("field_84");
+if(vEditInfo != null && vEditInfo.size() > 0)
+	strTemp = (String)vEditInfo.elementAt(85);
+%>
+		<td width="40%"><input type="text" name="field_84" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td>
+		<%
+strTemp = WI.fillTextValue("field_85");
+if(vEditInfo != null && vEditInfo.size() > 0)
+	strTemp = (String)vEditInfo.elementAt(86);
+%>
+		<td><input type="text" name="field_85" value="<%=WI.getStrValue(strTemp)%>" class="textbox" /></td>
+	</tr>
+	<tr><Td colspan="3">&nbsp;</Td></tr>
+	<tr>
+			<td height="25" colspan="5"><div align="center">
+				<%if(iAccessLevel > 1){
+					if(strPrepareToEdit.equals("1")){%>
+						<a href="javascript:EditRecord('<%=WI.fillTextValue("info_index")%>');">
+							<img src="../../../images/edit.gif" border="0"></a>
+						<font size="1">click to edit entries</font>
+					<%}else{%>
+						<a href="javascript:UpdateRecord();"><img src="../../../images/save.gif" border="0"></a>
+							<font size="1">click to save entries</font>
+					<%}
+				}else{%>
+					<font size="1">Not authorized to change information</font>
+				<%}%>
+				<a href="javascript:ReloadPage();"><img src="../../../images/cancel.gif" border="0"></a>
+					<font size="1">click to cancel/erase entries</font></font></div></td>
+		</tr>
+</table>
+<%}//end of view fields
+}//end of vBasic not null%>
+
+<%if(vRecords != null && vRecords.size() > 0){%>
+		<table width="100%" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+			<tr> 
+		  		<td height="20" colspan="6" bgcolor="#B9B292" class="thinborder" align="center">
+					<strong>::: LIST OF STUDENT RECORDS :::</strong></td>
+			</tr>
+			<tr>
+				<td height="25" width="5%" align="center" class="thinborder"><strong>Count</strong></td>				
+				<td width="15%" align="center" class="thinborder"><strong>Recorded Date</strong></td>
+				<td width="15%" align="center" class="thinborder"><strong>Updated Date</strong></td>
+				<td width="25%" align="center" class="thinborder"><strong>Updated By</strong></td>
+				<td width="20%" align="center" class="thinborder"><strong>Options</strong></td>
+			</tr>
+		<%	iCount = 1;
+			for(int i = 0; i < vRecords.size(); i+=4){%>
+			<tr>
+				<td height="25" align="center" class="thinborder"><%=iCount++%></td>			    
+			    <td class="thinborder"><%=WI.getStrValue((String)vRecords.elementAt(i+1),"&nbsp;")%></td>
+			    <td class="thinborder"><%=WI.getStrValue((String)vRecords.elementAt(i+2),"&nbsp;")%></td>
+			    <td class="thinborder"><%=WI.getStrValue((String)vRecords.elementAt(i+3),"&nbsp;")%></td>
+			    <td align="center" class="thinborder">
+				<%if(iAccessLevel > 1){%>
+					<a href="javascript:PrepareToEdit('<%=(String)vRecords.elementAt(i)%>');">
+						<img src="../../../images/edit.gif" border="0"></a>
+					<%if(iAccessLevel == 2){%>
+						&nbsp;
+						<a href="javascript:DeleteRecord('<%=(String)vRecords.elementAt(i)%>')">
+							<img src="../../../images/delete.gif" border="0"></a>
+					<%}%>
+					<a href="javascript:PrintPg('<%=(String)vRecords.elementAt(i)%>');">
+					<img src="../../../images/print.gif" border="0"></a>
+				<%}else{%>
+					No edit/delete privilege.
+				<%}%></td>
+			</tr>
+		<%}%>
+		</table>
+<%}%>
+
+
+<table  width="100%" border="0" cellpadding="0" cellspacing="0" >
+	<tr >
+		<td height="25" colspan="9" bgcolor="#FFFFFF">&nbsp;</td>
+	</tr>
+	<tr >
+		<td height="25" colspan="9" bgcolor="#697A8F" class="footerDynamic">&nbsp;</td>
+	</tr>
+</table>
+	<input type="hidden" name="no_of_fields" value="93" > <!-- get the last number of fields; used in java -->
+	<input type="hidden" name="save_entry" >
+	<input type="hidden" name="search_" >
+	
+	<input type="hidden" name="page_action">
+	<input type="hidden" name="reload_page">
+	<input type="hidden" name="info_index" value="<%=WI.fillTextValue("info_index")%>">
+	<input type="hidden" name="prepareToEdit" value="<%=strPrepareToEdit%>">
+	<input type="hidden" name="view_fields" value="<%=strViewFields%>">
+	<input type="hidden" name="print_page" >
+	<input type="hidden" name="vDate" value="87">
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

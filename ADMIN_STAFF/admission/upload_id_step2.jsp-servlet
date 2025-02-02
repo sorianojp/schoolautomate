@@ -1,0 +1,42 @@
+<html>
+<script language="JavaScript">
+var imgWnd;
+function ShowUploadingImg()
+{
+	//check if the image is having correct extension for uploading the image and also image name is entered to upload.
+	var imgURL = document.myForm.myfile.value;
+	var myNewString = new String(imgURL);
+	
+	if(myNewString.length ==0)
+	{
+		alert("Please enter  a file name with extension ."+document.myForm.img_ext.value+" to upload");
+		return false;
+	}
+	myNewString = myNewString.toLowerCase();
+	if(myNewString.indexOf("."+document.myForm.img_ext.value) == -1)
+	{
+		alert("Please enter  a file name with extension ."+document.myForm.img_ext.value+" to upload");
+		return false;
+	}
+	
+	
+	var sT = "./uploading_image.htm";
+	imgWnd=window.open(sT,"showGif",'dependent=yes,resizable=no,width=400,height=160,top=220,left=200,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	imgWnd.focus();
+	return true;
+}
+function CloseUploadingImg()
+{
+	if (imgWnd && imgWnd.open && !imgWnd.closed) imgWnd.close();
+}
+</script>
+<body onUnload="CloseUploadingImg();">
+<form action="../../servlet/ServletUploadFile?stud_id=<%=request.getParameter("stud_id")%>" method="post" 
+										enctype="multipart/form-data" name="myForm" onSubmit="return ShowUploadingImg();">
+<input type="file" name="myfile" size="80" onfocus="style.backgroundColor='#D3EBFF'" onblur="style.backgroundColor='white'">
+  <br><br>
+<input type="submit" name="s" value="Upload File >>">
+
+<input type="hidden" name="img_ext" value="<%=request.getParameter("img_ext")%>">
+</form>
+</body></html>

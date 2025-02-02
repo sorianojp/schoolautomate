@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/css/tableBorder.css" rel="stylesheet" type="text/css"></head>
+</head>
+<script language="javascript" src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/jscript/date-picker.js"></script>
+<script language="javascript">
+function ShowDetail(strPrintStat) {
+	strTBDate = document.form_.bl_date.value;
+	if(strTBDate.length == 0) {
+		alert("Please enter  cutoff date..");
+		return;
+	}
+	document.form_.print_stat.value = strPrintStat;
+	document.form_.print_pg.value = "1";
+	document.form_.submit();
+}
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.WebInterface" %>
+<form name="form_" method="post" action="/ADMIN_STAFF/accounting/reports/financial_statements/balance_sheet/bl_1st_page.jsp">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="2" align="center" bgcolor="#A49A6A"><font color="#FFFFFF">
+	  <strong>:::: ACCOUNTS PAYABLE   - POSTING TO SUBSIDIARY LEDGER PAGE ::::</strong></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td width="51%" height="37"><span style="font-size:10px;"><a href="ap_deliveries.htm"><img src="../../../../../images/go_back.gif" border="0"></a></span></td>
+      <td width="49%" align="right"><span style="font-size:10px;"><a href="subsidiary_ledger.htm" target="_blank"><img src="../../../../../images/view.gif" border="0"></a>click to VIEW COMPLETE SUPPLIER LEDGER </span></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="10">&nbsp;</td>
+      <td height="10" align="right">&nbsp;</td>
+    </tr>
+  </table>
+  <label></label>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+  <tr>
+    <td width="4%" height="25">&nbsp;</td>
+    <td width="54%">Supplier Name : </td>
+    <td width="42%" height="25">Delivery Date : </td>
+    </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td>Checked By :      </td>
+    <td height="25">Invoice # : </td>
+    </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td>Received By : </td>
+    <td height="25">PO # : </td>
+    </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" colspan="2"><u>Particulars :</u> <br>
+      <table width="98%" border="0" cellpadding="0" cellspacing="0" class="thinborder">
+        <tr>
+          <td width="10%" height="27" class="thinborder"><font size="1"><strong>ITEM # </strong></font></td>
+          <td width="9%" height="27" class="thinborder"><font size="1"><strong>QUANTITY</strong></font></td>
+          <td width="11%" height="27" class="thinborder"><font size="1"><strong>UNIT</strong></font></td>
+          <td width="43%" height="27" class="thinborder"><font size="1"><strong>ITEM/PARTICULARS/DESCRIPTION</strong></font></td>
+          <td width="14%" height="27" class="thinborder"><font size="1"><strong>UNIT PRICE</strong></font></td>
+          <td width="13%" height="27" class="thinborder"><font size="1"><strong>TOTAL</strong></font></td>
+          </tr>
+        <tr>
+          <td height="25" class="thinborder">&nbsp;</td>
+          <td height="25" class="thinborder">&nbsp;</td>
+          <td height="25" class="thinborder">&nbsp;</td>
+          <td height="25" class="thinborder">&nbsp;</td>
+          <td height="25" class="thinborder">&nbsp;</td>
+          <td height="25" class="thinborder">&nbsp;</td>
+          </tr>
+      </table></td>
+    </tr>
+</table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+  <tr> 
+    <td width="2%">&nbsp;</td>
+    <td width="50%">&nbsp;</td>
+    <td width="14%">&nbsp;</td>
+    <td width="34%">&nbsp;</td>
+    </tr>
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td height="25">Gross Amount : <strong>$total_amount 
+      <select name="select3">
+        <option>Php</option>
+        <option>US$</option>
+        <option>AUS$</option>
+        <option>Pound</option>
+      </select>
+    </strong></td>
+    <td height="25">Discount : </td>
+    <td height="25">$discount
+      <label></label></td>
+    </tr>
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td height="25">Net Payable : <strong>$gross-deductions </strong></td>
+    <td height="25">New Discount: </td>
+    <td height="25"><input name="textfield272" type="text" size="8" maxlength="8">
+      <select name="select">
+        <option>%</option>
+        <option>specific amount</option>
+          </select>
+      <label></label></td>
+    </tr>
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td height="25">Terms : <strong>$terms_in_po </strong></td>
+    <td height="25">&nbsp;</td>
+    <td height="25"><strong>$new_discount</strong></td>
+    </tr>
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+    <td height="25">Rebates : </td>
+    <td height="25"><input name="textfield2722" type="text" size="8" maxlength="8">
+      <select name="select2">
+        <option>%</option>
+        <option>specific amount</option>
+      </select>
+      <label></label></td>
+    </tr>
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td height="25"><span style="font-size:10px;"><img src="../../../../../images/save.gif" border="0">click to SAVE TO SUPPLIER LEDGER</span></td>
+    <td height="25">&nbsp;</td>
+    <td height="25"><strong>$rebate</strong></td>
+    </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25"><span style="font-size:10px;"><img src="../../../../../images/edit.gif" border="0">click to EDIT entries </span></td>
+    <td height="25">$tax_type  : </td>
+    <td height="25"><strong>$vat_tax</strong></td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25"><span style="font-size:10px;"><img src="../../../../../images/delete.gif" border="0">click to DELETE FROM LEDGER </span></td>
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25"><br>
+Reason for editing/deleting :<br>
+<textarea name="textarea" cols="32" rows="3"></textarea></td>
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+  </tr>
+</table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="17%" height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+  <input type="hidden" name="print_pg">
+  <input type="hidden" name="print_stat">
+</form>
+</body>
+</html>

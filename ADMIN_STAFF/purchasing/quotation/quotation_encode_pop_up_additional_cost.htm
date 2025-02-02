@@ -1,0 +1,322 @@
+<%@ page language="java" import="utility.*,purchasing.Quotation,java.util.Vector" %>
+<%	
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript" src="../../../jscript/date-picker.js"></script>
+<script language="JavaScript" src="../../../jscript/common.js"></script>
+<script language='JavaScript'>
+function CloseWindow(){
+	window.opener.document.form_.submit();
+	self.close();
+}
+function ReloadPage(){
+	document.form_.pageReloaded.value = "1";		
+	this.SubmitOnce('form_');
+}
+function PageAction(strAction,strIndex,strDel){
+	if(strAction == 0){
+		if(confirm('Delete '+strDel+' from quotation list?')){
+			document.form_.pageAction.value = strAction;
+			document.form_.prepToEdit.value = strIndex;
+			this.SubmitOnce('form_');
+		}
+	}
+	else{
+		document.form_.pageAction.value = strAction;
+		document.form_.prepToEdit.value = strIndex;
+		this.SubmitOnce('form_');
+	}	
+}
+</script>
+<body bgcolor="#D2AE72">
+<%
+	String strErrMsg = null;
+	String strTemp = null;
+    //add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Accounting-TRANSACTION","PR.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Accounting","TRANSACTION",request.getRemoteAddr(),
+														"PR.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+	Quotation QTN = new Quotation();		
+	Vector vReqItems = null;	
+	Vector vRetQuotedItems = null;
+	Vector vRetNonQuotedItems = null;	
+	Vector vRetResult = new Vector();
+	int iLoop = 0;
+	boolean bolIsEditErr = false;	
+	
+	if(WI.fillTextValue("pageAction").length() > 0 && !(WI.fillTextValue("pageAction")).equals("3") 
+		&& !WI.fillTextValue("pageReloaded").equals("1")){
+		vReqItems = QTN.operateOnReqItemsQtn(dbOP,request,
+			Integer.parseInt(WI.fillTextValue("pageAction")),WI.fillTextValue("strPOIndex"));
+		if(vReqItems == null){
+			strErrMsg = QTN.getErrMsg();
+			if(WI.fillTextValue("pageAction").equals("2"))
+				bolIsEditErr = true;
+		}
+		else
+			strErrMsg = "Operation Successful.";
+	}
+	if(WI.fillTextValue("supplier").length() > 0 || (WI.fillTextValue("pageAction")).equals("3")){
+		vRetResult = QTN.showSupplierInfo(dbOP,request);
+		if(vRetResult == null)
+			strErrMsg = QTN.getErrMsg();					
+	}
+	vReqItems = QTN.operateOnReqItemsQtn(dbOP,request,3,WI.fillTextValue("strIndex"));	
+	if(vReqItems == null)
+		strErrMsg = QTN.getErrMsg();
+	else{
+		vRetNonQuotedItems = (Vector)vReqItems.elementAt(0);
+		vRetQuotedItems = (Vector)vReqItems.elementAt(1);
+	}
+%>
+<form name="form_" method="post" action="./quotation_encode_pop_up.jsp">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="2" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF"><strong>:::: 
+          QUOTATION - ENCODE QUOTATION - ADDITIONAL COST PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td width="85%" height="25">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;<strong><font size="3"><%=WI.getStrValue(strErrMsg)%></font></strong> </td>
+      <td width="15%"><div align="right"><a href="javascript:CloseWindow();"> 
+          <img src="../../../images/close_window.gif" border="0"> </a></div></td>
+    </tr>
+  </table>
+  <%if(vRetResult != null && vRetNonQuotedItems != null && vRetNonQuotedItems.size() > 3){%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="4%" height="25">&nbsp;</td>
+      <td width="46%">Purchase Order No. : <strong><%=(String)vRetNonQuotedItems.elementAt(4)%></strong></td>
+      <td width="50%">PO Date : <strong><%=(String)vRetNonQuotedItems.elementAt(6)%></strong></td>
+    </tr>
+    <tr> 
+      <td height="10" colspan="3"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="100%" height="10">(NOTE : Show below all the items quoted by 
+        the selected supplier )</td>
+    </tr>
+  </table>  
+  <table width="100%" height="225" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="3%" height="25">&nbsp;</td>
+      <td colspan="3">Supplier : 
+        <%
+		if(vRetResult != null && vRetResult.size() > 3)
+			strTemp = (String)vRetResult.elementAt(2);
+		else if(WI.fillTextValue("supplier").length() > 0)
+	  		strTemp = WI.fillTextValue("supplier");
+		else
+			strTemp = "";%>
+        <select name="supplier" onChange="ReloadPage()">
+          <option value="">Select supplier</option>
+          <%=dbOP.loadCombo("PROFILE_INDEX","SUPPLIER_CODE"," from PUR_SUPPLIER_PROFILE order by SUPPLIER_CODE asc", strTemp, false)%> 
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="3"><u>Contact Information :</u></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="15%" height="25">Contact Person : </td>
+      <td> 
+        <%if(vRetResult != null && vRetResult.size() > 1){%>
+        <%=(String)vRetResult.elementAt(0)%>&nbsp; 
+        <%}else{%>
+        &nbsp; 
+        <%}%>      </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25" valign="top">Contact Nos. : </td>
+      <td height="25" valign="top"> 
+        <%if(vRetResult != null && vRetResult.size() > 1){%>
+        <%=(String)vRetResult.elementAt(1)%>&nbsp; 
+        <%}else{%>
+        &nbsp; 
+        <%}%>      </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="3"><u>Additional Cost :</u></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">Cost Name :</td>
+      <td height="25"><select name="select">
+          <option>Importation Tax</option>
+          <option>Shipping Cost</option>
+          <option>Freight Cost</option>
+          <option>Handling Cost</option>
+        </select> <img src="../../../images/update.gif" width="60" height="26"><font size="1">click 
+        to update list of Cost Name</font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">Amount :</td>
+      <td height="25"><input name="textfield" type="text" size="10">
+        <select name="select2">
+          <option>P</option>
+          <option>$</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="4"><div align="center"><font size="1"> 
+          <input type="text" name="price_quoted" class="textbox" value="<%=strTemp%>"
+	    onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"
+		onKeyUp="AllowOnlyIntegerExtn('form_','price_quoted','.')">
+          <%if(WI.fillTextValue("pageAction").equals("3") || bolIsEditErr){%>
+          <a href="javascript:PageAction(2,'<%=WI.fillTextValue("prepToEdit")%>','');"> 
+          <img src="../../../images/edit.gif" border="0"> </a> click to EDIT Additional 
+          Cost details 
+          <%}else{%>
+          <a href="javascript:PageAction(1,'<%=WI.fillTextValue("strIndex")%>','');"> 
+          <img src="../../../images/add.gif" border="0"> </a> click to ADD Additional 
+          Cost details 
+          <%}%>
+          </font></div></td>
+    </tr>
+  </table>
+  <%if(vRetQuotedItems != null && vRetQuotedItems.size() > 3){%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+    <tr bgcolor="#B9B292"> 
+      <td height="25" colspan="7" class="thinborder"><div align="center"><font color="#FFFFFF"><strong>ITEM(S) 
+          QUOTED </strong></font></div></td>
+    </tr>
+    <tr>
+      <td width="10%" class="thinborder"><div align="center"><strong>COUNT</strong></div></td>
+      <td width="20%" height="25" class="thinborder"><div align="center"><strong>SUPPLIER</strong></div></td>
+      <td width="20%" class="thinborder"><div align="center"><strong>PRICE QUOTED</strong></div></td>
+      <td width="15%" class="thinborder"><div align="center"><strong>DISCOUNT</strong></div></td>
+      <td width="15%" class="thinborder"><div align="center"><strong>FINAL UNIT PRICE</strong></div></td>
+      <td width="10%" class="thinborder"><div align="center"><strong>EDIT</strong></div></td>
+      <td width="10%" class="thinborder"><div align="center"><strong>DELETE</strong></div></td>
+    </tr>
+    <%for(iLoop = 0;iLoop < vRetQuotedItems.size();iLoop+=10){%>
+    <tr>
+      <td class="thinborder"><div align="center"><%=(iLoop+10)/10%></div></td>
+      <td height="25" class="thinborder"><div align="left"><%=(String)vRetQuotedItems.elementAt(iLoop+4)%></div></td>
+      <td class="thinborder"><div align="right"><%=(String)vRetQuotedItems.elementAt(iLoop+5)%></div></td>
+      <td class="thinborder"><div align="right">
+          <%if(((String)vRetQuotedItems.elementAt(iLoop+7)).equals("1")){%>
+          <%=CommonUtil.formatFloat(Double.parseDouble((String)vRetQuotedItems.elementAt(iLoop+6)),false)%>% 
+          <%}else{%>
+          <%=CommonUtil.formatFloat(Double.parseDouble((String)vRetQuotedItems.elementAt(iLoop+6)),true)%> 
+          <%}%>
+          </div></td>
+      <td class="thinborder"><div align="right"><%=(String)vRetQuotedItems.elementAt(iLoop+8)%></div></td>
+      <td class="thinborder"><div align="center">
+	  <a href="javascript:PageAction(3,'<%=(String)vRetQuotedItems.elementAt(iLoop+9)%>','')">
+	  <img src="../../../images/edit.gif" border="0">
+	  </a>	  
+	  </div></td>
+      <td class="thinborder"><div align="center">
+	  <a href="javascript:PageAction(0,'<%=(String)vRetQuotedItems.elementAt(iLoop+9)%>','<%=(String)vRetQuotedItems.elementAt(iLoop+4)%>')">
+	  <img src="../../../images/delete.gif" border="0">
+	  </a>
+	  </div></td>
+    </tr>
+    <%}%>
+    <tr> 
+      <td height="25" colspan="7" class="thinborder"><div align="left"><strong>TOTAL 
+          ITEM(S) : &nbsp;&nbsp;<%=((iLoop+10)/10)-1%></strong></div></td>
+    </tr>    
+  </table>
+  <%}%>
+  <%}%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td width="4%" height="25" colspan="8"><table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+          <tr bgcolor="#B9B292"> 
+            <td height="25" colspan="4" class="thinborder"><div align="center"><font color="#FFFFFF"><strong>ADDITIONAL 
+                COST FOR THIS QUOTATION</strong></font></div></td>
+          </tr>
+          <tr> 
+            <td width="26%" class="thinborder"><div align="center"><strong>COST 
+                NAME </strong></div></td>
+            <td width="50%" height="25" class="thinborder"><div align="center"><strong>AMOUNT</strong></div></td>
+            <td width="11%" class="thinborder"><div align="center"><strong>EDIT</strong></div></td>
+            <td width="13%" class="thinborder"><div align="center"><strong>DELETE</strong></div></td>
+          </tr>
+          <%for(iLoop = 0;iLoop < vRetQuotedItems.size();iLoop+=10){%>
+          <tr> 
+            <td class="thinborder"><div align="center"><%=(iLoop+10)/10%></div></td>
+            <td height="25" class="thinborder"><div align="left"><%=(String)vRetQuotedItems.elementAt(iLoop+4)%></div></td>
+            <td class="thinborder"><div align="center"> <a href="javascript:PageAction(3,'<%=(String)vRetQuotedItems.elementAt(iLoop+9)%>','')"> 
+                <img src="../../../images/edit.gif" border="0"> </a> </div></td>
+            <td class="thinborder"><div align="center"> <a href="javascript:PageAction(0,'<%=(String)vRetQuotedItems.elementAt(iLoop+9)%>','<%=(String)vRetQuotedItems.elementAt(iLoop+4)%>')"> 
+                <img src="../../../images/delete.gif" border="0"> </a> </div></td>
+          </tr>
+          <%}%>
+          <tr> 
+            <td height="25" colspan="4" class="thinborder"><div align="left"></div></td>
+          </tr>
+        </table></td>
+    </tr>
+    <tr bgcolor="#B8CDD1">
+      <td height="25" colspan="8" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table> 
+  <input type="hidden" name="strIndex" value="<%=WI.fillTextValue("strIndex")%>">
+  <input type="hidden" name="strPOIndex" value="<%=WI.fillTextValue("strPOIndex")%>">
+  <%if(vRetNonQuotedItems != null && vRetNonQuotedItems.size() > 3)
+  		strTemp = (String)vRetNonQuotedItems.elementAt(1);
+	else
+		strTemp = "";%>
+  <input type="hidden" name="qty" value="<%=strTemp%>">  
+  <input type="hidden" name="encode_pop" value="1">
+  <input type="hidden" name="pageAction" value="<%=WI.fillTextValue("pageAction")%>">
+  <input type="hidden" name="prepToEdit" value="<%=WI.fillTextValue("prepToEdit")%>">
+  <input type="hidden" name="pageReloaded" value="">
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

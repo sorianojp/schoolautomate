@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td width="100%" height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>:::: 
+          PAYROLL : REPORTS : PAY SLIPS -REGULAR MONTH PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25"><font size="1">&nbsp;</font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="100%" height="27">&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25"> Salary Month/Year :</td>
+      <td width="78%" height="25"> <select name="month_of">
+          <%=dbOP.loadComboMonth(WI.fillTextValue("month_of"))%> 
+        </select>
+        - 
+        <select name="year_of">
+          <%=dbOP.loadComboYear(WI.fillTextValue("year_of"),2,1)%> </select></td>
+    </tr>
+    <tr> 
+      <td  width="6%"height="29">&nbsp;</td>
+      <td width="16%" height="29">Salary Period :</td>
+      <td height="29"><strong> 
+        <select name="sal_period_index" style="font-weight:bold;font-size:11px" onChange="ReloadPage();">
+          <option>01-15</option>
+          <option>16-EOM</option>
+          <option>Whole Month</option>
+        </select>
+        </strong></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="3"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Payroll Category :</td>
+      <td height="25"><select name="select2">
+          <option>Teaching</option>
+          <option>Non-Teaching</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Payroll Status :</td>
+      <td height="25"><select name="select">
+          <option>Full-time</option>
+          <option>Part-time</option>
+          <option>Contractual</option>
+        </select> </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Pay Mode :</td>
+      <td height="25"><select name="select3">
+          <option>ATM</option>
+          <option>Non-ATM</option>
+          <option>All</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="3"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25"><strong><u>Print by :</u></strong></td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">College</td>
+      <td height="25"><select name="c_index" onChange="ReloadPage();">
+          <option value="">ALL</option>
+          <%=dbOP.loadCombo("c_index","c_name", " from college where is_del= 0", strCollegeIndex,false)%> 
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td height="26">Office</td>
+      <td height="26"><select name="d_index" onChange="ReloadPage();">
+          <option value="">ALL</option>
+          <%if ((strCollegeIndex.length() == 0)){%>
+          <%=dbOP.loadCombo("d_index","d_name", " from department where is_del= 0 and (c_index = 0 or c_index is null)", WI.fillTextValue("d_index"),false)%> 
+          <%}else if (strCollegeIndex.length() > 0){%>
+          <%=dbOP.loadCombo("d_index","d_name", " from department where is_del= 0 and c_index = " + strCollegeIndex , WI.fillTextValue("d_index"),false)%> 
+          <%}%>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Employee ID </td>
+      <td height="25"><input name="emp_id" type="text" size="16"maxlength="16" value="<%=WI.fillTextValue("emp_id")%>"></td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td height="26">&nbsp;</td>
+      <td height="26"><a href="javascript:SearchEmployee();"><img src="../../../../images/form_proceed.gif" border="0"></a><font size="1">click 
+        to display employee list to print.</font></td>
+    </tr>
+    <tr> 
+      <td height="10">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"></div></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2">Print Employee payroll whose lastname starts 
+        with 
+        <select name="lname_from" onChange="ReloadPage();">
+          <%
+	 strTemp = WI.fillTextValue("lname_from");
+	 int j = 0; //displays from and to to avoid conflict -- check the page ;-)
+	 for(int i=0; i<28; ++i){
+	 if(strTemp.compareTo(strConvertAlphabet[i]) ==0){
+	 j = i; %>
+          <option selected><%=strConvertAlphabet[i]%></option>
+          <%}else{%>
+          <option><%=strConvertAlphabet[i]%></option>
+          <%}
+			}%>
+        </select>
+        to 
+        <select name="lname_to">
+          <option value="0"></option>
+          <%
+			 strTemp = WI.fillTextValue("lname_to");
+			 
+			 for(int i=++j; i<28; ++i){
+			 if(strTemp.compareTo(strConvertAlphabet[i]) ==0){%>
+          <option selected><%=strConvertAlphabet[i]%></option>
+          <%}else{%>
+          <option><%=strConvertAlphabet[i]%></option>
+          <%}
+		}%>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2"><font size="3">TOTAL EMPLOYEES TO BE PRINTED 
+        : <strong><%=WI.getStrValue(strTemp,"0")%></strong></font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">PRINT OPTION 1 : </td>
+      <td height="25"><select name="print_page_range">
+          <option value="">ALL</option>
+          <%
+	  strTemp = WI.fillTextValue("print_page_range");
+	  int iTemp = vRetResult.size()/11;
+	  int iLastCount = 0;
+	  for(int i = 1; i <= iTemp;){
+	  	i += 25; //in batch of 25
+		if(i > iTemp)
+			iLastCount = iTemp;
+		else	
+			iLastCount += 25;
+		 if(strTemp.compareTo(Integer.toString(iLastCount)) == 0){%>
+          <option value="<%=iLastCount%>" selected><%=i - 25%> to <%=iLastCount%></option>
+          <%}else{%>
+          <option value="<%=iLastCount%>"><%=i - 25%> to <%=iLastCount%></option>
+          <%}
+	  }%>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">PRINT OPTION 2 : <br> <font color="#0099FF">&nbsp; </font></td>
+      <td height="25"><input name="print_option2" type="text" size="16" maxlength="32" 
+	  value="<%=WI.fillTextValue("print_option2")%>" class="textbox"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"> 
+        <font color="#0099FF" size="1"><strong>(Enter page numbers and/or page 
+        ranges separated by commas. For ex: 1,3,5-12)</strong></font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0"  bgcolor="#FFFFFF" class="thinborder">
+    <% if(vRetResult != null && vRetResult.size() > 0  ) { %>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" colspan="5" align="right"><a href="javascript:PrintALL();"> 
+        <img src="../../../../images/print.gif" border="0"></a> <font size="1">Click 
+        to print all</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B9B292" class="thinborder"> 
+      <td height="23" colspan="5" align="center"><b>LIST OF EMPLOYEES FOR PRINTING.</b></td>
+    </tr>
+    <tr bgcolor="#ffff99" class="thinborder"> 
+      <td class="thinborder" height="25" colspan="2" align="center"><strong>EMPLOYEE 
+        ID</strong></td>
+      <td class="thinborder" width="29%" align="center"><strong>EMPLOYEE NAME</strong></td>
+      <td class="thinborder" width="43%" align="center"><strong>DEPARTMENT/OFFICE</strong></td>
+      <td class="thinborder" width="8%" align="center"><strong>PRINT</strong></td>
+    </tr>
+    <% 	//System.out.println("size " +vRetResult.size());	
+	for(int i = 0,iCount=1; i < vRetResult.size(); i += 11,++iCount){		
+	%>
+    <tr bgcolor="#FFFFFF" class="thinborder"> 
+      <td class="thinborder" width="4%">&nbsp;<%=iCount%>.</td>
+      <td class="thinborder" width="16%" height="25">&nbsp;<%=(String)vRetResult.elementAt(i)%></td>
+      <td class="thinborder" >&nbsp;<%=(String)vRetResult.elementAt(i + 2)%>, 
+        <%=(String)vRetResult.elementAt(i + 1)%> </td>
+      <%if((String)vRetResult.elementAt(i + 3)== null || (String)vRetResult.elementAt(i + 4)== null){
+		  	strTemp = " ";			
+		  }else{
+		  	strTemp = " - ";
+		  }
+		%>
+      <td class="thinborder" >&nbsp; <%=WI.getStrValue((String)vRetResult.elementAt(i + 3)," ")%><%=strTemp%><%=WI.getStrValue((String)vRetResult.elementAt(i + 4)," ")%> 
+      </td>
+      <td class="thinborder" align="center"> <a href='javascript:PrintSlip("<%=(String)vRetResult.elementAt(i)%>",
+	  								"<%=WI.fillTextValue("sal_period_index")%>",
+									"<%=(String)vRetResult.elementAt(i+7)%>",
+									"<%=(String)vRetResult.elementAt(i+9)%>",
+									"<%=iCount%>","<%=WI.fillTextValue("pt_ft")%>",
+									"<%=WI.fillTextValue("is_atm")%>",
+									"<%=WI.fillTextValue("tenure_name")%>")'> 
+        </a> </td>
+    </tr><img src="../../../../images/print.gif" border="0">
+    <%} // end for loop
+	
+	} // end if vRetResult != null && vRetResult.size() %>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+  <tr>
+    <td height="30">&nbsp;</td>
+  </tr>
+</table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="94%" height="25">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

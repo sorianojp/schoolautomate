@@ -1,0 +1,307 @@
+<%@ page language="java" import="utility.*,java.util.Vector,payroll.PReDTRME" %>
+<%
+	WebInterface WI = new WebInterface(request);//to make sure , i call the dynamic opener form name to reload when close window is clicked.
+boolean bolIsSchool = false;
+if( (new CommonUtil().getIsSchool(null)).equals("1"))
+	bolIsSchool = true;
+String[] strColorScheme = CommonUtil.getColorScheme(6);
+//strColorScheme is never null. it has value always.
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Faculty Substitutions for WNU</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+.bgDynamic {
+	background-color:<%=strColorScheme[1]%>
+}
+.footerDynamic {
+	background-color:<%=strColorScheme[2]%>
+}
+</style>
+</head>
+<script language="JavaScript" src="../../../../jscript/common.js"></script>
+<script language="JavaScript" src="../../../../jscript/date-picker.js"></script>
+<script language="JavaScript" src="../../../../Ajax/ajax.js"></script>
+<script language="JavaScript">
+function ReloadPage()
+{
+	document.form_.searchEmployee.value="";
+	document.form_.print_page.value="";
+	this.SubmitOnce("form_");
+}
+
+function SearchEmployee(){	
+	document.form_.searchEmployee.value="1";
+	document.form_.print_page.value="";
+	this.SubmitOnce("form_");
+}
+
+function checkAllSave() {
+	var maxDisp = document.form_.emp_count.value;
+	//unselect if it is unchecked.
+	if(!document.form_.selAllSave.checked) {
+		for(var i =1; i< maxDisp; ++i)
+			eval('document.form_.save_'+i+'.checked=false');
+	}
+	else {
+		for(var i =1; i< maxDisp; ++i)
+			eval('document.form_.save_'+i+'.checked=true');
+	}
+}
+
+function PrintPg() {
+	document.form_.print_page.value = "1";
+	this.SubmitOnce('form_');
+}
+
+function DeleteRecord(){
+  var vProceed = confirm('Remove selected records?');
+  if(vProceed){
+		document.form_.page_action.value = "0";
+		document.form_.searchEmployee.value = "1";
+		document.form_.print_page.value = "";
+		this.SubmitOnce("form_");
+  }	
+}
+
+function SaveData() {
+	document.form_.page_action.value = "1";
+	document.form_.print_page.value = "";
+	document.form_.searchEmployee.value = "1";
+	document.form_.save.disabled = true;
+	document.form_.submit();
+//	this.SubmitOnce('form_');
+}
+
+function CancelRecord(){
+	document.form_.page_action.value = "";
+	document.form_.print_page.value = "";
+	this.SubmitOnce('form_');
+}
+
+function CopyHour(){
+	var vItems = document.form_.emp_count.value;
+	if (vItems.length == 0)
+		return;			
+	for (var i = 1 ; i < eval(vItems);++i)
+		eval('document.form_.period_units_'+i+'.value=document.form_.period_units_1.value');			
+
+}
+
+function CopyMin(){
+	var vItems = document.form_.emp_count.value;
+	if (vItems.length == 0)
+		return;			
+	for (var i = 1 ; i < eval(vItems);++i)
+		eval('document.form_.min_work_'+i+'.value=document.form_.min_work_1.value');			
+}
+function OpenSearch() {
+	var pgLoc = "../../../../search/srch_emp.jsp?opner_info=form_.emp_id";
+	var win=window.open(pgLoc,"PrintWindow",'width=900,height=600,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+function loadDept() {
+		var objCOA=document.getElementById("load_dept");
+ 		var objCollegeInput = document.form_.c_index[document.form_.c_index.selectedIndex].value;
+		
+		this.InitXmlHttpObject(objCOA, 2);//I want to get innerHTML in this.retObj
+  		if(this.xmlHttp == null) {
+			alert("Failed to init xmlHttp.");
+			return;
+		}
+		///if blur, i must find one result only,, if there is no result foud
+		var strURL = "../../../../Ajax/AjaxInterface.jsp?methodRef=112&col_ref="+objCollegeInput+
+								 "&sel_name=d_index&all=1";
+		this.processRequest(strURL);
+}
+</script>
+
+<%
+	DBOperation dbOP = null;
+	String strErrMsg = null;
+	String strTemp = null;
+	String strTemp2 = null;
+	boolean bolProceed = true;
+	String strHasWeekly  = null;
+	boolean bolHasConfidential = false;	
+	boolean bolHasTeam = false;	
+	
+//add security here.
+if (WI.fillTextValue("print_page").length() > 0){%>
+	<jsp:forward page="./faculty_sem_subs_print.jsp" />
+	<% 
+return;}
+
+try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Payroll-DTR-Faculty Substitution(Sem)WNU","faculty_sem_subs_wnu.jsp");
+
+		ReadPropertyFile readPropFile = new ReadPropertyFile();
+		strHasWeekly = readPropFile.getImageFileExtn("PAYROLL_WEEKLY","0");
+		
+		bolHasConfidential = (readPropFile.getImageFileExtn("HAS_CONFIDENTIAL","0")).equals("1");
+		bolHasTeam = (readPropFile.getImageFileExtn("HAS_TEAMS","0")).equals("1");		
+	}
+catch(Exception exp)
+	{
+		exp.printStackTrace();
+		if(strErrMsg == null)
+			strErrMsg = "Error in opening DB Connection.";
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3"><%=strErrMsg%></font></p>
+		<%
+		return;
+	}
+
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Payroll","DTR",request.getRemoteAddr(),
+														"faculty_sem_subs_wnu.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+	Vector vRetResult = null;
+	PReDTRME prEdtrME = new PReDTRME();
+	int iSearchResult = 0;
+	int i = 0;
+	String strPayrollPeriod  = null;
+	if(bolIsSchool)
+		strTemp = "College";
+	else
+		strTemp = "Division";
+	String[] astrSortByName    = {"Employee ID","Firstname","Lastname",strTemp,"Department"};
+	String[] astrSortByVal     = {"id_number","user_table.fname","lname","c_name","d_name"};
+	String strPageAction = WI.fillTextValue("page_action");
+	String[] astrConvertSem = {"Summer","1st Semester","2nd Semester","3rd Trimester"};
+	if(strPageAction.length() > 0){
+		if(prEdtrME.operateOnFacultyPeriods(dbOP, request, Integer.parseInt(strPageAction)) == null){
+			strErrMsg = prEdtrME.getErrMsg();
+		} else {
+			if(strPageAction.equals("1"))
+				strErrMsg = "Schedule successfully posted.";		
+			if(strPageAction.equals("0")){
+				strErrMsg = "Schedule successfully removed.";		
+			}			
+		}
+	}
+	
+	if(WI.fillTextValue("searchEmployee").length() > 0){
+	  vRetResult = prEdtrME.operateOnFacultyPeriods(dbOP,request, 4);
+		if(vRetResult == null)
+			strErrMsg = prEdtrME.getErrMsg();
+		else
+			iSearchResult = prEdtrME.getSearchCount();
+	}	
+%>
+<body bgcolor="#D2AE72" class="bgDynamic">
+<form action="encode_faculty_periods.jsp" method="post" name="form_">
+  <% if (vRetResult != null &&  vRetResult.size() > 0) {%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0"  bgcolor="#FFFFFF" class="thinborder">
+    <tr> 
+      <td height="20" colspan="6" align="center" bgcolor="#B9B292" class="thinborder"><strong>LIST OF EMPLOYEES</strong></td>
+    </tr>
+    
+    <tr>
+      <td width="3%" class="thinborder">&nbsp;</td>
+      <td width="12%" class="thinborder">&nbsp;</td>
+      <td width="35%" height="23" align="center" class="thinborder"><strong><font size="1">EMPLOYEE NAME </font></strong></td>
+      <td width="31%" align="center" class="thinborder"><strong><font size="1">DEPARTMENT/OFFICE</font></strong></td>
+      <td width="7%" align="center" class="thinborder"><strong><font size="1">Periods<br>
+      <a href="javascript:CopyHour();">Copy all</a></font></strong></td>
+      <td width="5%" align="center" class="thinborder"><font size="1"><strong>SELECT ALL<br>
+        </strong>
+        <input type="checkbox" name="selAllSave" value="0" onClick="checkAllSave();" checked>
+      </font></td>
+    </tr>
+    <% int iCount = 1;
+		for (i = 0; i < vRetResult.size(); i+=13,iCount++){ %>
+    <tr>
+      <td class="thinborder"><span class="thinborderTOPLEFT">&nbsp;<%=iCount%></span></td>
+      <td class="thinborder">&nbsp;<%=(String)vRetResult.elementAt(i+1)%></td> 
+      <td height="25" class="thinborder"><font size="1"><strong>&nbsp;&nbsp;<%=WI.formatName((String)vRetResult.elementAt(i+2), (String)vRetResult.elementAt(i+3),
+							(String)vRetResult.elementAt(i+4), 4).toUpperCase()%></strong></font>							</td>
+			<input type="hidden" name="_period_index_<%=iCount%>" value="<%=vRetResult.elementAt(i+10)%>">							
+			<input type="hidden" name="user_<%=iCount%>" value="<%=vRetResult.elementAt(i)%>">
+			
+      <%if((String)vRetResult.elementAt(i + 5)== null || (String)vRetResult.elementAt(i + 6)== null){
+		  	strTemp = " ";			
+		  }else{
+		  	strTemp = " - ";
+		  }
+		%>							
+      <td class="thinborder">&nbsp; <%=WI.getStrValue((String)vRetResult.elementAt(i + 5),"")%><%=strTemp%><%=WI.getStrValue((String)vRetResult.elementAt(i + 6),"")%> </td>
+		<%
+			strTemp = "";
+			if(WI.fillTextValue("with_schedule").equals("1"))
+				strTemp = (String)vRetResult.elementAt(i + 7);
+			strTemp = WI.getStrValue(strTemp,"0");
+			
+			if(Double.parseDouble(strTemp) == 0d)
+				strTemp = "";
+		%>			
+      <td class="thinborder"><div align="center"><strong> 
+        <input name="period_units_<%=iCount%>" type="text" class="textbox" size="4" maxlength="6" 
+	      onKeypress=" if(event.keyCode<46 || event.keyCode== 47 || event.keyCode > 57) event.returnValue=false;"
+				value="<%=strTemp%>" style="text-align:right" >
+      </strong></div></td>
+		<%
+			strTemp = "";
+			if(WI.fillTextValue("with_schedule").equals("1"))
+				strTemp = (String)vRetResult.elementAt(i + 9);
+			strTemp = WI.getStrValue(strTemp,"0");
+			
+			if(Double.parseDouble(strTemp) == 0d)
+				strTemp = "";
+		%>			
+      <td align="center" class="thinborder">        <input type="checkbox" name="save_<%=iCount%>" value="1" checked tabindex="-1">      </td>
+    </tr>
+    <%} //end for loop%>
+    <tr>
+      <td height="25" colspan="6"><div align="center">
+        <input type="button" name="save" value=" Save " style="font-size:11px; height:28px;border: 1px solid #FF0000;" onClick="javascript:SaveData();">
+        <font size="1"> click to save entries</font>
+          <%if((WI.fillTextValue("with_schedule")).equals("1")){%>
+            <input type="button" name="delete" value=" Delete " style="font-size:11px; height:28px;border: 1px solid #FF0000;" onClick="javascript:DeleteRecord();">
+            <font size="1"> Click to delete selected </font>
+          <%}%>
+          <input type="button" name="cancel" value=" Cancel " style="font-size:11px; height:28px;border: 1px solid #FF0000;" onClick="javascript:CancelRecord();">
+          <font size="1"> click to cancel or go previous</font></div></td>
+    </tr>
+    <input type="hidden" name="emp_count" value="<%=iCount%>">
+  </table>
+<% } // end vRetResult != null && vRetResult.size() > 0 %>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25"  colspan="3" bgcolor="#FFFFFF">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25"  colspan="3" bgcolor="#A49A6A" class="footerDynamic">&nbsp;</td>
+    </tr>
+  </table>
+  <input type="hidden" name="print_page">
+  <input type="hidden" name="searchEmployee" > 
+  <input type="hidden" name="page_action">	
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

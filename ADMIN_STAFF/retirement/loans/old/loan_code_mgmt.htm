@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td width="100%" height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>::::RETIREMENT 
+          - LOANS - LOAN CODE MGMT PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25"><font size="1">&nbsp;</font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="2%">&nbsp;</td>
+      <td width="16%" height="27">School Year</td>
+      <td width="30%" height="27"><input name="textfield6" type="text" size="4" maxlength="4">
+        to 
+        <input name="textfield62" type="text" size="4" maxlength="4"></td>
+      <td width="9%">Semester</td>
+      <td colspan="2"><select name="select2">
+          <option>1st Semester</option>
+          <option>2nd Semester</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="27">Loan Type</td>
+      <td height="27"><select name="select3">
+          <option>Regular Retirement Fund</option>
+          <option>Emergency </option>
+        </select></td>
+      <td height="27">Loan Code :</td>
+      <td height="27" colspan="2"><strong><font color="#0000FF">$loancode</font></strong></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="27">Interest :</td>
+      <td height="27"><input name="textfield3" type="text" size="8" maxlength="8"> 
+        <select name="select4">
+          <option>amount</option>
+          <option>%</option>
+        </select> <select name="select5">
+          <option>per annum</option>
+          <option>per month</option>
+          <option>per day</option>
+        </select></td>
+      <td height="27" colspan="2"> Date of 1st Interest payment: </td>
+      <td width="32%"><font size="1"> 
+        <select name="select7">
+          <option>January</option>
+          <option>February</option>
+          <option>March</option>
+          <option>April</option>
+          <option>May</option>
+          <option>June</option>
+          <option>July</option>
+          <option>August</option>
+          <option>September</option>
+          <option>October</option>
+          <option>November</option>
+          <option>December</option>
+        </select>
+        <select name="select8">
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
+          <option>10</option>
+          <option>11</option>
+          <option>12</option>
+          <option>13</option>
+        </select>
+        </font></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="27">&nbsp;</td>
+      <td height="27">&nbsp;</td>
+      <td height="27" colspan="2">&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td height="27">&nbsp;</td>
+      <td height="27" colspan="4"><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/save.gif" border="0"></a>click 
+        to save entries <a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/cancel.gif" border="0"></a>click 
+        to cancel/clear entries </font></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td height="27">&nbsp;</td>
+      <td height="27" colspan="4"><div align="right"><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/print.gif" border="0"></a>click 
+          to print list </font></div></td>
+    </tr>
+  </table>
+  <table width="100%" border="1" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#BBBC81"> 
+      <td height="30" colspan="7"><div align="center"><strong><font color="#FFFFFF">:: 
+          LIST OF EXISTING LOAN CODE ::</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td width="10%" height="25"><div align="center"><font size="1">OPTIONS</font></div></td>
+      <td width="11%" height="25"><div align="center"><font size="1">LOAN CODE</font></div></td>
+      <td width="12%"><div align="center"><font size="1">SCHOOL YEAR</font></div></td>
+      <td width="14%"><div align="center"><font size="1">SEMESTER</font></div></td>
+      <td width="24%"><div align="center"><font size="1">LOAN TYPE</font></div></td>
+      <td width="10%" height="25"><div align="center"><font size="1">INTEREST</font></div></td>
+      <td width="19%"><div align="center"><font size="1">DATE OF 1ST INT. PAYMENT</font></div></td>
+    </tr>
+    <tr>
+      <td height="25"><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/edit.gif" border="0"></a><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../images/delete.gif" border="0"></a></font></td>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="94%" height="25">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

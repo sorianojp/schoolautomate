@@ -1,0 +1,12 @@
+a:hover {
+	font-weight: bolder;
+}
+a:link {
+	color: #CC0000;
+}
+a:active {
+	color: #CC0000;
+}
+a:visited {
+	color: #CC0000;
+}

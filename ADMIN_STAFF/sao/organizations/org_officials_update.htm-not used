@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<%
+	String strTemp = request.getParameter("stud_id");
+	if(strTemp == null) strTemp = "";
+%>
+<form action="../stud_track/./per_track_page2.jsp" method="post" name="offlineRegd">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="2"><div align="center"><font color="#FFFFFF" ><strong>::::
+          ORGANIZATIONS - EDIT OFFICIALS PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr >
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="98%"><a href="edit_org.jsp"><img src="../../../images/go_back.gif" width="50" height="27" border="0"></a></td>
+    </tr>
+  </table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="3">Set of officers for the year : <input name="textfield3" type="text" size="4">
+        to 
+        <input name="textfield32" type="text" size="4"></td>
+    </tr>
+    <tr> 
+      <td width="3%" height="24">&nbsp;</td>
+      <td width="25%">Position :</td>
+      <td colspan="2"><select name="select">
+        </select> <a href="add_org_update_officials.htm"><img src="../../../images/update.gif" width="60" height="26" border="0"></a> 
+      </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Stud ID :</td>
+      <td height="25" colspan="2"><input type="text" name="textfield2"> <a href="add_org_update_officials.htm"><img src="../../../images/search.gif" width="31" height="22" border="0"></a></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+  </table>
+
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr >
+      <td height="25" colspan="7"><div align="center"></div></td>
+      <td width="26%" height="25"><img src="../../../images/save.gif" width="48" height="28">
+        <font size="1">click to save entries &nbsp;</font></td>
+      <td width="60%" height="25"><img src="../../../images/cancel.gif" width="51" height="26">
+        <font size="1">click to cancel or clear entries &nbsp;</font></td>
+    </tr>
+	</table>
+
+
+  <table bgcolor="#FFFFFF" width="100%" border="1" cellpadding="0" cellspacing="0">
+    <tr>
+      <td height="25" colspan="6" bgcolor="#B9B292"><div align="center"><font color="#FFFFFF"><strong>LIST
+          OF OFFICERS FOR SCHOOL YEAR $school_year</strong></font></div></td>
+    </tr>
+    <tr>
+      <td width="18%" height="25"><div align="center"><font size="1"><strong>POSITION</strong></font></div></td>
+      <td width="35%"><div align="center"><font size="1"><strong>OFFICIAL NAME</strong></font></div></td>
+      <td width="32%"><div align="center"><font size="1"><strong>COURSE/MAJOR</strong></font></div></td>
+      <td width="11%"><div align="center"><font size="1"><strong>YEAR</strong></font></div></td>
+      <td width="2%"><div align="center"><font size="1"></font></div>&nbsp;</td>
+      <td width="2%"><div align="center"><font size="1"></font></div>&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><img src="../../../images/edit.gif" width="40" height="26"></td>
+      <td><img src="../../../images/delete.gif" width="55" height="28"></td>
+    </tr>
+  </table>
+
+
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr >
+      <td height="25" colspan="9">&nbsp;</td>
+    </tr>
+    <tr >
+      <td height="25" colspan="9" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

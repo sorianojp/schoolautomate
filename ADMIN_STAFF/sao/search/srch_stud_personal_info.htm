@@ -1,0 +1,800 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Search Student</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript">
+function PrintPage(strStudId)
+{
+ 	var vProceed = confirm("Please keep your printer ready and click <OK> to print.if you are not ready to print, please click cancel.");
+	var sT = "#";
+	if(vProceed)
+		sT = "./residency_status_print.jsp?stud_id="+escape(strStudId);
+
+	//print here
+	if(vProceed)
+	{
+		var win=window.open(sT,"PrintWindow",'scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+		win.focus();
+	}
+}
+</script>
+
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,GradeSystem,java.util.Vector" %>
+<%
+
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	String strErrMsg = null;
+	String strTemp = null;
+	WebInterface WI = new WebInterface(request);
+	Vector vTemp = null;
+	int i=0; int j=0;
+	int iYear = 0;
+	int iSem  = 0;
+	int iTempYear = 0;
+	int iTempSem = 0;
+
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_veiwall.jsp","While Opening DB Con");
+
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+GradeSystem GS = new GradeSystem();
+vTemp = GS.getResidencySummary(dbOP,request.getParameter("stud_id"));
+if(vTemp == null)
+	strErrMsg = GS.getErrMsg();
+else
+{
+	//do something.
+}
+
+if(strErrMsg == null) strErrMsg = "";
+String[] astrConvertYear ={"","1st Year","2nd Year","3rd Year","4th Year","5th Year","6th Year","7th Year"};
+String[] astrConvertSem = {"Summer","1st Sem","2nd Sem","3rd Sem","4th Sem"};
+String strResidencyStatus = null;
+%>
+<form action="file:///C|/ApacheTomcat4.0/webapps/schoolbliz_vmuf/ADMIN_STAFF/registrar/residency/./residency_status.jsp" method="post">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="4" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF"><strong>:::: 
+          SEARCH INFO FROM GSPIS PAGE ::::</strong></font></div></td>
+    </tr>
+	</table>
+
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25" colspan="7">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td  width="2%"height="25">&nbsp;</td>
+      <td width="18%">Search Data Type</td>
+      <td colspan="3"><select name="select14">
+          <option>Personal Data</option>
+          <option>Alien Status Data</option>
+          <option>Residence Data</option>
+          <option>Physical Description</option>
+          <option>Family Data</option>
+          <option>Educational Background</option>
+          <option>General Qualification</option>
+        </select></td>
+      <td width="54%" colspan="2"><img src="../../../images/form_proceed.gif" width="81" height="21"></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="7"><hr size="1"></td>
+    </tr>
+	</table>
+   
+   
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="12%" valign="bottom">Nationality</td>
+      <td width="27%" valign="bottom">&nbsp; </td>
+      <td colspan="2" valign="bottom">Birthdate (Month) </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td><select name="select">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select></td>
+      <td><input type="text" name="textfield"></td>
+      <td width="20%"><select name="select21">
+          <option>January</option>
+          <option>February</option>
+          <option>March</option>
+        </select></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td valign="bottom">Religion</td>
+      <td valign="bottom">&nbsp;</td>
+      <td valign="bottom">Age</td>
+      <td width="39%" valign="bottom">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td><select name="select7">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select></td>
+      <td><input type="text" name="textfield2"></td>
+      <td><select name="select3">
+          <option>Equal to</option>
+          <option>Less than</option>
+          <option>More than</option>
+        </select> <input name="textfield5" type="text" size="3"></td>
+      <td><select name="select5">
+          <option>Equal to</option>
+          <option>Less than</option>
+          <option>More than</option>
+        </select> <input name="textfield52" type="text" size="3"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td valign="bottom">Gender </td>
+      <td valign="bottom">&nbsp;</td>
+      <td colspan="2" valign="bottom">Date of Birth</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td><select name="select6">
+          <option>Female</option>
+          <option>Male</option>
+        </select></td>
+      <td>&nbsp;</td>
+      <td><font size="1">From </font> <input name="textfield4323" type="text" size="10"> 
+        <img src="../../../images/calendar.gif" width="18" height="20"> </td>
+      <td><font size="1">From </font> <input name="textfield43235" type="text" size="10"> 
+        <img src="../../../images/calendar.gif" width="18" height="20"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td valign="bottom">Civil Status</td>
+      <td valign="bottom">&nbsp;</td>
+      <td valign="bottom">Birth Order</td>
+      <td valign="bottom">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td><select name="select2">
+          <option>Single</option>
+          <option>Married</option>
+          <option>Divorced</option>
+          <option>Widow</option>
+        </select></td>
+      <td>&nbsp;</td>
+      <td><select name="select8">
+          <option>1st</option>
+          <option>2nd</option>
+          <option>3rd</option>
+          <option>4th</option>
+          <option>5th</option>
+          <option>6th</option>
+          <option>7th</option>
+          <option>8th</option>
+          <option>9th</option>
+          <option>10th</option>
+          <option>11th</option>
+          <option>12th</option>
+          <option>13th</option>
+          <option>14th</option>
+          <option>15th</option>
+          <option>16th</option>
+        </select></td>
+      <td>&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5"><hr size="1"></td>
+    </tr>
+  </table>
+  
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td colspan="4">Visa Status 
+        <select name="select15">
+        </select> <font size="1">&lt;list will come from table&gt;</font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td width="21%" valign="bottom">Passport Expiration</td>
+      <td width="24%" valign="bottom">&nbsp; </td>
+      <td width="21%" valign="bottom">Authorized Stay</td>
+      <td width="32%">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td><font size="1">From </font> <input name="textfield4323" type="text" size="10"> 
+        <img src="../../../images/calendar.gif" width="18" height="20"> </td>
+      <td><font size="1">From </font> <input name="textfield43235" type="text" size="10"> 
+        <img src="../../../images/calendar.gif" width="18" height="20"></td>
+      <td><font size="1">From </font> <input name="textfield4323" type="text" size="10"> 
+        <img src="../../../images/calendar.gif" width="18" height="20"> </td>
+      <td><font size="1">From </font> <input name="textfield43235" type="text" size="10"> 
+        <img src="../../../images/calendar.gif" width="18" height="20"></td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td valign="bottom">ACR Expiration</td>
+      <td valign="bottom">&nbsp; </td>
+      <td valign="bottom">CRTS Expiration</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td><font size="1">From </font> <input name="textfield4323" type="text" size="10"> 
+        <img src="../../../images/calendar.gif" width="18" height="20"> </td>
+      <td><font size="1">From </font> <input name="textfield43235" type="text" size="10"> 
+        <img src="../../../images/calendar.gif" width="18" height="20"></td>
+      <td><font size="1">From </font> <input name="textfield4323" type="text" size="10"> 
+        <img src="../../../images/calendar.gif" width="18" height="20"> </td>
+      <td><font size="1">From </font> <input name="textfield43235" type="text" size="10"> 
+        <img src="../../../images/calendar.gif" width="18" height="20"></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5"><hr size="1"></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="2"><u>Home Address:</u></td>
+      <td colspan="2"><u>Current Contact Address &amp; Relation:</u></td>
+    </tr>
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="15%" valign="bottom">Municipality/City</td>
+      <td width="32%" valign="bottom">&nbsp; </td>
+      <td width="15%" valign="bottom">Municipality/City</td>
+      <td width="36%" valign="bottom">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td colspan="2" valign="bottom"><select name="select20">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield3" type="text" size="16"></td>
+      <td colspan="2" valign="bottom"><select name="select24">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield34" type="text" size="16"></td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td valign="bottom">Province</td>
+      <td valign="bottom">&nbsp; </td>
+      <td valign="bottom">Province</td>
+      <td valign="bottom">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td colspan="2" valign="bottom"><select name="select22">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield32" type="text" size="16"></td>
+      <td colspan="2" valign="bottom"><select name="select25">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield35" type="text" size="16"></td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td valign="bottom">Country</td>
+      <td valign="bottom">&nbsp; </td>
+      <td valign="bottom">Country</td>
+      <td valign="bottom">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="2" valign="bottom"><select name="select23">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield33" type="text" size="16"></td>
+      <td colspan="2" valign="bottom"><select name="select26">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield36" type="text" size="16"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="2" valign="bottom">&nbsp;</td>
+      <td valign="bottom">Relation</td>
+      <td valign="bottom">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="2" valign="bottom">&nbsp;</td>
+      <td colspan="2" valign="bottom"><select name="select27">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> </td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5"><hr size="1"></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="15%" valign="bottom">Height (cms)</td>
+      <td width="32%" valign="bottom">&nbsp; </td>
+      <td width="15%" valign="bottom">Eye Color</td>
+      <td width="36%" valign="bottom">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td colspan="2" valign="bottom"><select name="select16">
+          <option>Equal to</option>
+          <option>Less than</option>
+          <option>More than</option>
+        </select> <input name="textfield3" type="text" size="4"> <select name="select17">
+          <option>Equal to</option>
+          <option>Less than</option>
+          <option>More than</option>
+        </select> <input name="textfield37" type="text" size="4"> </td>
+      <td colspan="2" valign="bottom"><select name="select19">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield332" type="text" size="16"></td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td valign="bottom">Weight</td>
+      <td valign="bottom">&nbsp; </td>
+      <td valign="bottom">Hair color</td>
+      <td valign="bottom">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td colspan="2" valign="bottom"><select name="select18">
+          <option>Equal to</option>
+          <option>Less than</option>
+          <option>More than</option>
+        </select> <input name="textfield38" type="text" size="4"> <select name="select18">
+          <option>Equal to</option>
+          <option>Less than</option>
+          <option>More than</option>
+        </select> <input name="textfield372" type="text" size="4"></td>
+      <td colspan="2" valign="bottom"><select name="select29">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield334" type="text" size="16"></td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td valign="bottom">Built</td>
+      <td valign="bottom">&nbsp; </td>
+      <td valign="bottom">Complexion</td>
+      <td valign="bottom">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="2" valign="bottom"><select name="select28">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield333" type="text" size="16"> </td>
+      <td colspan="2" valign="bottom"><select name="select30">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield335" type="text" size="16"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="2" valign="bottom"> <br>
+        Other Distinguishing Features <br></td>
+      <td colspan="2" valign="bottom">Physical Handicap or Disability </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="2" valign="bottom"><select name="select31">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield3332" type="text" size="20"></td>
+      <td colspan="2" valign="bottom"><select name="select32">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield33322" type="text" size="20"> </td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5"><hr size="1"></td>
+    </tr>
+  </table>
+  
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="47%" valign="bottom">Father's Name</td>
+      <td width="51%" colspan="2" valign="bottom">Father's Occupation </td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td valign="bottom"><select name="select33">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield3333" type="text" size="20"></td>
+      <td colspan="2" valign="bottom"><select name="select41">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield33333" type="text" size="20"> </td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td valign="bottom">Mother's Name</td>
+      <td colspan="2" valign="bottom">Mother's Occupation </td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td valign="bottom"><select name="select42">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield33222" type="text" size="20"></td>
+      <td colspan="2" valign="bottom"><select name="select43">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield332222" type="text" size="20"></td>
+    </tr>
+    <tr>
+      <td height="24">&nbsp;</td>
+      <td valign="bottom">Brother(s)/Sister(s) Name</td>
+      <td colspan="2" valign="bottom">Brother(s)/Sister(s) School </td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td valign="bottom"><select name="select34">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield33332" type="text" size="20"></td>
+      <td colspan="2" valign="bottom"><select name="select44">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield333323" type="text" size="28"></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="4"><hr size="1"></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="47%" valign="bottom">Year Graduated</td>
+      <td width="51%" colspan="2" valign="bottom">School Graduated
+        <select name="select38">
+          <option>Elementary</option>
+          <option>High School</option>
+          <option>College</option>
+          <option>Post Grad</option>
+          <option>Vocational</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td valign="bottom"><select name="select36">
+          <option>Equal to</option>
+          <option>Less than</option>
+          <option>More than</option>
+        </select> <input name="textfield39" type="text" size="4"> <select name="select36">
+          <option>Equal to</option>
+          <option>Less than</option>
+          <option>More than</option>
+        </select> <input name="textfield373" type="text" size="4"></td>
+      <td colspan="2" valign="bottom"><select name="select37">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield333322" type="text" size="28"> </td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td valign="bottom">Honors/Awards</td>
+      <td colspan="2" valign="bottom">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="24">&nbsp;</td>
+      <td valign="bottom"><select name="select35">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield3322" type="text" size="20"></td>
+      <td colspan="2" valign="bottom">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="4"><hr size="1"></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="15%" height="25" valign="bottom">Languages</td>
+      <td width="32%" height="25" valign="bottom">&nbsp;</td>
+      <td width="15%" height="25" valign="bottom">Sports</td>
+      <td width="36%" height="25" valign="bottom">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2" valign="bottom"><select name="select39">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield3334" type="text" size="16"> </td>
+      <td height="25" colspan="2" valign="bottom"><select name="select19">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield332" type="text" size="16"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" valign="bottom">Hobbies</td>
+      <td height="25" valign="bottom">&nbsp; </td>
+      <td height="25" colspan="2"> <br>
+        Honors/Awards/Merits</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2" valign="bottom"><select name="select40">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield33342" type="text" size="16"></td>
+      <td height="25" colspan="2" valign="bottom"><select name="select29">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield334" type="text" size="16"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" valign="bottom">Skills</td>
+      <td height="25" valign="bottom">&nbsp; </td>
+      <td height="25" colspan="2" valign="bottom">Extra-Curricular Activities 
+      </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2" valign="bottom"><select name="select28">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield333" type="text" size="16"> </td>
+      <td height="25" colspan="2" valign="bottom"><select name="select30">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield335" type="text" size="16"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2" valign="bottom"> <br>
+        Talents<br></td>
+      <td height="25" colspan="2" valign="bottom">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="2" valign="bottom"><select name="select31">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select> <input name="textfield3332" type="text" size="20"></td>
+      <td colspan="2" valign="bottom">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="5"><hr size="1"></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td  width="2%" height="25">&nbsp;</td>
+      <td width="8%">Sort by</td>
+      <td width="19%"><select name="select4">
+          <option>Student ID</option>
+          <option>Lastname</option>
+          <option>Firstname</option>
+          <option>Gender</option>
+          <option>Year Level</option>
+          <option>Course</option>
+        </select>
+      </td>
+      <td width="20%"><select name="select12">
+          <option>Student ID</option>
+          <option>Lastname</option>
+          <option>Firstname</option>
+          <option>Gender</option>
+          <option>Year Level</option>
+          <option>Course</option>
+        </select>
+      </td>
+      <td width="51%"><select name="select13">
+          <option>Student ID</option>
+          <option>Lastname</option>
+          <option>Firstname</option>
+          <option>Gender</option>
+          <option>Year Level</option>
+          <option>Course</option>
+        </select>
+      </td>
+      <td width="0%">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><select name="select9">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+      <td><select name="select10">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+      <td><select name="select11">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><img src="../../../images/form_proceed.gif" width="81" height="21"></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="25" colspan="3"><div align="right"><a href="srch_stud_personal_info_print.htm"><img src="../../../images/print.gif" width="58" height="26" border="0"></a> 
+          <font size="1">click to print result</font></div></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="3" bgcolor="#B9B292"><div align="center"><strong><font color="#FFFFFF">SEARCH
+          RESULT</font></strong></div></td>
+    </tr>
+    <tr>
+      <td width="54%" height="25"><b>Total Result : <%=iSearchResult%> - Showing(<%=SM.strDispRange%>)</b></td>
+      <td width="15%"><div align="right"><img src="../../../images/form_proceed.gif" width="81" height="21"></div></td>
+      <td width="31%"><div align="right">Jump To page:
+          <select name="jumpto" onChange="goToNextSearchPage();">
+            <%
+			strTemp = request.getParameter("jumpto");
+			if(strTemp == null || strTemp.trim().length() ==0) strTemp = "0";
+
+			for( int i =1; i<= iPageCount; ++i )
+			{
+				if(i == Integer.parseInt(strTemp) ){%>
+            <option selected value="<%=i%>"><%=i%> of <%=iPageCount%></option>
+            <%}else{%>
+            <option value="<%=i%>"><%=i%> of <%=iPageCount%></option>
+            <%
+					}
+			}
+			%>
+          </select>
+          <%}%>
+        </div></td>
+    </tr>
+  </table>
+
+
+  <table  bgcolor="#FFFFFF" width="100%" border="1" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td  width="11%" height="25" ><div align="center"><strong><font size="1">STUDENT 
+          ID</font></strong></div></td>
+      <td width="17%"><div align="center"><strong><font size="1">LASTNAME</font></strong></div></td>
+      <td width="19%"><div align="center"><strong><font size="1">FIRSTNAME</font></strong></div></td>
+      <td width="4%"><div align="center"><strong><font size="1">MI</font></strong></div></td>
+      <td width="33%"><div align="center"><strong><font size="1">COURSE/MAJOR</font></strong></div></td>
+      <td width="5%"><div align="center"><strong><font size="1">YEAR LEVEL</font></strong></div></td>
+      <td width="5%"><div align="center"><strong><font size="1">SELECT</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">&nbsp;</font></td>
+      <td height="25">&nbsp;</td>
+      <td><font size="1">&nbsp;</font></td>
+      <td>&nbsp;</td>
+      <td><font size="1">&nbsp;</font></td>
+      <td><font size="1">&nbsp;</font></td>
+      <td><div align="center"><font size="1">&nbsp; 
+          <input type="radio" name="radiobutton" value="radiobutton">
+          </font></div></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF"width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="69%" height="25"><div align="right"><img src="../../../images/form_proceed.gif" width="81" height="21"></div></td>
+      <td width="31%">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td><div align="right"><a href="srch_stud_personal_info_print.htm"><img src="../../../images/print.gif" width="58" height="26" border="0"></a> 
+          <font size="1">click to print result</font></div></td>
+    </tr>
+  </table>
+
+  <table  bgcolor="#999900" width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+  </tr>
+</table>
+
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

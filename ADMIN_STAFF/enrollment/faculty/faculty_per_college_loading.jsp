@@ -1,0 +1,454 @@
+<%
+String strSchCode = (String)request.getSession(false).getAttribute("school_code");
+if(strSchCode == null)
+	strSchCode = "";
+
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript" src="../../../jscript/common.js"></script>
+<script language="JavaScript">
+function ReloadPage()
+{
+	document.form_.print_all.value ="";
+	document.form_.print_pg.value = "";
+	if(document.form_.sy_to.value.length < 4 || document.form_.sy_from.value.length < 4) {
+		alert("Please enter Schoolyear information first.");
+		return;
+	}
+	this.SubmitOnce("form_");
+}
+function CallPrint()
+{
+	document.form_.print_all.value ="";
+	document.form_.print_pg.value = "1";
+	this.SubmitOnce("form_");
+}
+function NextPage() {
+	location = "./teaching_load_slip_per_college.jsp?sy_from="+document.form_.sy_from.value+
+	"&sy_to="+document.form_.sy_to.value+
+	"&semester="+document.form_.semester[document.form_.semester.selectedIndex].value;
+}
+function PrintALL() {
+	document.form_.print_all.value ="1";
+	document.form_.print_pg.value = "1";
+	this.SubmitOnce("form_");
+}
+function PrintPg(id_number)
+{
+	var loadPg = "";
+	<%if(!strSchCode.startsWith("SPC") && !strSchCode.startsWith("SWU") && !strSchCode.startsWith("UB")){%>
+		loadPg = "./teaching_load_slip_per_college_print.jsp";
+	<%}else{
+		if(strSchCode.startsWith("SWU")){%>
+			loadPg = "./teaching_load_slip_per_college_print_swu.jsp";
+		<%}else if(strSchCode.startsWith("UB")){%>
+			loadPg = "./teaching_load_slip_print_ub.jsp";
+		<%}else{%>
+			if(document.form_.show_teacher_copy && document.form_.show_teacher_copy.checked)
+				loadPg = "./teaching_load_slip_per_college_print_spc_tc.jsp";
+			else	
+				loadPg = "./teaching_load_slip_per_college_print_spc_fc.jsp";
+		<%}
+	}%>
+	
+	loadPg += "?emp_id="+id_number+
+			"&sy_from="+document.form_.sy_from.value+
+			"&sy_to="+document.form_.sy_to.value+
+			"&c_index="+document.form_.c_index.value+
+			"&d_index="+document.form_.d_index.value+
+			"&semester="+document.form_.semester[document.form_.semester.selectedIndex].value;
+	if(document.form_.show_enroll_stud){
+		var strTemp = "";
+		if(document.form_.show_enroll_stud.checked)
+			strTemp = "1";
+		loadPg += "&show_enroll_stud="+strTemp;
+	}
+	if(document.form_.show_sub_desc){
+		var strTemp = "";
+		if(document.form_.show_sub_desc.checked)
+			strTemp = "1";
+		loadPg += "&show_sub_desc="+strTemp;
+	}
+	
+	var win=window.open(loadPg,"myfile",'dependent=no,width=800,height=450,top=20,left=20,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,java.util.Vector,EnrlReport.StatementOfAccount, enrollment.FacultyManagementExtn" %>
+<%
+
+	DBOperation dbOP = null;
+	String strErrMsg = null;
+	String strTemp = null;
+
+	WebInterface WI = new WebInterface(request);
+
+	int iAccessLevel = 0;
+	java.util.Hashtable svhAuth = (java.util.Hashtable)request.getSession(false).getAttribute("svhAuth");
+	if(svhAuth == null)
+		iAccessLevel = -1; // user is logged out.
+	else if (svhAuth.size() == 1 && svhAuth.get("ALL") != null)//super user.
+		iAccessLevel = Integer.parseInt(WI.getStrValue(svhAuth.get("ALL"),"0"));
+	else {
+		iAccessLevel = Integer.parseInt(WI.getStrValue(svhAuth.get("ENROLLMENT-FACULTY"),"0"));
+		if(iAccessLevel == 0) {
+			iAccessLevel = Integer.parseInt(WI.getStrValue(svhAuth.get("ENROLLMENT"),"0"));
+		}
+		if(iAccessLevel == 0) {
+			iAccessLevel = Integer.parseInt(WI.getStrValue(svhAuth.get("ENROLLMENT-FACULTY-SUMMARY LOAD"),"0"));
+		}
+	}
+	if(iAccessLevel == -1) {//for fatal error.
+		request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+		request.getSession(false).setAttribute("errorMessage","You are already logged out. Please login again.");
+		response.sendRedirect("../../../commfile/fatal_error.jsp");
+		return;
+	}
+	else if(iAccessLevel == 0) {//NOT AUTHORIZED.
+		response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+		return;
+	}
+
+
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Enrollment-FACULTY-Teaching Load Slip","admission_slip_main.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+/**
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Enrollment","FACULTY",request.getRemoteAddr(),
+														"admission_slip_main.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+**/
+//end of authenticaion code.
+
+
+
+
+String[] astrConvertTerm = {"Summer","1st Sem","2nd Sem","3rd Sem","4th Sem"};
+//get here the list of student to be printed if the print by course is selected.
+Vector vRetResult = null;
+StatementOfAccount SOA = new StatementOfAccount();
+FacultyManagementExtn  fm = new FacultyManagementExtn();
+if(WI.fillTextValue("print_by").compareTo("1") == 0) {
+	vRetResult = fm.getFacultLoadBatchPrint(dbOP, request);
+	if(vRetResult == null)
+		strErrMsg = SOA.getErrMsg();
+}
+
+
+//if print all - i have to print all one by one..
+Vector vEmployeeList = new Vector();
+int iCount = 0;
+
+if(WI.fillTextValue("print_all").compareTo("1") == 0 && vRetResult != null && vRetResult.size() > 0){
+	int iMaxPage = vRetResult.size()/3;
+	if(WI.fillTextValue("print_option2").length() > 0) {
+		int[] aiPrintPg = SOA.getPrintPage(WI.fillTextValue("print_option2"),iMaxPage);
+		if(aiPrintPg == null)
+			strErrMsg = SOA.getErrMsg();
+		else {//print here.
+			for(int i = 0; i < aiPrintPg.length; ++i,++iCount)
+				vEmployeeList.addElement(vRetResult.elementAt(aiPrintPg[i] * 4 - 3));
+		}
+	}
+	else {//enter this only if page number is selected. -- but call the above only if page range in enter in the input box.
+		int iPrintRangeTo = Integer.parseInt(WI.getStrValue(WI.fillTextValue("print_page_range"),"0"));
+		int iPrintRangeFr = iPrintRangeTo - 25; 
+		if(iPrintRangeFr < 1) 
+			iPrintRangeFr = 0;
+		if(iPrintRangeTo == iMaxPage && iMaxPage %25 > 0) //i can't subtract just like that.. i have to find the last page count.
+			iPrintRangeFr = iMaxPage - iMaxPage%25;
+		
+		iCount = 0;
+		for(int i = 0; i < vRetResult.size(); i += 4,++iCount) {
+			if(iPrintRangeTo > 0) {
+				if( (iCount + 1) < iPrintRangeFr || (iCount + 1) > iPrintRangeTo)
+						continue;
+			}
+			vEmployeeList.addElement((String)vRetResult.elementAt(i+1));
+		}//end of for loop.
+
+	}//end if print_option2 is not entered.
+
+}//end if print is called.
+
+if(vEmployeeList.size() > 0) {
+	
+	request.getSession(false).setAttribute("emp_list", vEmployeeList);
+	
+	
+	if(!strSchCode.startsWith("SWU")){		
+		request.getSession(false).setAttribute("dbOP_", dbOP);
+		response.sendRedirect("./teaching_load_slip_per_college_print_batch.jsp?sy_from="+WI.fillTextValue("sy_from")+"&sy_to="+WI.fillTextValue("sy_to")+"&semester="+
+			WI.fillTextValue("semester")+
+			"&show_teacher_copy="+WI.fillTextValue("show_teacher_copy")+
+			"&show_sub_desc="+WI.fillTextValue("show_sub_desc")+
+			"&show_enroll_stud="+WI.fillTextValue("show_enroll_stud"));
+	}else{		
+		dbOP.cleanUP();	
+		response.sendRedirect("./teaching_load_slip_per_college_print_swu.jsp?batch_print=1&sy_from="+WI.fillTextValue("sy_from")+"&sy_to="+WI.fillTextValue("sy_to")+
+			"&semester="+WI.fillTextValue("semester")+"&c_index="+WI.fillTextValue("c_index")+"&d_index="+WI.fillTextValue("d_index"));
+	}
+	return;
+}
+
+
+%>
+
+<form name="form_" action="./faculty_per_college_loading.jsp" method="post">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" ><strong>::::
+          PRINT DETAILED FACULTY LOAD PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="3"><b><%=WI.getStrValue(strErrMsg)%></b></font></td>
+    </tr>
+	</table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td width="17%" height="25">SY/TERM</td>
+      <td height="25" colspan="3"> <%
+strTemp = WI.fillTextValue("sy_from");
+if(strTemp.length() ==0)
+	strTemp = (String)request.getSession(false).getAttribute("cur_sch_yr_from");
+%> <input name="sy_from" type="text" size="4" maxlength="4" value="<%=strTemp%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"
+	  onKeyUp='DisplaySYTo("form_","sy_from","sy_to")'>
+        to
+        <%
+strTemp = WI.fillTextValue("sy_to");
+if(strTemp.length() ==0)
+	strTemp = (String)request.getSession(false).getAttribute("cur_sch_yr_to");
+%> <input name="sy_to" type="text" size="4" maxlength="4" value="<%=strTemp%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"
+	  readonly="yes"> <select name="semester">
+          <option value="0">Summer</option>
+          <%
+strTemp = WI.fillTextValue("semester");
+if(strTemp.length() ==0)
+	strTemp = (String)request.getSession(false).getAttribute("cur_sem");
+if(strTemp.compareTo("1") ==0){%>
+          <option value="1" selected>1st Sem</option>
+          <%}else{%>
+          <option value="1">1st Sem</option>
+          <%}if(strTemp.compareTo("2") == 0){%>
+          <option value="2" selected>2nd Sem</option>
+          <%}else{%>
+          <option value="2">2nd Sem</option>
+          <%}if(strTemp.compareTo("3") == 0){%>
+          <option value="3" selected>3rd Sem</option>
+          <%}else{%>
+          <option value="3">3rd Sem</option>
+          <%}%>
+        </select> &nbsp;&nbsp;&nbsp;&nbsp; <a href="javascript:ReloadPage();"><img src="../../../images/form_proceed.gif" border="0"></a></td>
+    </tr>
+    <tr>
+      <td width="4%" height="35">&nbsp;</td>
+      <td height="25">Print by </td>
+      <td width="18%" height="25"><select name="print_by" onChange="ReloadPage();">
+          <option value="0">Employee</option>
+          <%
+strTemp = WI.fillTextValue("print_by");
+if(strTemp.compareTo("1") ==0){%>
+          <option value="1" selected>College / Dept</option>
+          <%}else{%>
+          <option value="1">College / Dept</option>
+          <%}%>
+        </select></td>
+      <td width="14%">&nbsp;</td>
+      <td width="47%">&nbsp;</td>
+    </tr>
+    <%
+strTemp = WI.fillTextValue("print_by");
+if(strTemp.compareTo("1") != 0){%>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp; </td>
+      <td height="25">&nbsp; </td>
+      <td height="25"><a href="javascript:NextPage();">NEXT PAGE</a></td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <%}else{%>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25"> College</td>
+      <td height="25" colspan="3"><select name="c_index" onChange="ReloadPage();">
+          <option value="">Select Any</option>
+          <%
+//for all course listing strTemp = " from course_offered where IS_DEL=0 AND IS_VALID=1 order by course_name asc"
+strTemp = " from college where IS_DEL=0 order by c_name asc";
+%>
+          <%=dbOP.loadCombo("c_index","c_name",strTemp, request.getParameter("c_index"), false)%>
+        </select></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">Dept / Office</td>
+      <td height="25" colspan="3"> <select name="d_index">
+          <option value="">ALL</option>
+          <%
+	strTemp = request.getParameter("c_index");
+	if(strTemp != null && strTemp.length() != 0)
+	{
+		strTemp = " from department where is_del=0 and c_index="+strTemp ;
+	} else{
+		strTemp = " from department where is_del = 0 and (c_index = 0 or c_index is null)";
+	}
+%>
+          <%=dbOP.loadCombo("d_index","d_name",strTemp, request.getParameter("d_index"), false)%>
+        </select></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <%
+if(vRetResult != null && vRetResult.size() > 0){%>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="4"><font size="3">TOTAL INSTRUCTORS TO BE PRINTED
+        : <strong><%=vRetResult.size()/4%></strong></font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">PRINT OPTION 1</td>
+      <td height="25" colspan="3"> <select name="print_page_range">
+          <option value="">ALL</option>
+          <%
+	  strTemp = WI.fillTextValue("print_page_range");
+	  int iTemp = vRetResult.size()/4;
+	  int iLastCount = 0;
+	  for(int i = 1; i <= iTemp;){
+	  	i += 25; //in batch of 25
+		if(i > iTemp)
+			iLastCount = iTemp;
+		else
+			iLastCount += 25;
+		 if(strTemp.compareTo(Integer.toString(iLastCount)) == 0){%>
+          <option value="<%=iLastCount%>" selected><%=i - 25%> to <%=iLastCount%></option>
+          <%}else{%>
+          <option value="<%=iLastCount%>"><%=i - 25%> to <%=iLastCount%></option>
+          <%}
+	  }%>
+        </select></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td valign="top">PRINT OPTION 2</td>
+      <td height="25" colspan="3" valign="top"><input name="print_option2" type="text" size="16" maxlength="32"
+	  value="<%=WI.fillTextValue("print_option2")%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+        <br> <font color="#0099FF"> <strong>(Enter page numbers and/or page ranges
+        separated by commas. For ex: 1,3,5-12)</strong></font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="3"> <a href="javascript:CallPrint()"><img border="0" src="../../../images/form_proceed.gif">
+        </a> <font size="1">click to display instructor list to print.</font></td>
+    </tr>
+    <%}//only if vRetResult is not null;
+
+	}//if print_by is not student
+%>
+  </table>
+<%
+if(vRetResult != null && vRetResult.size() > 0 && WI.fillTextValue("print_pg").compareTo("1") == 0){%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="1" bgcolor="#000000">
+    <tr bgcolor="#FFFFFF">
+      <td height="25" colspan="6" align="right">
+	  <%if(strSchCode.startsWith("UB")){%>
+	  <input type="checkbox" name="show_enroll_stud" value="1">Show no. of enrolled student
+	  &nbsp;&nbsp;
+	  <input type="checkbox" name="show_sub_desc" value="1">Show subject description
+	  <%}
+	  if(strSchCode.startsWith("SPC")){%>
+	  	<input type="checkbox" name="show_teacher_copy" value="checked" <%=WI.fillTextValue("show_teacher_copy")%>> Show Teacher's Copy
+	  <%}%>
+	  
+	  <a href="javascript:PrintALL();">
+        <img src="../../../images/print.gif" border="0"></a> <font size="1">Click
+        to print</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    </tr>
+    <tr bgcolor="#999999">
+      <td height="25" colspan="6" align="center"><B>LIST OF FACULTIES FOR PRINTING.</B></td>
+    </tr>
+    <tr bgcolor="#ffff99">
+      <td height="25" align="center">&nbsp;</td>
+      <td height="25" align="center"><font size="1"><strong>EMPLOYEE ID</strong></font></td>
+      <td height="25" align="center"><font size="1"><strong>FACULTY NAME</strong></font></td>
+      <td width="29%" align="center"><font size="1"><strong>COLLEGE :: DEPARTMENT</strong></font></td>
+      <td width="11%" align="center"><font size="1"><strong>TOTAL LOAD</strong></font></td>
+      <td width="10%" align="center"><font size="1"><strong>PRINT</strong></font></td>
+    </tr>
+    <%iCount=1;
+ for(int i = 0; i < vRetResult.size(); i += 4,++iCount){%>
+    <tr bgcolor="#FFFFFF">
+      <td width="3%"><%=iCount%>.</td>
+      <td width="14%">&nbsp;<%=(String)vRetResult.elementAt(i + 1)%></td>
+      <td width="33%" height="26">&nbsp;&nbsp;<%=WI.getStrValue((String)vRetResult.elementAt(i + 2))%></td>
+      <td>&nbsp;<%=(String)vRetResult.elementAt(i)%></td>
+      <td>&nbsp;<%=(String)vRetResult.elementAt(i+3)%></td>
+      <td align="center"><a href='javascript:PrintPg("<%=(String)vRetResult.elementAt(i+1)%>");'><img src="../../../images/print.gif" border="0"></a></td>
+    </tr>
+    <%}%>
+  </table>
+<%}//end of vRetResult display.
+%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#A49A6A">
+      <td height="25">&nbsp;</td>
+    </tr>
+  </table>
+  <input type="hidden" name="print_pg" value="">
+  <input type="hidden" name="print_all" value="">
+</form>
+
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

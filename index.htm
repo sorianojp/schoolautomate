@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Colegio de Dagupan - School Automate</title>
+<script language="javascript" type="text/javascript">
+
+</script>
+<style type="text/css">
+body{
+    margin:50px 0px 50px 0px;
+	background:url('images/finalbackground.jpg') no-repeat;
+	background-size: 100%;	
+}
+
+#container_cdd{
+	width:810px;
+	background-image:url(images/cdd_banner.png);
+	background-repeat:no-repeat;
+	height:475px;
+}
+
+#menu_cdd{
+	float:right;
+	margin:150px 70px 0px 0px;
+}
+
+#menu_cdd a{
+	margin:3px 0px 3px 0px;
+}
+
+</style>
+<script language="javascript" type="text/javascript">
+	function gethover(t, m){
+		if(t==1)
+			document.images["n"+m].src = "images/"+m+"_on.png";
+		else
+			document.images["n"+m].src = "images/"+m+"_off.png";		
+	}
+</script>
+</head>
+
+<body>
+<div align="center">
+
+<div id="container_cdd">
+	<div id="menu_cdd"> 
+    <a href="administrators/administrators_index.htm"><img src="images/1_off.png" name="n1" border="0" onmouseover="gethover(1,1)" onmouseout="gethover(0,1)" /></a><br />
+
+      <a href="ADMIN_STAFF/admin_staff_index.htm"><img src="images/2_off.png" name="n2" border="0"  onmouseover="gethover(1,2)" onmouseout="gethover(0,2)" /></a><br />
+
+
+      <a href="faculty_acad/faculty_acad_index.htm"><img src="images/4_off.png" name="n4" border="0" onmouseover="gethover(1,4)" onmouseout="gethover(0,4)" /></a><br />
+
+
+
+      <a href="PARENTS_STUDENTS/parents_student_index.htm"><img src="images/3_off.png" name="n3" border="0" onmouseover="gethover(1,3)" onmouseout="gethover(0,3)" /></a><br />
+
+    </div>
+</div>
+
+</div>
+</body>
+</html>

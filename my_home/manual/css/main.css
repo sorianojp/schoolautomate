@@ -1,0 +1,252 @@
+@charset "UTF-8";
+*
+{
+    margin:0;
+    padding:0;
+}
+body
+{
+    background: rgb(213,213,213);
+    font: normal normal 16px/18px Georgia, 'Times New Roman', serif;
+}
+p
+{
+    font:normal normal 1em/1.5em Georgia, 'Times New Roman', serif;
+    margin:15px 20px;
+    color: rgb(130,90,40);
+}
+p.sub
+{
+    margin:15px 40px;
+}
+h1,h2,h3
+{
+    color:rgb(90,90,90);
+}
+#book #pagewrapper h1
+{
+    margin:20px;
+}
+h3,h4
+{
+    margin:10px 20px;
+    font: italic bold 1em/1.2em Arial, sans-serif;
+    color:rgb(50,50,50);
+
+}
+#book
+{
+    overflow:hidden;
+    width:850px;
+    margin:10px auto;
+    padding-bottom:100px;
+}
+#book h1 a
+{
+    margin:0;
+    font:normal normal .9em/.6em Arial;
+    text-decoration:none;
+    color: rgb(90,90,90);
+
+}
+#book h1 a img
+{
+    border:none;
+}
+#book h2.booktitle
+{
+    padding:5px 10px;
+    display:block;
+    font:normal bold 1em Arial;
+    width:250px;
+    background: rgb(240,230,240);
+    border:1px solid rgb(200,200,200);
+    border-bottom:2px solid rgb(140,140,140);
+
+}
+.booknav .nav
+{
+    background:rgb(230,230,230) url('../nav_bg.gif') repeat-x;
+    padding:5px;
+    width:250px;
+    border:1px solid rgb(200,200,200);
+    font-size:.9em;
+}
+
+#book div.subnav
+{
+    float:left;
+    margin-top:0px;
+    margin-left:20px;
+    width:300px;
+    font:normal normal .8em Arial;
+
+}
+#book div.subnav ul
+{
+    list-style:none;
+    margin-left:25px;
+    margin-top:0;
+}
+#book div.subnav ul ul
+{
+    margin:0 0 0 15px;
+}
+#book div.subnav ul li
+{
+    margin:10px 10px;
+}
+#book div.subnav ul li a
+{
+    text-decoration:none;
+    color:rgb(90,90,100);
+}
+
+#book div.subnav ul ul
+{
+    border-left:1px solid rgb(200,200,200);
+}
+#book div.subnav ul ul li
+{
+    border-bottom:1px solid rgb(200,200,200);
+    margin:5px 0;
+    padding: 5px;
+}
+#book div.subnav ul ul ul li
+{
+    border:none;
+    margin:3px 0;
+    padding: 2px;
+    font-size:.95em;
+}
+#book div.subnav ul ul li a
+{
+    color:rgb(130,90,90);
+}
+
+#book #pagewrapper
+{
+    position:relative;
+    top:20px;
+    overflow:hidden;
+    background: url('../bookcover.gif') center no-repeat;
+}
+#book #pagecontainer
+{
+    float:right;
+
+    font-size:.8em;
+    width:480px;
+    height:630px;
+    margin:20px;
+}
+
+#book #pagecontainer .page
+{
+    position:absolute;
+    width:480px;
+    height:610px;
+    overflow:auto;
+    margin-top:10px;
+
+}
+#book #pagecontainer .page p em
+{
+    font-weight:bold;
+    font-style:italic;
+    color: rgb(30,30,30);
+}
+#book #pagecontainer .page table
+{
+    margin:20px;
+    font:normal normal .9em/1.3em arial, sans-serif;
+    color: rgb(60,60,60);
+    border-collapse:collapse;
+}
+#book #pagecontainer .page table tr td
+{
+    border:1px solid rgb(130,130,130);
+    padding:5px 15px;
+}
+#book #pagecontainer .page ul
+{
+    margin:20px 35px;
+}
+#book #pagecontainer .page ul li
+{
+    margin:5px;
+    list-style:outside disc;
+    font:normal normal 1em/1.5em Arial, sans-serif;
+    color: rgb(130,90,40);
+}
+
+
+#book #pagecontainer div .title
+{
+    padding:3px;
+}
+
+#book div h1
+{
+    font-size:1.6em;
+    line-height:1.1em;
+    font-family: Arial, Verdana, sans-serif;
+}
+#book div h2
+{
+    margin:0 20px;
+    font-size:1.2em;
+    font-family: Arial, Verdana, sans-serif;
+}
+#footer
+{
+    color:rgb(180,180,180);
+    font:normal normal .7em/1.2em 'MS Trebuchet', Verdana, Arial, sans-serif;
+    width:850px;
+    margin:0 auto;
+    text-align:center;
+    border-top:1px solid rgb(200,200,200);
+    padding:15px;
+    margin-bottom:40px;
+}
+
+div ol
+{
+    list-style: outside decimal;
+    margin:15px 45px;
+    color: rgb(130,90,40);
+    font-size:.9em;
+
+}
+div ol li
+{
+    margin:15px 0;
+}
+h2.serious
+{
+    color:rgb(255,0,0);
+}
+ol.offenses
+{
+    list-style:outside upper-roman
+}
+ol.offenses ol li
+{
+    margin:5px;
+    font-size:1.1em;
+}
+#pagecontainer .page table#tableofoffenses tr td
+{
+    font-size:1em;
+    line-height:1.2em;
+    padding:5px 10px;
+}
+#pagecontainer .page table#tableofoffenses tr td h1
+{
+    font-size: 1.2em;
+    margin:0;
+}
+#pagecontainer .page table#tableofoffenses tr td.serious
+{
+    color:red;
+}

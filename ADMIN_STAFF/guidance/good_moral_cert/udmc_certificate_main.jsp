@@ -1,0 +1,339 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+</head>
+<script language="javascript" src="../../../Ajax/ajax.js"></script>
+<script language="javascript" src="../../../jscript/common.js"></script>
+<script language="javascript" src="../../../jscript/date-picker.js"></script>
+<script language="javascript">
+function PageAction(strAction, strInfoIndex) {
+	if(strAction == "0") {
+		if(!confirm("Do you want to delete referral information?"))
+			return;
+	}
+	if(strInfoIndex.length > 0)
+		document.form_.info_index.value = strInfoIndex;
+	document.form_.page_action.value = strAction;
+	if(strAction.length == 0) { 
+		document.form_.preparedToEdit.value = "";
+		document.form_.info_index.value = "";
+	}
+}
+function PreparedToEdit(strInfoIndex) {
+//	alert("I am here.");
+	document.form_.preparedToEdit.value = "1";
+	document.form_.info_index.value = strInfoIndex;
+	document.form_.page_action.value = "";
+}
+function StudSearch() {
+	var pgLoc = "../../../search/srch_stud.jsp?opner_info=form_.stud_id";
+	var win=window.open(pgLoc,"PrintWindow",'width=800,height=600,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+function viewList(table,indexname,colname,labelname,tablelist,strIndexes, strExtraTableCond,strExtraCond,strFormField){
+	var loadPg = "../../HR/hr_updatelist.jsp?tablename=" + table + "&indexname=" + indexname + "&colname=" + colname+"&label="+escape(labelname)+"&table_list="+escape(tablelist)+
+	"&indexes="+escape(strIndexes)+"&extra_tbl_cond="+escape(strExtraTableCond)+"&extra_cond="+escape(strExtraCond) +
+	"&opner_form_name=form_&opner_form_field="+strFormField;
+	
+	var win=window.open(loadPg,"myfile",'dependent=yes,width=650,height=350,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+var AjaxCalledPos;
+function AjaxMapName(strPos) {
+		AjaxCalledPos = strPos;
+		if(strPos == "1") {
+			document.getElementById("stud_info1").innerHTML = "...";
+			document.getElementById("stud_info2").innerHTML = "...";
+		}
+		
+		var strCompleteName;
+		if(strPos == "1")
+			strCompleteName = document.form_.stud_id.value;
+		else	
+			strCompleteName = document.form_.emp_id.value;
+			
+		if(strCompleteName.length == 0)
+			return;
+		
+		var objCOAInput;
+		if(strPos == "1")
+			objCOAInput = document.getElementById("coa_info");
+		else	
+			objCOAInput = document.getElementById("coa_info2");
+			
+		this.InitXmlHttpObject(objCOAInput, 2);//I want to get innerHTML in this.retObj
+  		if(this.xmlHttp == null) {
+			alert("Failed to init xmlHttp.");
+			return;
+		}
+		var strURL = "../../../Ajax/AjaxInterface.jsp?methodRef=2&search_id=1&name_format=4&complete_name="+
+			escape(strCompleteName);
+		if(strPos == "2")
+			strURL += "&is_faculty=1";
+		//if(document.form_.account_type[1].checked) //faculty
+		//	strURL += "&is_faculty=1";
+		//alert(strURL);
+		this.processRequest(strURL);
+}
+function UpdateID(strID, strUserIndex) {
+	if(AjaxCalledPos == "2"){
+		document.form_.emp_id.value = strID;
+		return;
+	}
+	document.form_.stud_id.value = strID;
+	document.form_.stud_id.focus();
+	
+	document.getElementById("stud_info1").innerHTML = " == Press press enter to load information. == ";
+	document.getElementById("stud_info2").innerHTML = " == Press press enter to load information. == ";
+	//alert(strUserIndex);
+	document.form_.submit();
+}
+function UpdateName(strFName, strMName, strLName) {
+	//var strName = strLName.toUpperCase() +", "+strFName+" "+strMName.charAt(0);
+	//document.form_.charge_to_name.value = strName;
+}
+function UpdateNameFormat(strName) {
+	if(AjaxCalledPos == "1")
+		document.getElementById("coa_info").innerHTML = strName;
+	else	
+		document.getElementById("coa_info2").innerHTML = strName;
+}
+
+function PrintCertification() {
+	if(document.form_.stud_id.value == '') {
+		alert("Please enter student ID.");
+		return;
+	}
+	var pgLoc = "";
+/**
+	var obj = document.form_.offense_stat;
+	if(obj[0].checked)
+		pgLoc = "&offense_stat=0";
+	else if(obj[1].checked)
+		pgLoc = "&offense_stat=1";
+	else {
+		alert("Please select offense status - with offense or without offense.");
+		return;
+	}
+**/
+	var obj = document.form_.print_con;
+	if(obj[0].checked)
+		pgLoc += "&print_con=0";
+	else if(obj[1].checked)
+		pgLoc += "&print_con=1";
+	//else if(obj[2].checked)
+	//	pgLoc += "&print_con=2";
+	else {
+		alert("Please select print condition - Good moral with or without GWA");
+		return;
+	}
+	
+	pgLoc = "./udmc_certificate_print.jsp?stud_id="+document.form_.stud_id.value+pgLoc;
+	var win=window.open(pgLoc,"PrintWindow",'width=800,height=600,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+</script>
+<body bgcolor="#663300">
+<%@ page language="java" import="utility.*,osaGuidance.GDStudReferralFollowUp,java.util.Vector" %>
+<%
+	DBOperation dbOP = null;
+	WebInterface WI  = new WebInterface(request);
+
+	String strTemp   = null;
+	String strErrMsg = null;
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Accounting-Administration","cgh_certificate_main.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Guidance & Counseling","GOOD MORAL CERTIFICATION",request.getRemoteAddr(),
+														"udmc_certificate_main.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+//end of authenticaion code.
+
+String strStudID    = WI.fillTextValue("stud_id");
+String strStudIndex = null;
+String strSQLQuery  = null;
+
+Vector vRetResult   = null;
+
+java.sql.ResultSet rs = null;
+Vector vStudInfo      = new Vector();
+
+if(strStudID.length() > 0) {
+	strSQLQuery = "select user_index, fname, mname, lname from user_table where id_number = '"+
+		strStudID+"'";
+	rs = dbOP.executeQuery(strSQLQuery);
+	if(rs.next()) {
+		vStudInfo.addElement(WebInterface.formatName(rs.getString(1), rs.getString(2), rs.getString(3), 4));
+		strStudIndex = rs.getString(1);
+	}
+	rs.close();
+	if(vStudInfo.size() > 0) {
+		strSQLQuery = "select course_offered.course_code,major_name,sy_from,semester, year_level from stud_curriculum_hist "+
+			"join course_offered on (course_offered.course_index = stud_curriculum_hist.course_index) "+
+			"left join major on (major.major_index = stud_curriculum_hist.major_index) "+
+			"join semester_sequence on (semester_val = semester)"+
+			" where stud_curriculum_hist.is_valid = 1 and stud_curriculum_hist.user_index = "+strStudIndex+
+			" order by sy_from desc, semester desc";
+		rs = dbOP.executeQuery(strSQLQuery);
+		if(rs.next()) {
+			if(rs.getString(2) != null) 
+				vStudInfo.addElement(rs.getString(1) +" :: "+rs.getString(2));
+			else
+				vStudInfo.addElement(rs.getString(1));
+			vStudInfo.addElement(rs.getString(3)+" - "+rs.getString(4));	
+		}
+		rs.close();
+		if(vStudInfo.size() == 1)
+			strErrMsg = "Student enrollment information not found.";
+	}
+}
+
+if(vStudInfo.size() > 1) {
+	osaGuidance.ViolationConflict VC = new osaGuidance.ViolationConflict();
+	request.setAttribute("show_all_sem","1");
+	vRetResult = VC.operateOnViolation(dbOP, request,4);
+}
+
+boolean bolWithOffense = false;
+if(vRetResult != null && vRetResult.size() > 0) 
+	bolWithOffense = true;
+%>
+<form action="./udmc_certificate_main.jsp" method="post" name="form_" onSubmit="SubmitOnceButton(this);">
+  <table width="100%" border="0" cellpadding="0" cellspacing="1" bgcolor="#FFFFFF">
+    <tr>
+     <td width="100%" height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF"><strong>:::: 
+          </strong></font><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>GOOD 
+          MORAL CERTIFICATION</strong></font><font color="#FFFFFF"> <strong>PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr >
+      <td height="25" style="font-size:14px; color:#FF0000; font-weight:bold">&nbsp;&nbsp;&nbsp;<%=WI.getStrValue(strErrMsg)%></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="5%" height="25">&nbsp;</td>
+      <td width="22%">Student ID</td>
+      <td width="73%">
+	  	<input name="stud_id" type="text"  value="<%=WI.fillTextValue("stud_id")%>" class="textbox"
+	  		onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" 
+			onKeyUp="AjaxMapName('1');"><input type="image" src="../../../images/blank.gif" border="0">
+	  </td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="1" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td valign="top"> Student Name</td>
+      <td height="25"><label id="coa_info" style="font-size:11px; font-weight:bold; color:#0000FF"><%if(vStudInfo != null && vStudInfo.size() > 0){%><%=vStudInfo.elementAt(0)%><%}%></label></td>
+    </tr>
+    <tr> 
+      <td  width="5%"height="25">&nbsp;</td>
+      <td width="22%" height="25">Course</td>
+      <td height="25"><strong><label id="stud_info1"><%if(vStudInfo != null && vStudInfo.size() > 1){%><%=vStudInfo.elementAt(1)%><%}%></label></strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">SY/Term</td>
+      <td width="73%" height="25"><strong><label id="stud_info2"><%if(vStudInfo != null && vStudInfo.size() > 1){%><%=vStudInfo.elementAt(2)%><%}%></label></strong></td>
+    </tr>
+<%if(vStudInfo.size() > 1) {//only if student information exists... %>
+    <tr> 
+      <td height="10" colspan="3"><hr size="1"></td>
+    </tr>
+    <tr>
+      <td height="10" colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="10">&nbsp;</td>
+      <td height="10">Printing Condition  </td>
+      <td height="10">
+	  <input name="print_con" type="radio" value="0"> 
+	  Graduate without GWA
+      <input name="print_con" type="radio" value="1"> 
+      Graduate	with GWA </td>
+    </tr>
+    
+    <tr>
+      <td height="30" colspan="3" valign="top" align="right">
+	  <a href="javascript:PrintCertification();"><img src="../../../images/print.gif" border="0"></a>
+	  	<font size="1">Print Certification</font>	  </td>
+    </tr>
+<%}//end of stud info..  %>
+  </table>
+<%if(vRetResult != null && vRetResult.size() > 0) {%>
+  <table width="100%" border="0" bgcolor="#FFFFFF" cellpadding="0" cellspacing="0" class="thinborder">
+    <tr bgcolor="#FFCC99"> 
+      <td height="25" colspan="5" class="thinborder">
+	  <div align="center"><strong><font color="#0000FF">:: LIST OF OFFENSES :: </font></strong></div></td>
+    </tr>
+    <tr bgcolor="#FF6666"> 
+      <td width="10%" height="20" class="thinborder" style="font-size:9px; font-weight:bold;" align="center">SY/Term</td>
+      <td width="22%" class="thinborder" style="font-size:9px; font-weight:bold;" align="center">Violation Date  </td>
+      <td width="24%" class="thinborder" style="font-size:9px; font-weight:bold;" align="center">Violation Detail  </td>
+      <td width="22%" class="thinborder" style="font-size:9px; font-weight:bold;" align="center">Action Taken </td>
+      <td width="22%" class="thinborder" style="font-size:9px; font-weight:bold;" align="center">Incident Name </td>
+    </tr>
+<%
+String[] astrConvertSem = {"SU","FS","SS","TS"};
+for(int i = 0; i < vRetResult.size(); i += 20){%>
+    <tr> 
+      <td height="25" class="thinborder"><%=vRetResult.elementAt(i + 1)%> - <%=astrConvertSem[Integer.parseInt((String)vRetResult.elementAt(i + 3))]%></td>
+      <td class="thinborder"><%=vRetResult.elementAt(i + 4)%></td>
+      <td class="thinborder"><font color="#0000FF"><%=vRetResult.elementAt(i + 8)%></font><br><%=vRetResult.elementAt(i + 9)%></td>
+      <td class="thinborder"><%=vRetResult.elementAt(i + 10)%></td>
+      <td class="thinborder" style="font-size:9px"><%=vRetResult.elementAt(i + 15)%></td>
+    </tr>
+<%}%>
+  </table>
+<%}%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="94%" height="25">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>
+
+<%
+dbOP.cleanUP();
+%>

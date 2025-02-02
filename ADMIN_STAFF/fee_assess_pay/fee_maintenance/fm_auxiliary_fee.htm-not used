@@ -1,0 +1,360 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript">
+function PrepareToEdit(strInfoIndex)
+{
+	document.oth_sfee.editRecord.value = 0; 
+	document.oth_sfee.deleteRecord.value = 0; 
+	document.oth_sfee.addRecord.value = 0;
+	document.oth_sfee.prepareToEdit.value = 1;	
+	document.oth_sfee.info_index.value = strInfoIndex;	
+	document.oth_sfee.submit();
+	
+}
+function AddRecord()
+{	
+	if(document.oth_sfee.prepareToEdit.value == 1)
+	{
+		EditRecord(document.oth_sfee.info_index.value);
+		return;
+	}
+	document.oth_sfee.editRecord.value = 0; 
+	document.oth_sfee.deleteRecord.value = 0; 
+	document.oth_sfee.addRecord.value = 1;
+	
+	document.oth_sfee.submit();
+}
+function EditRecord(strTargetIndex)
+{	
+	document.oth_sfee.editRecord.value = 1; 
+	document.oth_sfee.deleteRecord.value = 0; 
+	document.oth_sfee.addRecord.value = 0;
+	
+	document.oth_sfee.info_index.value = strTargetIndex;
+	
+	document.oth_sfee.submit();	
+}
+	
+function DeleteRecord(strTargetIndex)
+{	
+	document.oth_sfee.editRecord.value = 0; 
+	document.oth_sfee.deleteRecord.value = 1; 
+	document.oth_sfee.addRecord.value = 0;
+	
+	document.oth_sfee.info_index.value = strTargetIndex;
+	document.oth_sfee.prepareToEdit.value == 0;
+	
+	document.oth_sfee.submit();
+}
+function CancelRecord()
+{
+	var strSYFrom = document.oth_sfee.sy_from.value;
+	var strSYTo = document.oth_sfee.sy_to.value;
+	
+	location = "./fm_other_sch_fee.jsp?sy_from="+strSYFrom+"&sy_to="+strSYTo+"&year_level="+document.oth_sfee.year_level[document.oth_sfee.year_level.selectedIndex].value;
+}
+
+</script>
+
+
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,FAFeeMaintenance,java.util.Vector" %>
+<%
+ 
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	MessageConstant mConst = new MessageConstant();
+	String strErrMsg = "";
+	String strTemp = null;
+	String strPrepareToEdit=request.getParameter("prepareToEdit");
+	if(strPrepareToEdit== null) strPrepareToEdit="0";
+//add security here.
+//request.getSession(false).setAttribute("userId","biswa");
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_add.jsp","While Opening DB Con");
+		
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+
+
+//end of security code. 
+FAFeeMaintenance FA = new FAFeeMaintenance();
+boolean bolProceed = true;
+
+//check for add - edit or delete 
+strTemp = request.getParameter("addRecord");
+if(strTemp != null && strTemp.compareTo("1") == 0)
+{
+	strPrepareToEdit="0";
+
+	//add it here and give a message.
+	if(FA.addOthSchFee(dbOP,request))
+		strErrMsg = "Other School Fee added successfully.";
+	else
+	{
+		bolProceed = false;
+		strErrMsg = FA.getErrMsg();
+	}
+}
+else //either it is edit or delete -- this page handles add/edit/delete/viewall :-) 
+{
+	String strInfoIndex = request.getParameter("info_index"); //required for delete / edit
+	
+	strTemp = request.getParameter("editRecord");
+	if(strTemp != null && strTemp.compareTo("1") == 0)
+	{
+		if(FA.editOthSchFee(dbOP,request))
+			strErrMsg = "Other School Fee edited successfully.";
+		else
+		{
+			bolProceed = false;
+			strErrMsg = FA.getErrMsg();
+		}
+	}
+	else
+	{	
+		strTemp = request.getParameter("deleteRecord");
+		if(strTemp != null && strTemp.compareTo("1") == 0)
+		{
+			strPrepareToEdit="0";
+
+			if(FA.delOthSchFee(dbOP,request.getParameter("info_index"),(String)request.getSession(false).getAttribute("login_log_index")))
+				strErrMsg = "Other School Fee deleted successfully.";
+			else
+			{
+				bolProceed = false;
+				strErrMsg = FA.getErrMsg();
+			}
+		}
+	}
+}	
+
+//get all levels created.
+Vector vRetResult = new Vector();
+Vector vEditInfo = new Vector();
+
+if(bolProceed)
+{
+	vRetResult = FA.viewOthSchFee(dbOP, null, request.getParameter("year_level"), request.getParameter("sy_from"), request.getParameter("sy_to"),true);//to view all
+	//if(vRetResult ==null)
+	//{
+	//	bolProceed = false;
+	//	strErrMsg = FA.getErrMsg();
+	//}
+}
+
+if(bolProceed && strPrepareToEdit != null && strPrepareToEdit.compareTo("1") == 0)
+{
+	vEditInfo = FA.viewOthSchFee(dbOP,request.getParameter("info_index"),null,null,null, false);//view all is false
+	if(vEditInfo == null || vEditInfo.size() == 0)
+	{
+		bolProceed = false;
+		strErrMsg = FA.getErrMsg();
+		if(strErrMsg == null)
+			strErrMsg = "Edit information not found. Please refresh page and edit again.";
+	}
+}
+
+dbOP.cleanUP();
+
+//do not proceed is bolProceed = false;
+if(!bolProceed)
+{
+	%>
+	<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+	<b><%=strErrMsg%></b></font></p>
+	<%
+	return;
+}
+%>
+
+
+<form name="oth_sfee" action="./fm_other_sch_fee.jsp" method="post">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="6"><div align="center"><font color="#FFFFFF"><strong>:::: 
+          AUXILIARY FEES MAINTENANCE PAGE ::::</strong></font></div></td>
+    </tr>
+	</table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25" colspan="5">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="4%" height="25">&nbsp;</td>
+      <td width="13%">Fee name </td>
+      <td  colspan="3"> 
+	<%
+	if(vEditInfo != null && vEditInfo.size() > 1)
+		strTemp = (String)vEditInfo.elementAt(2);
+	else
+		strTemp = request.getParameter("fee_name");
+	if(strTemp == null) strTemp = "";
+	%>
+		  <input name="fee_name" type="text" size="64" value="<%=strTemp%>"> </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Fee rate </td>
+      <td  colspan="2">
+        <%
+	if(vEditInfo != null && vEditInfo.size() > 1)
+		strTemp = (String)vEditInfo.elementAt(4);
+	else
+		strTemp = request.getParameter("amount");
+	if(strTemp == null) strTemp = "";
+	%>
+        <input name="amount" type="text" size="16" value="<%=strTemp%>"> 
+        <%
+	if(vEditInfo != null && vEditInfo.size() > 1)
+		strTemp = (String)vEditInfo.elementAt(5);
+	else
+		strTemp = request.getParameter("currency");
+	if(strTemp == null) strTemp = "";
+	%>
+        <select name="currency">
+          <%if(strTemp.compareToIgnoreCase("PHP") ==0){%>
+          <option value="Php" selected>Php</option>
+          <%}else{%>
+          <option value="Php">Php</option>
+          <%}if(strTemp.compareToIgnoreCase("US$") ==0){%>
+          <option value="US$" selected>US$</option>
+          <%}else{%>
+          <option value="US$">US$</option>
+          <%}%>
+        </select> </td>
+      <td width="55%">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>School Year</td>
+      <td  colspan="2">
+        <%
+	if(vEditInfo != null && vEditInfo.size() > 1)
+		strTemp = (String)vEditInfo.elementAt(0);
+	else
+		strTemp = request.getParameter("sy_from");
+	if(strTemp == null) strTemp = "";
+	%>
+        <input name="sy_from" type="text" size="4" maxlength="4" value="<%=strTemp%>">
+        to 
+        <%
+	if(vEditInfo != null && vEditInfo.size() > 1)
+		strTemp = (String)vEditInfo.elementAt(1);
+	else
+		strTemp = request.getParameter("sy_to");
+	if(strTemp == null) strTemp = "";
+	%>
+        <input name="sy_to" type="text" size="4" maxlength="4" value="<%=strTemp%>"> 
+      </td>
+      <td width="55%">Remarks &nbsp; 
+	<%
+	if(vEditInfo != null && vEditInfo.size() > 1)
+		strTemp = (String)vEditInfo.elementAt(6);
+	else
+		strTemp = request.getParameter("remark");
+	if(strTemp == null) strTemp = "";
+	%>
+		  <input name="remark" type="text" size="32" value="<%=strTemp%>"> 
+      </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp; </td>
+      <td colspan="3">&nbsp; 
+	  <%
+strTemp = strPrepareToEdit; 
+if(strTemp == null) strTemp = "0";
+if(strTemp.compareTo("0") == 0)
+{%>
+        <a href="javascript:AddRecord();"><img src="../../../images/add.gif" border="0"></a><font size="1">click 
+        to add</font> 
+        <%}else{%>
+        <a href="javascript:AddRecord();"><img src="../../../images/edit.gif" border="0"></a><font size="1">click 
+        to save changes</font> <a href="javascript:CancelRecord();"><img src="../../../images/cancel.gif" border="0"></a> 
+        <font size="1">click to cancel or go previous</font> 
+        <%}%></td>
+    </tr>
+    <%
+if(strErrMsg != null)
+{%> <tr> 
+  	<td height="25">&nbsp;</td>
+      <td colspan="4"><b><%=strErrMsg%></b></td>
+    </tr>
+    <%}//this shows the edit/add/delete success info%>
+
+	</table>
+  
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<%
+if(vRetResult != null && vRetResult.size() > 0)
+{%>
+    <tr bgcolor="#B9B292"> 
+      <td width="100%" height="25" colspan="5" bgcolor="#B9B292"><div align="center">LIST 
+          OF OTHER AUXILIARY FEES - FOR SCHOOL YEAR <%=request.getParameter("sy_from")%>-<%=request.getParameter("sy_to")%></div></td>
+    </tr>
+  </table>
+  <table width="100%" border="1" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="35%" height="25"><div align="center"><font size="1"><strong>FEE 
+          NAME</strong></font></div></td>
+      <td width="17%"><div align="center"><font size="1"><strong>FEE RATE (Php/$) 
+          </strong></font></div></td>
+      <td width="12%"><div align="center"><font size="1"><strong>SCHOOL YEAR </strong></font></div></td>
+      <td width="22%"><div align="center"><font size="1"><strong>REMARKS</strong></font></div></td>
+      <td width="6%">&nbsp;</td>
+      <td width="8%">&nbsp;</td>
+    </tr>
+    <%
+String[] convertYearLevel = {"All","1st","2nd","3rd","4th","5th","6th","7th","8th"};
+for(int i = 0 ; i< vRetResult.size() ; ++i)
+{%>
+    <tr> 
+      <td height="25" align="center"><font size="1"><%=(String)vRetResult.elementAt(i+1)%>&nbsp;</font></td>
+      <td align="center"><font size="1"><%=(String)vRetResult.elementAt(i+2)%> 
+        <%=(String)vRetResult.elementAt(i+3)%></font>&nbsp;</td>
+      <td align="center"><font size="1"><%=convertYearLevel[Integer.parseInt(request.getParameter("year_level"))]%></font>&nbsp;</td>
+      <td align="center"><font size="1">&nbsp;</font></td>
+      <td align="center"> <a href='javascript:PrepareToEdit("<%=(String)vRetResult.elementAt(i)%>");'><img src="../../../images/edit.gif" width="40" height="26" border="0"></a></td>
+      <td align="center"> <a href='javascript:DeleteRecord("<%=(String)vRetResult.elementAt(i)%>");'><img src="../../../images/delete.gif" width="55" height="28" border="0"></a></td>
+    </tr>
+    <% i = i+4;
+	}//end of displaying levels
+}//end of displaying existing question level
+%>
+  </table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="9">&nbsp;</td>
+    </tr>
+  </table>
+  <!-- all hidden fields go here -->
+  <%
+strTemp = request.getParameter("info_index"); 
+if(strTemp == null) strTemp = "0";
+%>
+<input type="hidden" name="info_index" value="<%=strTemp%>">
+<input type="hidden" name="addRecord" value="0">
+<input type="hidden" name="editRecord" value="0">
+<input type="hidden" name="prepareToEdit" value="<%=strPrepareToEdit%>">
+<input type="hidden" name="deleteRecord" value="0">
+
+</form>
+</body>
+</html>

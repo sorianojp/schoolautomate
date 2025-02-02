@@ -1,0 +1,322 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Search Organization</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript">
+function PrintPage(strStudId)
+{
+ 	var vProceed = confirm("Please keep your printer ready and click <OK> to print.if you are not ready to print, please click cancel.");
+	var sT = "#";
+	if(vProceed)
+		sT = "./residency_status_print.jsp?stud_id="+escape(strStudId);
+
+	//print here
+	if(vProceed)
+	{
+		var win=window.open(sT,"PrintWindow",'scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+		win.focus();
+	}
+}
+</script>
+
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,GradeSystem,java.util.Vector" %>
+<%
+
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	String strErrMsg = null;
+	String strTemp = null;
+	WebInterface WI = new WebInterface(request);
+	Vector vTemp = null;
+	int i=0; int j=0;
+	int iYear = 0;
+	int iSem  = 0;
+	int iTempYear = 0;
+	int iTempSem = 0;
+
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_veiwall.jsp","While Opening DB Con");
+
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+GradeSystem GS = new GradeSystem();
+vTemp = GS.getResidencySummary(dbOP,request.getParameter("stud_id"));
+if(vTemp == null)
+	strErrMsg = GS.getErrMsg();
+else
+{
+	//do something.
+}
+
+if(strErrMsg == null) strErrMsg = "";
+String[] astrConvertYear ={"","1st Year","2nd Year","3rd Year","4th Year","5th Year","6th Year","7th Year"};
+String[] astrConvertSem = {"Summer","1st Sem","2nd Sem","3rd Sem","4th Sem"};
+String strResidencyStatus = null;
+%>
+<form action="file:///C|/ApacheTomcat4.0/webapps/schoolbliz_vmuf/ADMIN_STAFF/registrar/residency/./residency_status.jsp" method="post">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="4" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF"><strong>:::: 
+          SEARCH LOST/FOUND/CLAIMED PAGE ::::</strong></font></div></td>
+    </tr>
+	</table>
+
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25" colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="14%">Case Type</td>
+      <td width="13%"><select name="select">
+          <option>Lost</option>
+          <option>Found</option>
+          <option>Claimed</option>
+        </select> </td>
+      <td width="71%">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Item Category</td>
+      <td><select name="select7">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select></td>
+      <td><input name="textfield2" type="text" size="30"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Location</td>
+      <td><select name="select2">
+          <option>Equal to</option>
+          <option>Starts with</option>
+          <option>Ends with</option>
+          <option>Contains</option>
+        </select></td>
+      <td><input name="textfield" type="text" size="30"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Date </td>
+      <td colspan="2">From 
+        <input name="textfield5" type="text" size="12"> <img src="../../../images/calendar.gif" width="18" height="20"> 
+        To 
+        <input name="textfield52" type="text" size="12"> <img src="../../../images/calendar.gif" width="18" height="20"></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="4"><hr size="1"></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td  width="2%" height="25">&nbsp;</td>
+      <td width="9%">Sort by</td>
+      <td width="21%"><select name="select4">
+          <option>Item Category</option>
+          <option>Date</option>
+          <option>Location</option>
+        </select> </td>
+      <td width="20%"><select name="select3">
+          <option>Item Category</option>
+          <option>Date</option>
+          <option>Location</option>
+        </select> </td>
+      <td width="48%"><select name="select5">
+          <option>Item Category</option>
+          <option>Date</option>
+          <option>Location</option>
+        </select> </td>
+      <td width="0%">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><select name="select9">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+      <td><select name="select10">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+      <td><select name="select11">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><img src="../../../images/form_proceed.gif" width="81" height="21"></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="25" colspan="3"><div align="left"><a href="search_lost_found_print.htm"><img src="../../../images/print.gif" width="58" height="26" border="0"></a> 
+          <font size="1">click to print result</font></div></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="3" bgcolor="#B9B292"><div align="center"><strong><font color="#FFFFFF">SEARCH 
+          RESULT FOR CASE TYPE $case_type </font></strong><font color="#FFFFFF" size="1">(reminder 
+          this is for Lost or Found case type)</font></div></td>
+    </tr>
+    <tr>
+      <td width="54%" height="25"><b>Total Result : <%=iSearchResult%> - Showing(<%=SM.strDispRange%>)</b></td>
+      <td width="15%"><div align="right"></div></td>
+      <td width="31%"><div align="right">Jump To page:
+          <select name="jumpto" onChange="goToNextSearchPage();">
+            <%
+			strTemp = request.getParameter("jumpto");
+			if(strTemp == null || strTemp.trim().length() ==0) strTemp = "0";
+
+			for( int i =1; i<= iPageCount; ++i )
+			{
+				if(i == Integer.parseInt(strTemp) ){%>
+            <option selected value="<%=i%>"><%=i%> of <%=iPageCount%></option>
+            <%}else{%>
+            <option value="<%=i%>"><%=i%> of <%=iPageCount%></option>
+            <%
+					}
+			}
+			%>
+          </select>
+          <%}%>
+        </div></td>
+    </tr>
+  </table>
+
+
+  <table  bgcolor="#FFFFFF" width="100%" border="1" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td  width="17%" height="25" ><div align="center"><strong><font size="1">ITEM 
+          CATEGORY </font></strong></div></td>
+      <td width="13%"><div align="center"><strong><font size="1">DATE</font></strong></div></td>
+      <td width="18%"><div align="center"><strong><font size="1">REPORTED BY</font></strong></div></td>
+      <td width="24%"><div align="center"><strong><font size="1">LOCATION</font></strong></div></td>
+      <td width="28%"><div align="center"><strong><font size="1">DESCRIPTION</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">&nbsp;</font></td>
+      <td height="25">&nbsp;</td>
+      <td><font size="1">&nbsp;</font></td>
+      <td><font size="1">&nbsp;</font></td>
+      <td><font size="1">&nbsp;</font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF"width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25"><div align="left"><a href="search_lost_found_print.htm"><img src="../../../images/print.gif" width="58" height="26" border="0"></a> 
+          <font size="1">click to print result</font></div></td>
+    </tr>
+  </table>
+
+<table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="25" colspan="3"><div align="right"><a href="search_claimed_print.htm"><img src="../../../images/print.gif" width="58" height="26" border="0"></a> 
+          <font size="1">click to print result</font></div></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="3" bgcolor="#B9B292"><div align="center"><font color="#FFFFFF">SEARCH 
+          RESULT FOR <strong>CLAIMED</strong> CASE TYPE </font></div></td>
+    </tr>
+    <tr>
+      <td width="54%" height="25"><b>Total Result : <%=iSearchResult%> - Showing(<%=SM.strDispRange%>)</b></td>
+      <td width="15%"><div align="right"></div></td>
+      <td width="31%"><div align="right">Jump To page:
+          <select name="jumpto" onChange="goToNextSearchPage();">
+            <%
+			strTemp = request.getParameter("jumpto");
+			if(strTemp == null || strTemp.trim().length() ==0) strTemp = "0";
+
+			for( int i =1; i<= iPageCount; ++i )
+			{
+				if(i == Integer.parseInt(strTemp) ){%>
+            <option selected value="<%=i%>"><%=i%> of <%=iPageCount%></option>
+            <%}else{%>
+            <option value="<%=i%>"><%=i%> of <%=iPageCount%></option>
+            <%
+					}
+			}
+			%>
+          </select>
+          <%}%>
+        </div></td>
+    </tr>
+  </table>
+
+  <table  bgcolor="#FFFFFF" width="100%" border="1" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td  width="17%" height="25" ><div align="center"><strong><font size="1">ITEM 
+          CATEGORY </font></strong></div></td>
+      <td width="14%"><div align="center"><strong><font size="1">DATE</font></strong></div></td>
+      <td width="24%"><div align="center"><strong><font size="1">CLAIMEDD BY</font></strong></div></td>
+      <td width="45%"><div align="center"><strong><font size="1">SUPPORTING DOCUMENTS 
+          PRESENTED UPON CLAIMING</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">&nbsp;</font></td>
+      <td height="25">&nbsp;</td>
+      <td><font size="1">&nbsp;</font></td>
+      <td><font size="1">&nbsp;</font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+<table  bgcolor="#FFFFFF"width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="69%" height="25">&nbsp;</td>
+      <td width="31%"><div align="right"><a href="search_claimed_print.htm"><img src="../../../images/print.gif" width="58" height="26" border="0"></a> 
+          <font size="1">click to print result</font></div></td>
+    </tr>
+  </table>
+  <table  bgcolor="#999900" width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+  </tr>
+</table>
+
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Administrator links</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/regmainlinkcss.css" rel="stylesheet" type="text/css">
+<link href="../../../css/treelinkcss.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" type="text/JavaScript">
+<!--
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+//-->
+</script>
+<script language="javascript">
+function EncodePC() {
+	strJVNumber = prompt('To edit or view detail, enter PC number.','Enter Petty Cash Voucher Number');
+	if(strJVNumber == null)
+		strJVNumber = "";
+	location = "../journal_voucher/journal_voucher_entry.jsp?jv_number="+strJVNumber+"&jv_type=0&is_cd=2";
+}
+
+function EncodeJV(strJVType) {
+	strJVNumber = prompt('To edit or view detail, enter JV number.','Enter JV Number');
+	if(strJVNumber == null)
+		strJVNumber = "";
+	if(strJVType == 3 && strJVNumber == "") {
+		//alert("Please enter jv number to modify/view enrollment information. To create enrollment jv , go to Fee assment and payment -> Reports -> Specific Fee Collection (AR)");
+		location = "../../../fee_assess_pay/reports/specific_acct_cpu.jsp";
+		return;
+	}
+	location = "./journal_voucher_entry.jsp?jv_number="+strJVNumber+"&jv_type="+strJVType;
+}
+
+</script>
+
+<%response.setHeader("Pragma","No-Cache");
+response.setDateHeader("Expires",0);
+response.setHeader("Cache-Control","no-Cache"); //HTTP 1.0
+response.setHeader("Cache-Control","no-store"); //HTTP 1.1
+%>
+</head>
+<body bgcolor="#C39E60" onLoad="MM_preloadImages('../../images/home_small_admin_rollover.gif','../../images/help_small_admin_rollover.gif')">
+<style>
+
+.trigger{
+	cursor: pointer;
+	cursor: hand;
+}
+.branch{
+	display: none;
+	margin-left: 16px;
+}
+</style>
+<script language="JavaScript">
+var openImg = new Image();
+openImg.src = "../../../images/box_with_minus.gif";
+var closedImg = new Image();
+closedImg.src = "../../../images/box_with_plus.gif";
+
+function showBranch(branch){
+	var objBranch = document.getElementById(branch).style;
+	if(objBranch.display=="block")
+		objBranch.display="none";
+	else
+		objBranch.display="block";
+}
+
+function swapFolder(img){
+	objImg = document.getElementById(img);
+	if(objImg.src.indexOf('box_with_plus.gif')>-1)
+		objImg.src = openImg.src;
+	else
+		objImg.src = closedImg.src;
+}
+</script>
+<form action="../../../../hisbliz/commfile/logout.jsp" method="post" target="_parent">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td width="8%" height="19" bgcolor="#E9E0D1">&nbsp;</td>
+      <td width="92%" bgcolor="#E9E0D1"><a href="../accounting_index.htm" target="_parent" onMouseOver="MM_swapImage('Image2','','../../../images/home_small_admin_rollover.gif',1)" onMouseOut="MM_swapImgRestore()" ><img src="../../../images/home_small_admin.gif" name="Image2" width="65" height="22" border="0" id="Image2"></a><a href="javascript:;" onMouseOver="MM_swapImage('Image1','','../../../images/help_small_admin_rollover.gif',1)" onMouseOut="MM_swapImgRestore()"><img src="../../../images/help_small_admin.gif" name="Image1" width="65" height="22" border="0" id="Image1"></a><a onMouseOver="MM_swapImage('Image3','','../../../images/logout_admin_rollover.gif',1)" onMouseOut="MM_swapImgRestore()">
+        <input type="image" src="../../../images/logout_admin.gif" name="Image3" width="65" height="22" border="0" id="Image3">
+      </a></td>
+    </tr>
+  </table>
+  <input type="hidden" name="logout_url" value="../ADMIN_STAFF/main%20files/admin_staff_bottom_content.htm">
+<input type="hidden" name="body_color" value="#C39E60">
+</form>
+<%@ page language="java" import="utility.*, java.util.Vector" %>
+<%
+//check if user is logged in, if logged, check authentication list here and allow the authentic user to access the system.
+DBOperation dbOP = null;
+CommonUtil comUtil = new CommonUtil();
+String strUserId = (String)request.getSession(false).getAttribute("userId");
+String strErrMsg = null;
+boolean bolGrantAll = false;
+boolean isAuthorized = false;
+String strSchCode    = (String)request.getSession(false).getAttribute("school_code");
+if(strSchCode == null) 
+	strSchCode = "";
+	
+if(strUserId != null)
+{
+	//open dbConnection here to check if user is registered already.
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		strErrMsg = "error in opening connection.";
+	}
+
+	if(strErrMsg == null)
+	{
+		//check here the authentication of the user.
+		if(comUtil.IsSuperUser(dbOP,strUserId))
+			bolGrantAll = true;	//grant all ;-)
+	}
+}
+else
+	strErrMsg = "";
+
+if(bolGrantAll || comUtil.IsAuthorizedSubModule(dbOP,strUserId,"System Administration","USER MANAGEMENT")!=0){isAuthorized=true;%>
+<!--<div class="trigger" onClick="showBranch('branch1');swapFolder('folder1')"> <img src="../../../images/box_with_plus.gif" border="0" id="folder1"> 
+  <strong><font color="#FFFFFF" font size="2" face="Geneva, Arial, Helvetica, sans-serif">ACCOUNTS RECEIVABLE </font></strong></div>
+<span class="branch" id="branch1"> <font size="2"face="Geneva, Arial, Helvetica, sans-serif" color="#FFFFFF"> 
+<img src="../../../images/broken_lines.gif"> <a href="../../../../hisbliz/admin_staff/system_administration/profile.jsp" target="useradminmainFrame">A/R Subsidiary Ledger </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../../../../hisbliz/admin_staff/system_administration/authentication.jsp" target="useradminmainFrame">Application of Payments </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../../../../hisbliz/admin_staff/system_administration/accessibility.jsp" target="useradminmainFrame">Bad Debts Application<br>&nbsp;&nbsp;&nbsp;&nbsp;(Write-Off)</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../../../../hisbliz/admin_staff/system_administration/user_stat.jsp" target="useradminmainFrame">Debit/Credit Memos </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../../../../hisbliz/admin_staff/system_administration/login_activity.jsp" target="useradminmainFrame">Collaterals for Promissory <br>&nbsp;&nbsp;&nbsp;&nbsp; Notes</a><br>-->
+</font></span> 
+
+<div class="trigger" onClick="showBranch('branch2');swapFolder('folder2')"> <img src="../../../images/box_with_plus.gif" border="0" id="folder2"> 
+  <strong><font color="#FFFFFF" font size="2" face="Geneva, Arial, Helvetica, sans-serif">ACCOUNTS PAYABLE </font></strong></div>
+<span class="branch" id="branch2"> <font size="2" face="Geneva, Arial, Helvetica, sans-serif" color="#FFFFFF"> 
+<img src="../../../images/broken_lines.gif"> <a href="ap/subsidiary_ledger/ap_deliveries.htm" target="accountingmainFrame">A/P Processing  </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="ap/subsidiary_ledger/encode_beginning_bal_sl.htm" target="accountingmainFrame">Encode Beginning Balance</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="ap/subsidiary_ledger/subsidiary_ledger.htm" target="accountingmainFrame">View  Subsidiary Ledger  </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="ap/request_for_payment_approval/request_for_payment.htm" target="accountingmainFrame">Request for Payment </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="ap/request_for_payment_approval/payment_approval.htm" target="accountingmainFrame">Update Request Status </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="ap/view_ap_total/view_ap_total.htm" target="accountingmainFrame">Account Payable Summary</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="./cash_disbursement/cash_disbursement.jsp" target="accountingmainFrame">Cash/Check Disbursement </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="ap/debit_credit_memos/debit_credit_memo.htm" target="accountingmainFrame">Debit/Credit Memos </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="ap/check_mgmt/update_check_stat.jsp" target="accountingmainFrame">Check Management </a><br>
+</font></span> 
+
+
+<div class="trigger" onClick="showBranch('branch8');swapFolder('folder8')"> 
+<img src="../../../images/box_with_plus.gif" border="0" id="folder8"> <strong><font color="#FFFFFF" font size="2" face="Geneva, Arial, Helvetica, sans-serif">ACCOUNTS RECEIVABLE </font></strong></div>
+<span class="branch" id="branch8"> <font size="2" face="Geneva, Arial, Helvetica, sans-serif" color="#FFFFFF"> 
+<img src="../../../images/broken_lines.gif"> <a href="../../fee_assess_pay/payment/check_payment_main.jsp" target="accountingmainFrame">Check Management  </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="accounts_receivable/aging_of_accounts/aging_of_accounts.htm" target="accountingmainFrame">Aging A/R Accounts</a><br>
+<!-- <img src="../../../images/broken_lines.gif"> <a href="../../../../hisbliz/admin_staff/system_administration/authentication.jsp" target="accountingmainFrame">Bad Debts Application<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Write-Off)</a><br>
+ --><img src="../../../images/broken_lines.gif"> <a href="../../fee_assess_pay/payment/refunds.jsp" target="accountingmainFrame">Debit/Credit Memos </a><br>
+</font></span> 
+
+<!-- <div class="trigger" onClick="showBranch('branch3');swapFolder('folder3')"> <img src="../../../images/box_with_plus.gif" border="0" id="folder3"> 
+  <strong><font color="#FFFFFF" font size="2" face="Geneva, Arial, Helvetica, sans-serif">CHECKS </font></strong></div>
+<span class="branch" id="branch3"> <font size="2" face="Geneva, Arial, Helvetica, sans-serif" color="#FFFFFF"> 
+<img src="../../../images/broken_lines.gif"> <a href="../../../../hisbliz/admin_staff/system_administration/profile.jsp" target="accountingmainFrame">Outstanding Checks  </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../../../../hisbliz/admin_staff/system_administration/authentication.jsp" target="accountingmainFrame">Cleared Checks  </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="../../../../hisbliz/admin_staff/system_administration/accessibility.jsp" target="accountingmainFrame">Bouncing Checks </a><br>
+</font></span>  -->
+
+<div class="trigger" onClick="showBranch('branch4');swapFolder('folder4')"> <img src="../../../images/box_with_plus.gif" border="0" id="folder4"> 
+<strong><font color="#FFFFFF" font size="2" face="Geneva, Arial, Helvetica, sans-serif">PETTY CASH </font></strong></div>
+<span class="branch" id="branch4"> <font size="2" face="Geneva, Arial, Helvetica, sans-serif" color="#FFFFFF"> 
+<img src="../../../images/broken_lines.gif"> <a href="./petty_cash/petty_cash_setup_amount.jsp" target="accountingmainFrame">Set Maximum/Minimum<br>
+&nbsp;&nbsp;&nbsp;&nbsp; Petty Cash Fund Amount   </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="javascript:EncodePC();" target="accountingmainFrame">Create Petty Cash Voucher </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="./petty_cash/pc_update_payment_stat_new.jsp" target="accountingmainFrame">Update Petty Cash <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voucher Payment Status </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="./petty_cash/petty_cash_create_req.jsp" target="accountingmainFrame">Create Requisition for <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reimbursement</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="./petty_cash/petty_cash_reimbursement.jsp" target="accountingmainFrame">Receive Reimbursement</a><br>
+<img src="../../../images/broken_lines.gif"> <a href="./petty_cash/petty_cash_summary.jsp" target="accountingmainFrame">View/Print Petty Cash Fund</a><br>
+</font></span> 
+
+<div class="trigger" onClick="showBranch('branch5');swapFolder('folder5')"> <img src="../../../images/box_with_plus.gif" border="0" id="folder5"> 
+<strong><font color="#FFFFFF" font size="2" face="Geneva, Arial, Helvetica, sans-serif">JOURNAL VOUCHER </font></strong></div>
+<font size="2"><span class="branch" id="branch5"> <font face="Geneva, Arial, Helvetica, sans-serif" color="#FFFFFF"> 
+<img src="../../../images/broken_lines.gif"> <a href="javascript:EncodeJV('0');" target="useradminmainFrame">Encode/Modify Journal<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voucher Entries  </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="./journal_voucher/jv_post.jsp" target="accountingmainFrame">Post/Verify Voucher  </a><br>
+<img src="../../../images/broken_lines.gif"> <a href="./journal_voucher/jv_summary.jsp" target="accountingmainFrame">View/Print JV Summary </a><br>
+</font></span> 
+
+
+<img src="../../../images/small_white_box.gif" width="7" height="7" border="0" > 
+<strong><font font face="Geneva, Arial, Helvetica, sans-serif"><a href="../transaction/budget_entry/budget_encode.jsp" target="accountingmainFrame">BUDGET ENTRY </a></font></strong><br>
+<br>
+
+
+<%}
+
+if(strUserId == null)
+	strErrMsg = "Session timeout. Please login again.";
+else if(!isAuthorized)
+	strErrMsg = "You are not authorized to view any link in this page. Please contact system admin for access permission.";
+if(strErrMsg == null)
+	strErrMsg = "";
+%>
+<font face="Verdana, Arial, Helvetica, sans-serif"><%=strErrMsg%></font></font> 
+</body>
+</html>
+<%
+if(dbOP != null) dbOP.cleanUP();
+%>

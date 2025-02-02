@@ -1,0 +1,5 @@
+The Evaluator should be the administrative officer handling the personnel.
+
+If the non-teaching staff will click the non-teaching link under the >>HR Management>>Assessment and Evaluation, the hr_assessment page will primarily show his/her evaluation without save, edit , and cancel button.
+
+	

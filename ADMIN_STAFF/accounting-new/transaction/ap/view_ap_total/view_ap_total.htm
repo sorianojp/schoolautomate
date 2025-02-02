@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../../../css/tableBorder.css" rel="stylesheet" type="text/css"></head>
+</head>
+<script language="javascript" src="../../../../../jscript/date-picker.js"></script>
+<script language="javascript">
+function ShowDetail(strPrintStat) {
+	strTBDate = document.form_.bl_date.value;
+	if(strTBDate.length == 0) {
+		alert("Please enter  cutoff date..");
+		return;
+	}
+	document.form_.print_stat.value = strPrintStat;
+	document.form_.print_pg.value = "1";
+	document.form_.submit();
+}
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.WebInterface" %>
+<form name="form_" method="post" action="/ADMIN_STAFF/accounting/reports/financial_statements/balance_sheet/bl_1st_page.jsp">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="3" align="center" bgcolor="#A49A6A"><font color="#FFFFFF"> 
+        <strong>:::: ACCOUNTS PAYABLE - VIEW TOTAL A/P PAGE ::::</strong></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td width="4%" height="38">&nbsp;</td>
+      <td width="11%" colspan="2"><div align="right"><span style="font-size:10px;"><a href="../subsidiary_ledger/subsidiary_ledger.htm"><img src="../../../../../images/print.gif" border="0"></a>click 
+          to print report</span></div></td>
+    </tr>
+  </table> 
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+    <tr bgcolor="#B4C5D6"> 
+      <td height="26" colspan="6" class="thinborder"><div align="center"><strong><font color="#FF0000">:: 
+          TOTAL A/P AS OF $CURRENT_DATE ::</font></strong></div></td>
+    </tr>
+    <tr bgcolor="#B4C5D6"> 
+      <td width="15%" height="26" class="thinborder"><div align="center"><font size="1"><strong>TYPE</strong></font></div></td>
+      <td width="27%" height="26" class="thinborder"><div align="center"><font size="1"><strong>PAYEE 
+          NAME</strong></font></div></td>
+      <td width="11%" class="thinborder"><div align="center"><font size="1"><strong>DEBIT</strong></font></div></td>
+      <td width="14%" height="26" class="thinborder"><div align="center"><font size="1"><strong>CREDIT</strong></font></div></td>
+      <td width="22%" height="26" class="thinborder"><div align="center"><font size="1"><strong>BALANCE</strong></font></div></td>
+      <td width="11%" class="thinborder"><div align="center"><font size="1"><strong>VIEW 
+          DETAILS</strong></font></div></td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder">SUPPLIER</td>
+      <td height="25" class="thinborder">Thinking Tools</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+      <td height="25" class="thinborder" align="right">5,000.00</td>
+      <td height="25" class="thinborder" align="right">5,000.00</td>
+      <td class="thinborder" align="right"><span style="font-size:10px;"><strong><a href="../subsidiary_ledger/subsidiary_ledger.htm"><img src="../../../../../images/view.gif" border="0"></a></strong></span></td>
+    </tr>
+    <tr> 
+      <td height="29" class="thinborder">NON-SUPPLIER</td>
+      <td height="29" class="thinborder">Ellen Nayak</td>
+      <td class="thinborder" align="right">15,000.00</td>
+      <td height="29" class="thinborder" align="right">25,000.00</td>
+      <td height="29" class="thinborder" align="right"><font color="#FF0000">10,000.00 
+        $CURRENCY </font></td>
+      <td class="thinborder" align="right">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder">SUPPLIER</td>
+      <td height="25" class="thinborder">Blue Sky Trading</td>
+      <td class="thinborder" align="right">5,000.00</td>
+      <td height="25" class="thinborder" align="right">25,000.00</td>
+      <td height="25" class="thinborder" align="right">15,000.00 $CURRENCY</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder">SUPPLIER</td>
+      <td height="25" class="thinborder">GTI Software </td>
+      <td class="thinborder" align="right">10,000.00</td>
+      <td height="25" class="thinborder" align="right">50,000.00</td>
+      <td height="25" class="thinborder" align="right">45,000.00 $CURRENCY</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="42%" height="25" rowspan="4">&nbsp;</td>
+      <td width="25%" rowspan="4"><strong>TOTAL BALANCE : &nbsp;&nbsp;&nbsp;</strong></td>
+      <td height="25"><strong>$TOTAL $currency1</strong></td>
+    </tr>
+    <tr>
+      <td height="25"><strong>$TOTAL $currency2</strong></td>
+    </tr>
+    <tr>
+      <td height="25"><strong>$TOTAL $currency3</strong></td>
+    </tr>
+    <tr>
+      <td height="25"><strong>$TOTAL $currency4</strong></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" colspan="3" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+  <input type="hidden" name="print_pg">
+  <input type="hidden" name="print_stat">
+</form>
+</body>
+</html>

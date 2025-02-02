@@ -1,0 +1,30 @@
+/* CSS Document -- use this only if page is using TAB.*/
+
+a:link {
+	color: #FFFFFF;
+	text-decoration:none;
+	font-size:12px;
+	font-family:"lucida grande", "trebuchet ms", sans;
+	}
+a:visited {
+	color: #FFFFFF;
+	text-decoration:none;
+	font-size:12px;
+	font-family:"lucida grande", "trebuchet ms", sans;
+	}
+a:active {
+	color: #FFFFFF;
+	text-decoration:none;
+	font-size:12px;
+	font-family:"lucida grande", "trebuchet ms", sans;
+	}
+a:hover {
+	color:#F96C17;
+	/**font-weight:700;**/
+	}
+.tabFont {
+	color:#00468C;
+	font-weight:700;
+	font-size:12px;
+	font-family:"lucida grande", "trebuchet ms", sans;
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/lms_redesigned/css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#DEC9CC">
+<form name="form1" method="post" action="">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#A8A8D5"> 
+      <td height="25" colspan="8" bgcolor="#A8A8D5"><div align="center"><font color="#FFFFFF" ><strong>:::: 
+          CATALOGING : REPORTS - AUTHOR CARD ::::</strong></font></div></td>
+    </tr>
+	</table>
+	  
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="100%" height="30" colspan="4"><font size="1"><font size="1"><a href="main_page.jsp" target="_self"><img src="../../images/go_back.gif" border="0" ></a></font></font
+        ></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="15" colspan="4">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="28">&nbsp;</td>
+      <td height="28">SEARCH BY</td>
+      <td height="28" colspan="2"><select name="select">
+          <option>Title</option>
+          <option>Author</option>
+          <option>Subject</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td width="49" height="28">&nbsp;</td>
+      <td width="157" height="28">From <font size="1"><font size="1"><a href="from_to_popup_window.htm" target="_blank"><img src="../../images/search.gif" border="0" ></a></font></font
+        ></td>
+      <td width="1026" height="28" colspan="2"><input name="textfield" type="text" size="32" maxlength="128"> 
+        <font size="1">&nbsp;</font
+        > </td>
+    </tr>
+    <tr> 
+      <td height="28">&nbsp;</td>
+      <td height="28">To<font size="1"><font size="1">&nbsp;&nbsp;&nbsp;<a href="from_to_popup_window.htm" target="_blank"><img src="../../images/search.gif" border="0" ></a></font></font
+        ></td>
+      <td height="28" colspan="2"><input name="textfield2" type="text" size="32" maxlength="128"> 
+        <font size="1">&nbsp;</font
+        ></td>
+    </tr>
+    <tr> 
+      <td height="15" colspan="4"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td height="28">&nbsp;</td>
+      <td height="28"> <a href="filters_popup_window.htm" target="_blank"><strong>FILTERS</strong></a>....</td>
+      <td height="28" colspan="2">&nbsp; </td>
+    </tr>
+    <tr> 
+      <td height="15" colspan="4"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="51" height="28">&nbsp;</td>
+      <td width="65" height="28"><strong>SORT</strong></td>
+      <td width="84" height="28"><input type="radio" name="radiobutton" value="radiobutton">
+        Author</td>
+      <td width="82" height="28"><input type="radio" name="radiobutton" value="radiobutton">
+        Title</td>
+      <td width="950" height="28"><input type="radio" name="radiobutton" value="radiobutton">
+        Call Number</td>
+    </tr>
+    <tr> 
+      <td height="28" colspan="5"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="100%" height="50"><div align="center"><font size="1"><a href="author_card_print.htm" target="_blank"><img src="../../images/print.gif" border="0" ></a><font size="1">click 
+          to print Author Card(s)</font></font
+        ></div></td>
+    </tr>
+  </table>
+</form>
+	
+</body>
+</html>

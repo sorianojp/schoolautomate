@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr > 
+      <td height="25" colspan="5" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" ><strong>:::: 
+          PAYROLL: REPORTS : ALPHALIST OF PAYEES SUBJECT TO EXPANDED WITHHOLDING 
+          TAX FROM WHOM TAXES HAVE BEEN WITHHELD ::::</strong></font></div></td>
+    </tr>
+</table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="23" colspan="4"><font size="1"><font size="1"><img src="../../../../images/go_back.gif" ></font></font></td>
+    </tr>
+    <tr> 
+      <td width="4%" height="29">&nbsp;</td>
+      <td width="7%">TIN #</td>
+      <td width="14%"><input name="textfield2" type="text" size="16" maxlength="16"></td>
+      <td width="75%"><font size="1"><img src="../../../../images/form_proceed.gif" > 
+        (NOTE: after clicking PROCEED button, show details for the following fields 
+        if the TIN# has the data already)</font></td>
+    </tr>
+    <tr> 
+      <td height="27">&nbsp;</td>
+      <td height="27" colspan="3"><u>PAYEE INFO : </u> </td>
+    </tr>
+    <tr> 
+      <td height="27">&nbsp;</td>
+      <td height="27">&nbsp;</td>
+      <td height="27" colspan="2">Classification : 
+        <select name="select3">
+          <option>Personal</option>
+          <option>Company</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="27">&nbsp;</td>
+      <td height="27">&nbsp;</td>
+      <td height="27" colspan="2">Last name 
+        <input name="textfield" type="text" size="32" maxlength="32"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;First 
+        name 
+        <input name="textfield3" type="text" size="32" maxlength="32"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Middle 
+        name 
+        <input name="textfield32" type="text" size="32" maxlength="32"> </td>
+    </tr>
+    <tr> 
+      <td height="27">&nbsp;</td>
+      <td height="27">&nbsp;</td>
+      <td height="27" colspan="2">Company Name 
+        <input name="textfield5" type="text" size="64" maxlength="128"></td>
+    </tr>
+    <tr> 
+      <td height="27">&nbsp;</td>
+      <td height="27">ATC Code</td>
+      <td height="27" colspan="2"><select name="select">
+          <option>W1010</option>
+          <option>W1120</option>
+          <option>W1380</option>
+        </select>
+        <font size="1"><font size="1"><a href="update_ATC.htm" target="_blank"><img src="../../../../images/update.gif" border="0" ></a></font></font> 
+        click to update list of ATC Code</td>
+    </tr>
+    <tr> 
+      <td height="27">&nbsp;</td>
+      <td height="27" colspan="3">Nature of Income Payment : $NAture_of_income_payment</td>
+    </tr>
+    <tr> 
+      <td height="27">&nbsp;</td>
+      <td height="27" colspan="3">Tax Rate : $rate</td>
+    </tr>
+    <tr> 
+      <td height="27">&nbsp;</td>
+      <td height="27" colspan="3">Amount of Income Payment : 
+        <input type="text" name="textfield4"></td>
+    </tr>
+    <tr> 
+      <td height="27">&nbsp;</td>
+      <td height="27" colspan="3">Amount of Tax Withheld : $amount</td>
+    </tr>
+    <tr> 
+      <td height="48">&nbsp;</td>
+      <td height="48" colspan="3" valign="bottom"><font size="1"><img src="../../../../images/save.gif" > 
+        click to SAVE entries &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="../../../../images/cancel.gif" > 
+        click to CANCEL/CLEAR entries </font></td>
+    </tr>
+  </table>
+	
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="4%" height="28">&nbsp;</td>
+      <td width="96%" height="28"><div align="right"><font size="1"><font size="1"><font size="1"><img src="../../../../images/print.gif" ></font> 
+          <font size="1">click to print list</font></font></font></div></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="1" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#666666"> 
+      <td height="24" colspan="11"><div align="center"><strong><font color="#FFFFFF">:: 
+          ALPHALIST ::</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="28" colspan="11"><strong><font size="1">TOTAL PAYEE(S) : </font></strong></td>
+    </tr>
+    <tr> 
+      <td width="4%" rowspan="2"><div align="center"><font size="1"><strong>COUNT</strong></font></div></td>
+      <td width="12%" rowspan="2"><div align="center"><font size="1"><strong>TIN 
+          #</strong></font></div></td>
+      <td height="21" colspan="3"><div align="center"><font size="1"><strong>NAME 
+          OF PAYEES</strong></font></div></td>
+      <td width="4%" rowspan="2"><div align="center"><font size="1"><strong>ATC 
+          CODE </strong></font></div></td>
+      <td width="11%" rowspan="2"><div align="center"><font size="1"><strong>NATURE 
+          OF INCOME PAYMENT</strong></font></div></td>
+      <td width="8%" rowspan="2"><div align="center"><font color="#000000"><strong><font size="1">AMOUNT 
+          OF INCOME PAYMENT</font></strong></font></div></td>
+      <td width="4%" rowspan="2"><div align="center"><font size="1"><strong>TAX 
+          RATE </strong></font></div></td>
+      <td width="7%" rowspan="2"><div align="center"><font size="1"><strong>AMOUNT 
+          OF TAX WITHHELD</strong></font></div></td>
+      <td width="6%" rowspan="2"><div align="center"><font size="1"></font></div></td>
+    </tr>
+    <tr> 
+      <td width="15%" height="22"><strong><font size="1">Last Name</font></strong></td>
+      <td width="14%"><strong><font size="1">First Name</font></strong></td>
+      <td width="15%"><strong><font size="1">Middle Name</font></strong></td>
+    </tr>
+    <tr> 
+      <td height="33">1</td>
+      <td height="33">&nbsp;</td>
+      <td height="33">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td height="33">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="center"><font size="1"><font size="1"><font size="1"><img src="../../../../images/edit.gif" > 
+          <img src="../../../../images/delete.gif" > </font></font></font></div></td>
+    </tr>
+    <tr>
+      <td height="33">&nbsp;</td>
+      <td height="33">&nbsp;</td>
+      <td height="33">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td height="33">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25"  colspan="3" bgcolor="#FFFFFF"><div align="left"></div></td>
+    </tr>
+    <tr> 
+      <td height="25"  colspan="3" bgcolor="#FFFFFF">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25"  colspan="3" bgcolor="#FFFFFF">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25"  colspan="3" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

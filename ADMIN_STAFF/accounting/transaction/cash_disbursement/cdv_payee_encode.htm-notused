@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td width="100%" height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>::::
+          DISBURSEMENT : ENCODING OF PAYEE PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25"><font size="1"><a href="../../../../ADMIN_STAFF/accounting/transaction/petty_cash/petty_cash_encode.htm"><img src="../../../../images/close_window.gif" border="0"></a></font>click
+        to close window and have the changes reflected in the dropdown list</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="27" colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="27">&nbsp;</td>
+      <td>Payee Name</td>
+      <td><input name="textfield5" type="text" size="64" maxlength="128"></td>
+    </tr>
+    <tr>
+      <td width="6%" height="25">&nbsp;</td>
+      <td width="13%" height="25">Category</td>
+      <td width="81%" height="25"><font size="1">
+        <select name="select6">
+          <option>Personal (CPU Personnel)</option>
+          <option>Personal (Non-CPU Personnel)</option>
+          <option>Company</option>
+        </select>
+        </font></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="3"><hr size="1"></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25"><font size="1"><a href="../../../../ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../../images/save.gif" border="0"></a>click
+        to save entries <a href="../../../../ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../../images/cancel.gif" border="0"></a>click
+        to cancel/clear entries </font></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="1" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="25" colspan="4" bgcolor="#B9B292"><div align="center"><font color="#FFFFFF"><strong>::
+          LIST OF EXISTING PAYEES IN THE DATABASE :: </strong></font></div></td>
+    </tr>
+    <tr>
+      <td width="41%" height="25"><div align="center"><strong><font size="1">PAYEE
+          NAME</font></strong></div></td>
+      <td width="27%"><div align="center"><strong><font size="1">CATEGORY</font></strong></div></td>
+      <td width="15%"><font size="1">&nbsp;</font></td>
+      <td width="17%"><div align="center"><font size="1"><strong>HIDE FROM DROPDOWN
+          LIST</strong></font></div></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><font size="1"><a href="../../../../ADMIN_STAFF/accounting/transaction/petty_cash/petty_cash_encode.htm" target="_blank"><img src="../../../../images/edit.gif" border="0"></a><a href="../../../../ADMIN_STAFF/accounting/transaction/petty_cash/petty_cash_view_dtls.htm" target="_blank"><img src="../../../../images/delete.gif" border="0"></a></font></td>
+      <td><div align="center">
+          <input type="checkbox" name="checkbox" value="checkbox">
+        </div></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><font size="1"><a href="../../../../ADMIN_STAFF/accounting/transaction/petty_cash/petty_cash_encode.htm" target="_blank"><img src="../../../../images/edit.gif" border="0"></a><a href="../../../../ADMIN_STAFF/accounting/transaction/petty_cash/petty_cash_view_dtls.htm" target="_blank"><img src="../../../../images/delete.gif" border="0"></a></font></td>
+      <td><div align="center">
+          <input type="checkbox" name="checkbox2" value="checkbox">
+        </div></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><font size="1"><a href="../../../../ADMIN_STAFF/accounting/transaction/petty_cash/petty_cash_encode.htm" target="_blank"><img src="../../../../images/edit.gif" border="0"></a><a href="../../../../ADMIN_STAFF/accounting/transaction/petty_cash/petty_cash_view_dtls.htm" target="_blank"><img src="../../../../images/delete.gif" border="0"></a></font></td>
+      <td><div align="center">
+          <input type="checkbox" name="checkbox3" value="checkbox">
+        </div></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td width="19%" height="25"><div align="left"></div></td>
+      <td width="81%" height="25"><font size="1"><a href="../../../../ADMIN_STAFF/accounting/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="../../../../images/save.gif" border="0"></a>click
+        to save setting</font></td>
+    </tr>
+    <tr>
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1">
+      <td height="25" colspan="2" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

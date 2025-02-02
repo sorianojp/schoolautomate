@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td width="100%" height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" ><strong>:::: 
+          PAYROLL : ADDITIONAL MONTH PAY PARAMETERS PAGE ::::</strong></font><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25"><font size="1"><a href="../addtl_mth_pay_main.jsp"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/images/go_back.gif" border="0"></a></font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="100%" height="27">&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30">Effectivity Period/Year</td>
+      <td height="30"><input name="textfield2" type="text" size="4" maxlength="4"></td>
+    </tr>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30"> Additional Pay Name</td>
+      <td width="74%" height="30"> <input name="textfield" type="text" size="32" maxlength="32"></td>
+    </tr>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30">Procedure</td>
+      <td height="30"><select name="select2">
+          <option>Specific Amount</option>
+          <option>Computed</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30">Amount</td>
+      <td height="30"><input name="textfield4" type="text" size="16" maxlength="16">
+        (show this if specific amount) </td>
+    </tr>
+    <tr> 
+      <td  width="6%"height="30">&nbsp;</td>
+      <td width="20%" height="30">Inclusive Month</td>
+      <td height="30"> 
+        <%
+		if(vEditInfo != null && vEditInfo.size() > 0) 
+			strTemp = (String)vEditInfo.elementAt(1);
+		else	
+			strTemp = "0";
+	   %>
+        <select name="month_fr">
+          <%=dbOP.loadComboMonth(strTemp)%> 
+        </select>
+        - 
+        <%
+		if(vEditInfo != null && vEditInfo.size() > 0) 
+			strTemp = (String)vEditInfo.elementAt(2);
+		else	
+			strTemp = "11";
+	   %>
+        <select name="month_to">
+          <%=dbOP.loadComboMonth(strTemp)%> 
+        </select>
+        (show this if computed)</td>
+    </tr>
+    <tr> 
+      <td height="35">&nbsp;</td>
+      <td height="35">Compensation Source for Computation</td>
+      <td height="35"> <select name="salary_type" onChange="ReloadPage()">
+          <% for(int i =2 ; i >= 0 ; i--) { 
+	if (Integer.parseInt(WI.getStrValue(request.getParameter("salary_type"),"2")) == i){ %>
+          <option value="<%=i%>" selected><%=astrTypeLabel[i]%></option>
+          <%}else{%>
+          <option value="<%=i%>" ><%=astrTypeLabel[i]%></option>
+          <%}}%>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="30">&nbsp;</td>
+      <td height="30">&nbsp;</td>
+      <td height="30">&nbsp;plus (+) <font color="#FF0000" size="1">&nbsp;</font> 
+        &nbsp;&nbsp;&nbsp; Item 2 : &nbsp;&nbsp;&nbsp; 
+        <% strTemp = WI.getStrValue(request.getParameter("obi"),"2");%>
+        <select name="obi" onChange="ReloadPage()">
+          <option value="2">Overtimes</option>
+          <% if (strTemp.compareTo("0") == 0) {%>
+          <option value="0" selected>Benefits</option>
+          <%}else{%>
+          <option value="0">Benefits</option>
+          <%}if (strTemp.compareTo("1") == 0) {%>
+          <option value="1" selected>Incentives</option>
+          <%}else{%>
+          <option value="1" >Incentives</option>
+          <%}%>
+        </select> 
+        <% if (strTemp.compareTo("2") != 0) {%>
+        <select name="benefit_index">
+          <%=dbOP.loadCombo("distinct benefit_index","sub_type"," from hr_benefit_incentive where is_benefit = " + strTemp + " and is_del = 0",WI.fillTextValue("benefit_index"),false)%> 
+        </select> 
+        <%}%>
+      </td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">Computation Formula</td>
+      <td height="25">Summation of Source 
+        <select name="select3">
+          <option>/</option>
+          <option>*</option>
+        </select> 
+        <input name="textfield5" type="text" size="4" maxlength="4">
+        plus 
+        <input name="textfield6" type="text" size="16" maxlength="16"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Eligibility Period/Schedule</td>
+      <td height="25"><input type="text" name="textfield3"> <select name="select">
+          <option>day(s)</option>
+          <option>week(s)</option>
+          <option>month(s)</option>
+          <option>year(s)</option>
+        </select>
+        of work</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Implementation Setting </td>
+      <td height="25">
+<select name="select4">
+          <option>Apply when eligible </option>
+          <option>Position</option>
+          <option>College</option>
+          <option>Department</option>
+          <option>Office</option>
+          <option>Employment Type</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="50">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><font size="1"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/images/save.gif" border="0">click 
+        to save entries <img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/images/cancel.gif" border="0">click 
+        to cancel/clear entries </font></td>
+    </tr>
+    <tr> 
+      <td height="10">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="right"><font size="1"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/images/print.gif" border="0">click 
+          to print list</font></div></td>
+    </tr>
+  </table>
+  <table width="100%" border="1" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#B9B292"> 
+      <td height="25" colspan="8"><div align="center"><font color="#FFFFFF"><strong>:: 
+          LIST OF CURRENT :: </strong></font></div></td>
+    </tr>
+    <tr> 
+      <td width="17%" height="25"><div align="center"><font size="1"><strong>ADDITIONAL 
+          PAY NAME</strong></font></div></td>
+      <td width="15%"><div align="center"><font size="1"><strong>PROCEDURE</strong></font></div></td>
+      <td width="15%" height="25"><div align="center"><font size="1"><strong>INCLUSIVE 
+          MONTH </strong></font></div></td>
+      <td width="17%"><div align="center"><font size="1"><strong>COMPENSATION 
+          SOURCE FOR COMPUTATION</strong></font></div></td>
+      <td width="14%" height="25"><div align="center"><font size="1"><strong>EFFECTIVITY 
+          </strong></font></div></td>
+      <td width="13%"><div align="center"><font size="1"><strong>ELIGIBILITY</strong></font></div></td>
+      <td width="13%"><div align="center"><font size="1"><strong>SETTING</strong></font></div></td>
+      <td width="11%" height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>13th Month</td>
+      <td>Computed</td>
+      <td>January - December</td>
+      <td>Basic Salary </td>
+      <td>2000</td>
+      <td>1 day(s) work</td>
+      <td>Apply when eligible</td>
+      <td><font size="1"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/images/edit.gif" border="0"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/images/delete.gif" border="0"></font></td>
+    </tr>
+    <tr> 
+      <td>Bonus</td>
+      <td>Specific Amount</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>2006</td>
+      <td>6 month(s)</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+  <tr>
+    <td height="30">&nbsp;</td>
+  </tr>
+</table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="94%" height="25">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

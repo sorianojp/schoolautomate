@@ -1,0 +1,237 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="2" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>:::: 
+          FIXED ASSETS MANAGEMENT -ENCODE ASSET - EQUIPMENT PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="27" colspan="2"><font size="1"><a href="encode_fixed_asset.htm" target="_self"><img src="../../../images/go_back.gif" border="0"></a></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td width="3%" height="25">&nbsp;</td>
+      <td width="97%">ASSET TYPE : <strong>EQUIPMENT</strong></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%"  cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="3%" height="25">&nbsp;</td>
+      <td width="17%" valign="middle">Item Name</td>
+      <td width="80%">$item_name</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Brand Name</td>
+      <td>$brand_name</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Supplier Name</td>
+      <td>$supplier_name</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Date Acquired</td>
+      <td>$date_delivered<font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"></a></font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Unit Cost</td>
+      <td> $unit_cost<font size="1">&nbsp; </font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Quantity</td>
+      <td>$qty<font size="1">&nbsp; </font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Unit</td>
+      <td>$unit </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Acquisition Cost</td>
+      <td>$unit_cost * $quantity<font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"></a></font></td>
+    </tr>
+    <tr>
+      <td height="33">&nbsp;</td>
+      <td><font color="#000000">Item Usage Category</font></td>
+      <td><select name="select">
+          <option>General Administration</option>
+          <option>Educational</option>
+        </select> <font size="1"><img src="../../../images/update.gif" width="60" height="25" border="0"></a>click 
+        to update USAGE CATEGORY list</font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Life</td>
+      <td><input name="textfield" type="text" size="8" maxlength="8"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Remaining Asset Life</td>
+      <td>$date_cons-current_date</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Yearly Depreciation</td>
+      <td><strong>$yr_dep</strong> (Acquisition Cost/life)</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Asset Status</td>
+      <td height="25" valign="bottom"><select name="select3">
+          <option>Current</option>
+          <option>Donated</option>
+          <option>Discarded (In junk shop)</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="55">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td valign="bottom"><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"><img src="../../../images/save.gif" border="0"></a>click 
+        to save entries&nbsp;&nbsp;&nbsp; <a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"><img src="../../../images/cancel.gif" border="0"></a>click 
+        to cancel/clear entries</font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="1"  cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#99CCFF"> 
+      <td height="25" colspan="8"><div align="center"><strong><font color="#FF0000">:: 
+          LIST OF EQUIPMENT PURCHASED AND DELIVERED - $SPECIFIC DATE/$DATE_RANGE/$MONTH/YEAR 
+          ::</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="3"><font size="1"><strong>TOTAL ITEM(S) : $total</strong></font></td>
+      <td height="25" colspan="5">NOTE : Click ADD button to record to Fixed Asset. 
+        Click VIEW to view details</td>
+    </tr>
+    <tr> 
+      <td width="4%" height="25"><div align="center"><font size="1">COUNT</font></div></td>
+      <td width="24%" valign="middle"><div align="center"><font size="1">ITEM 
+          NAME</font></div></td>
+      <td width="11%"><div align="center"><font size="1">DATE ACQUIRED</font></div></td>
+      <td width="15%" height="25"><div align="center"><font size="1">SUPPLIER</font></div></td>
+      <td width="8%" valign="middle"><div align="center"><font size="1">QTY/UNIT</font></div></td>
+      <td width="22%"><div align="center"><font size="1">BRAND</font></div></td>
+      <td width="8%"><div align="center"><font size="1">UNIT COST</font></div></td>
+      <td width="8%">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"><img src="../../../images/add.gif" border="0"></a><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"><img src="../../../images/view.gif" border="0"></a></font></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%"  cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="73%"><div align="center"><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"><img src="../../../images/save.gif" border="0"></a>click 
+          to save entries&nbsp;&nbsp;&nbsp; <a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"><img src="../../../images/cancel.gif" border="0"></a>click 
+          to cancel/clear entries</font></div></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="1"  cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25" colspan="6" bgcolor="#B9B292"><div align="center">LIST OF 
+          ASSET(S) ENCODED TODAY (MM/DD/YYYY)</div></td>
+    </tr>
+    <tr> 
+      <td width="18%" height="25"><div align="center"><font size="1"><strong> 
+          ASSET TYPE</strong></font></div></td>
+      <td width="25%"><div align="center"><font size="1"><strong>ASSET DESCRIPTION</strong></font></div></td>
+      <td width="10%"><div align="center"><font size="1"><strong>DATE ACQUIRED/ 
+          IMPROVEMENT</strong></font></div></td>
+      <td width="15%"><div align="center"><font size="1"><strong>COST</strong></font></div></td>
+      <td width="7%"><div align="center"><font size="1"><strong>ASSET STATUS</strong></font></div></td>
+      <td width="5%">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">Buildings</font></td>
+      <td><font size="1">Hospital with 4 floors</font></td>
+      <td><font size="1">09/14/2004</font></td>
+      <td><font size="1">11,123,456.78</font></td>
+      <td><font size="1">CURRENT</font></td>
+      <td><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"><img src="../../../images/view.gif" border="0"></a><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"><img src="../../../images/edit.gif" border="0"></a><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/accounting/transaction/fixed_assets_depre_update_type.jsp" target="_self"><img src="../../../images/delete.gif" border="0"></a></font></td>
+    </tr>
+  </table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="22">&nbsp;</td>
+      <td colspan="4" height="22">&nbsp;</td>
+      <td height="22" colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+      <td width="1%" height="25">&nbsp;</td>
+      <td colspan="4" height="25"><div align="left"><font size="1"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/ADMIN_STAFF/fee_assess_pay/reports/statement_of_account_print.htm" target="_blank"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/images/print.gif" width="58" height="26" border="0"></a><font size="1">click
+          to print list of assets</font></font></div></td>
+      <td width="1%" height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25" colspan="8">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1">
+      <td height="25" colspan="8" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

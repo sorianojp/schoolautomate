@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td width="100%" height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>:::: 
+          PAYROLL : LOANS : ENCODE PAG-IBIG LOAN AMORTIZATION SCHEDULE PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25"><font size="1"><a href="encode_pagibig_loan_amo.htm"><img src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/images/go_back.gif" border="0"></a></font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="10" colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="4%" height="26">&nbsp;</td>
+      <td width="15%">Payroll Period</td>
+      <td width="81%" colspan="2"><input name="textfield" type="text" size="10" maxlength="10">
+        <font size="1"><img src="../../../images/calendar_new.gif" border="0"></font> 
+      </td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td>Principal</td>
+      <td colspan="2"><input name="textfield3" type="text" size="4" maxlength="4">
+      </td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td>Interest</td>
+      <td colspan="2"><input name="textfield32" type="text" size="4" maxlength="4">
+      </td>
+    </tr>
+    <tr> 
+      <td height="38">&nbsp;</td>
+      <td height="38">Amount Due</td>
+      <td height="38" colspan="2">$Principal+$interest<font size="1">&nbsp;</font></td>
+    </tr>
+    <tr> 
+      <td height="38"><div align="center"><font size="1"></font></div></td>
+      <td height="38">&nbsp;</td>
+      <td height="38" colspan="2" valign="bottom"><font size="1"><img src="../../../images/save.gif" border="0"> 
+        click to SAVE entries <img src="../../../images/cancel.gif" border="0"> 
+        click to CANCEL/CLEAR entries </font></td>
+    </tr>
+    <tr> 
+      <td height="26" colspan="4"><div align="right"><font size="1"><img src="../../../images/print.gif" border="0">click 
+          to PRINT list</font></div></td>
+    </tr>
+  </table>
+	  
+  <table width="100%" border="1" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#99CCFF"> 
+      <td height="25" colspan="4"><div align="center"><strong>:: AMORTIZATION 
+          SCHEDULE FOR PAG-IBIG LOAN $loan_name ::</strong></div></td>
+    </tr>
+    <tr> 
+      <td width="12%" height="25"><div align="center"><strong><font size="1">PAYROLL 
+          PERIOD</font></strong></div></td>
+      <td width="21%" height="25"><div align="center"><strong><font size="1">AMOUNT 
+          DUE </font></strong></div></td>
+      <td width="21%" height="25"><div align="center"><strong><font size="1">PRINCIPAL</font></strong></div></td>
+      <td width="21%"><div align="center"><strong><font size="1">INTEREST</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">June 30, 2006</font></td>
+      <td height="25"><font size="1">2,806.02</font></td>
+      <td height="25"><font size="1">0.00</font></td>
+      <td><font size="1">2,806.02</font></td>
+    </tr>
+    <tr> 
+      <td height="24"><font size="1">July 15, 2006</font></td>
+      <td height="24"><font size="1">0.00</font></td>
+      <td height="24"><font size="1">0.00</font></td>
+      <td><font size="1">0.00</font></td>
+    </tr>
+    <tr> 
+      <td height="24"><font size="1">July 31,2006</font></td>
+      <td height="24"><font size="1">1,800.00</font></td>
+      <td height="24"><font size="1">0.00</font></td>
+      <td><font size="1">1,800.00</font></td>
+    </tr>
+    <tr> 
+      <td><font size="1">June 30, 2007</font></td>
+      <td height="24"><font size="1">3,825.00</font></td>
+      <td height="24"><font size="1">2,045.00</font></td>
+      <td><font size="1">1,779.55</font></td>
+    </tr>
+    <tr> 
+      <td><font size="1">July 15, 2007</font></td>
+      <td height="24"><font size="1">2,045.00</font></td>
+      <td height="24"><font size="1">2,045.00</font></td>
+      <td><font size="1">0.00</font></td>
+    </tr>
+    <tr> 
+      <td><font size="1">July 31,2007</font></td>
+      <td height="24"><font size="1">3,784.09</font></td>
+      <td height="24"><font size="1">2,045.00</font></td>
+      <td><font size="1">1,738.64</font></td>
+    </tr>
+    <tr> 
+      <td height="24" colspan="4"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td>TOTALS :</td>
+      <td height="24">&nbsp;</td>
+      <td height="24">&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="100%" height="25">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

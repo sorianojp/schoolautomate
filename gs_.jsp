@@ -1,0 +1,1 @@
+<jsp:forward page="./PARENTS_STUDENTS/onlinepayment/gs_payment_response.jsp" />

@@ -1,0 +1,439 @@
+<%@ page language="java" import="utility.*, health.ClinicVisitLog ,java.util.Vector " %>
+<%
+boolean bolIsSchool = false;
+if( (new CommonUtil().getIsSchool(null)).equals("1"))
+	bolIsSchool = true;
+String[] strColorScheme = CommonUtil.getColorScheme(8);
+//strColorScheme is never null. it has value always.
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<script language="javascript"  src ="../../../jscript/common.js" ></script>
+<script language="JavaScript" src="../../../jscript/date-picker.js"></script>
+<script language="JavaScript" src="../../../Ajax/ajax.js"></script>
+<style type="text/css">
+.bgDynamic {
+	background-color:<%=strColorScheme[1]%>
+}
+.footerDynamic {
+	background-color:<%=strColorScheme[2]%>
+}
+</style>
+<script language="javascript">
+	
+	function SearchVisitLog(){
+		document.form_.search_visit_log.value = "1";
+		document.form_.submit();
+	}
+	
+</script>
+</head>
+<%
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+	Vector vRetResult = null;
+	Vector vEditInfo = null;
+
+	String strInfoIndex = null;
+	String strErrMsg = null;
+	String strTemp = null;
+	String strSlash = null;
+
+	//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Health Monitoring-Clinic Visit Log","dependent_listing.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+	//authenticate this user.
+	CommonUtil comUtil = new CommonUtil();
+	int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+															"Health Monitoring","Clinic Visit Log",request.getRemoteAddr(),
+															"dependent_listing.jsp");
+	if(iAccessLevel == -1)//for fatal error.
+	{
+		dbOP.cleanUP();
+		request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+		request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+		response.sendRedirect("../../../commfile/fatal_error.jsp");
+		return;
+	}
+	else if(iAccessLevel == 0)//NOT AUTHORIZED.
+	{
+		dbOP.cleanUP();
+		response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+		return;
+	}
+	
+	//end of authenticaion code.
+	
+	String[] astrDropListEqual = {"Equal to","Starts with","Ends with","Contains"};
+	String[] astrDropListValEqual = {"equals","starts","ends","contains"};
+	String[] astrList = {"Starts with","Ends with","Contains"};
+	String[] astrListVal = {"starts","ends","contains"};
+	String[] astrSortByName    = {"Visit Date","Case #","Patient ID","FirstName","LastName","Doctor ID"};
+	String[] astrSortByVal     = {"visit_date","case_no","patient_table.id_number","patient_table.fname","patient_table.lname", "doc_table.id_number"};
+	int iSearchResult = 0;
+	
+	ClinicVisitLog CVLog = new ClinicVisitLog();
+	
+	if(WI.fillTextValue("search_visit_log").length() > 0){
+		vRetResult = CVLog.viewDependentListings(dbOP, request);
+		if(vRetResult == null)
+			strErrMsg = CVLog.getErrMsg();
+	}
+%>
+<body bgcolor="#8C9AAA" class="bgDynamic">
+<form action="./dependent_listing.jsp" method="post" name="form_">
+	<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+		<tr bgcolor="#697A8F"> 
+			<td width="61%" height="28" class="footerDynamic"><div align="center"><font color="#FFFFFF" >
+				<strong>:::: CLINIC VISIT LOG - LISTINGS PAGE ::::</strong></font></div></td>
+		</tr>
+		<tr bgcolor="#697A8F"> 
+			<td height="18" bgcolor="#FFFFFF"><%=WI.getStrValue(strErrMsg)%></td>
+		</tr>
+	</table>
+			
+	<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+		<tr>
+			<td height="25">&nbsp;</td>
+		    <td>ID Number: </td>
+	      <td>
+				<%
+					strTemp = WI.fillTextValue("member_id");
+				%>
+				<select name="member_id_con">
+					<%=CVLog.constructGenericDropList(WI.fillTextValue("member_id_con"),astrDropListEqual,astrDropListValEqual)%>
+				</select>
+				<input name="member_id" type="text" size="16" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" 
+					onBlur="style.backgroundColor='white'" value="<%=strTemp%>"></td>
+		</tr>
+		<tr>
+			<td height="25">&nbsp;</td>
+		    <td>First Name: </td>
+		    <td>
+				<%
+					strTemp = WI.fillTextValue("member_fname");
+				%>
+				<select name="member_fname_con">
+					<%=CVLog.constructGenericDropList(WI.fillTextValue("member_fname_con"),astrDropListEqual,astrDropListValEqual)%>
+				</select>
+				<input name="member_fname" type="text" size="32" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" 
+					onBlur="style.backgroundColor='white'" value="<%=strTemp%>"></td>
+		</tr>
+		<tr>
+			<td height="25">&nbsp;</td>
+		    <td>Middle Name: </td>
+		    <td>
+				<%
+					strTemp = WI.fillTextValue("member_mname");
+				%>
+				<select name="member_mname_con">
+					<%=CVLog.constructGenericDropList(WI.fillTextValue("member_mname_con"),astrDropListEqual,astrDropListValEqual)%>
+				</select>
+				<input name="member_mname" type="text" size="32" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" 
+					onBlur="style.backgroundColor='white'" value="<%=strTemp%>"></td>
+		</tr>
+		<tr>
+			<td height="25">&nbsp;</td>
+		    <td>Last Name: </td>
+		    <td>
+				<%
+					strTemp = WI.fillTextValue("member_lname");
+				%>
+				<select name="member_lname_con">
+					<%=CVLog.constructGenericDropList(WI.fillTextValue("member_lname_con"),astrDropListEqual,astrDropListValEqual)%>
+				</select>
+				<input name="member_lname" type="text" size="32" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" 
+					onBlur="style.backgroundColor='white'" value="<%=strTemp%>"></td>
+		</tr>
+		<tr bgcolor="#697A8F"> 
+			<td width="3%" height="25" bgcolor="#FFFFFF">&nbsp;</td>
+			<td width="17%" bgcolor="#FFFFFF">Attended by(ID)</td>
+			<%
+				strTemp = WI.fillTextValue("doc_id");
+			%>
+			<td width="80%" bgcolor="#FFFFFF"><strong>         
+				<select name="doc_id_con">
+					<%=CVLog.constructGenericDropList(WI.fillTextValue("doc_id_con"),astrDropListEqual,astrDropListValEqual)%>
+				</select>
+				<input name="doc_id" type="text" size="16" class="textbox" onFocus="style.backgroundColor='#D3EBFF'" 
+					onBlur="style.backgroundColor='white'" value="<%=strTemp%>"> Doctor</strong></td>
+		</tr>
+		<tr bgcolor="#697A8F">
+			<td height="25" bgcolor="#FFFFFF">&nbsp;</td>
+			<td bgcolor="#FFFFFF">Attended by(ID)</td>
+			<%
+				strTemp = WI.fillTextValue("nurse_id");
+			%>
+			<td bgcolor="#FFFFFF"><strong>
+				<select name="nurse_id_con">
+					<%=CVLog.constructGenericDropList(WI.fillTextValue("nurse_id_con"),astrDropListEqual,astrDropListValEqual)%>
+				</select>
+				<input name="nurse_id" type="text" size="16" class="textbox" onFocus="style.backgroundColor='#D3EBFF'"
+					onBlur="style.backgroundColor='white'" value="<%=strTemp%>"> Nurse</strong></td>
+		</tr>
+    	<tr bgcolor="#697A8F">
+			<td height="25" bgcolor="#FFFFFF">&nbsp;</td>
+			<td bgcolor="#FFFFFF">Purpose of visit </td>
+			<td bgcolor="#FFFFFF">
+				<%
+					strTemp = WI.fillTextValue("purpose");
+				%>
+				<select name="purpose">
+					<option value="">Select purpose of visit</option>
+					<%=dbOP.loadCombo("purpose_index","purpose"," FROM hm_preload_purpose order by purpose", strTemp, false)%>
+				</select></td>
+		</tr>
+		<tr bgcolor="#697A8F"> 
+			<td height="25" bgcolor="#FFFFFF">&nbsp;</td>
+			<td bgcolor="#FFFFFF">Complaints</td>
+			<td bgcolor="#FFFFFF"><strong> 
+				<%
+					strTemp = WI.fillTextValue("comp1_index");
+				%>
+				<select name="comp1_index">
+					<option value="">Select Complaint</option>
+					<%=dbOP.loadCombo("COMPLAINT_TYPE_INDEX","COMPLAINT_TYPE"," FROM HM_PRELOAD_COMPLAINT", strTemp, false)%>
+				</select>
+				or&nbsp; 
+				<%
+					strTemp = WI.fillTextValue("comp2_index");
+				%>
+				<select name="comp2_index">
+					<option value="">Select Complaint</option>
+					<%=dbOP.loadCombo("COMPLAINT_TYPE_INDEX","COMPLAINT_TYPE"," FROM HM_PRELOAD_COMPLAINT", strTemp, false)%>
+				</select>
+				or &nbsp; 
+				<%
+					strTemp = WI.fillTextValue("comp3_index");
+				%>
+				<select name="comp3_index">
+					<option value="">Select Complaint</option>
+					<%=dbOP.loadCombo("COMPLAINT_TYPE_INDEX","COMPLAINT_TYPE"," FROM HM_PRELOAD_COMPLAINT", strTemp, false)%>
+				</select></strong></td>
+		</tr>
+		<tr bgcolor="#697A8F">
+			<td height="25" bgcolor="#FFFFFF">&nbsp;</td>
+			<td bgcolor="#FFFFFF">Diagnosis</td>
+			<td bgcolor="#FFFFFF">
+				<select name="diagnosis_con">
+					<%=CVLog.constructGenericDropList(WI.fillTextValue("diagnosis_con"),astrList,astrListVal)%>
+				</select>
+				<input type="text" name="diagnosis" value="<%=WI.fillTextValue("diagnosis")%>" class="textbox"
+					onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"></td>
+		</tr>
+		<tr bgcolor="#697A8F"> 
+			<td height="25" bgcolor="#FFFFFF">&nbsp;</td>
+			<td bgcolor="#FFFFFF">Prognosis</td>
+			<td bgcolor="#FFFFFF"><strong> 
+				<%
+					strTemp = WI.fillTextValue("prog1_index");
+				%>
+				<select name="prog1_index">
+				<option value="">Select Prognosis</option>
+				<%=dbOP.loadCombo("PROGNOSIS_TYPE_INDEX","PROGNOSIS_TYPE"," FROM HM_PRELOAD_PROGNOSIS", strTemp, false)%>
+				</select>
+				or&nbsp; 
+				<%
+					strTemp = WI.fillTextValue("prog2_index");
+				%>
+				<select name="prog2_index">
+				<option value="">Select Prognosis</option>
+				<%=dbOP.loadCombo("PROGNOSIS_TYPE_INDEX","PROGNOSIS_TYPE"," FROM HM_PRELOAD_PROGNOSIS", strTemp, false)%>
+				</select>
+				or&nbsp; 
+				<%
+					strTemp = WI.fillTextValue("prog3_index");
+				%>
+				<select name="prog3_index">
+				<option value="">Select Prognosis</option>
+				<%=dbOP.loadCombo("PROGNOSIS_TYPE_INDEX","PROGNOSIS_TYPE"," FROM HM_PRELOAD_PROGNOSIS", strTemp, false)%>
+				</select></strong></td>
+		</tr>
+		<tr>
+			<td height="25">&nbsp;</td>
+			<td>Accr. Physician: </td>
+			<td>
+				<%
+					strTemp = WI.fillTextValue("accr_physician");
+				%>
+				<select name="accr_physician">
+					<option value="">Select Accr. Physician</option>
+					<%=dbOP.loadCombo("physician_index","physician_name", " from hm_accredited_physicians where is_valid = 1 order by physician_name",strTemp,false)%>
+				</select></td>
+		</tr>
+		<tr>
+			<td height="25">&nbsp;</td>
+			<td>Ref. Physician: </td>
+			<td>
+				<%
+					strTemp = WI.fillTextValue("ref_physician");
+				%>
+				<select name="ref_physician">
+					<option value="">Select Ref. Physician</option>
+					<%=dbOP.loadCombo("physician_index","physician_name", " from hm_accredited_physicians where is_valid = 1 order by physician_name",strTemp,false)%>
+				</select></td>
+		</tr>
+		<tr bgcolor="#697A8F"> 
+			<td height="18" colspan="3" bgcolor="#FFFFFF"><hr size="1"></td>
+		</tr>
+		<tr bgcolor="#697A8F"> 
+			<td height="25" bgcolor="#FFFFFF">&nbsp;</td>
+			<td bgcolor="#FFFFFF">Date Range</td>
+			<td bgcolor="#FFFFFF">
+				<%
+					strTemp = WI.fillTextValue("date_fr");
+				%>
+				<input name="date_fr" type="text" class="textbox" id="date"  onFocus="style.backgroundColor='#D3EBFF'" 
+					onBlur="style.backgroundColor='white'" value="<%=strTemp%>" size="12" maxlength="12" readonly="true"> 
+				<a href="javascript:show_calendar('form_.date_fr');" title="Click to select date" onMouseOver="window.status='Select date';return true;" 
+					onMouseOut="window.status='';return true;"><img src="../../../images/calendar_new.gif" width="20" height="16" border="0"></a> 
+				&nbsp;&nbsp; <strong>to</strong> &nbsp;&nbsp; 
+				<%
+					strTemp = WI.fillTextValue("date_to");
+				%>
+				<input name="date_to" type="text" class="textbox" id="date"  onFocus="style.backgroundColor='#D3EBFF'" 
+					onBlur="style.backgroundColor='white'" value="<%=strTemp%>" size="12" maxlength="12" readonly="true"> 
+				<a href="javascript:show_calendar('form_.date_to');" title="Click to select date" onMouseOver="window.status='Select date';return true;" 
+					onMouseOut="window.status='';return true;"><img src="../../../images/calendar_new.gif" width="20" height="16" border="0"></a></td>
+		</tr>
+		<tr bgcolor="#697A8F"> 
+			<td height="21" colspan="3" bgcolor="#FFFFFF"><hr size="1"></td>
+		</tr>
+		<tr bgcolor="#697A8F"> 
+			<td height="25" bgcolor="#FFFFFF">&nbsp;</td>
+			<td colspan="2" bgcolor="#FFFFFF">SORT BY</td>
+		</tr>
+		<tr bgcolor="#697A8F"> 
+			<td height="25" bgcolor="#FFFFFF">&nbsp;</td>
+			<td colspan="2" bgcolor="#FFFFFF">
+				<select name="sort_by1">
+					<option value="">N/A</option>
+					<%=CVLog.constructSortByDropList(WI.fillTextValue("sort_by1"),astrSortByName,astrSortByVal)%> 
+				</select>&nbsp;&nbsp;
+				<select name="sort_by1_con">
+					<option value="asc">Ascending</option>
+				<%if(WI.fillTextValue("sort_by1_con").compareTo("desc") ==0){%>
+					<option value="desc" selected>Descending</option>
+				<%}else{%>
+					<option value="desc">Descending</option>
+				<%}%>
+				</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<select name="sort_by2">
+					<option value="">N/A</option>
+					<%=CVLog.constructSortByDropList(WI.fillTextValue("sort_by2"),astrSortByName,astrSortByVal)%> 
+				</select>
+				<select name="sort_by2_con">
+					<option value="asc">Ascending</option>
+				<% if(WI.fillTextValue("sort_by2_con").compareTo("desc") ==0){%>
+					<option value="desc" selected>Descending</option>
+				<%}else{%>
+					<option value="desc">Descending</option>
+				<%}%>
+				</select></td>
+		</tr>
+		<tr bgcolor="#697A8F"> 
+			<td height="43" bgcolor="#FFFFFF">&nbsp;</td>
+			<td colspan="2" bgcolor="#FFFFFF"><a href="javascript:SearchVisitLog();"><img src="../../../images/form_proceed.gif" border="0"></a></td>
+		</tr>
+	</table>
+ 
+<%if (vRetResult!=null && vRetResult.size()>0){%>
+  <table width="100%" border="0" bgcolor="#FFFFFF" class="thinborder" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#FFFF9F"> 
+      <td height="25" colspan="7" align="center" class="thinborder"><font size="2"><strong>RESULT 
+          OF SPECIFICATION(S)</strong></font></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="4" class="thinborder"><font size="1" face="Verdana, Arial, Helvetica, sans-serif">TOTAL 
+        :<strong><%=iSearchResult%></strong></font></td>
+      <td colspan="3" class="thinborder">  <div align="right"><font size="1"> 
+          <%
+	  //if more than one page , constuct page count list here.  - 20 default display per page)
+		int iPageCount = iSearchResult/CVLog.defSearchSize;
+		if(iSearchResult % CVLog.defSearchSize > 0) ++iPageCount;
+		if(iPageCount > 1)
+		{%>
+          Jump To page: 
+          <select name="jumpto" onChange="SearchVisitLog();">
+            <%
+			strTemp = request.getParameter("jumpto");
+			if(strTemp == null || strTemp.trim().length() ==0) strTemp = "0";
+
+			for( int i =1; i<= iPageCount; ++i )
+			{
+				if(i == Integer.parseInt(strTemp) ){%>
+            <option selected value="<%=i%>"><%=i%> of <%=iPageCount%></option>
+            <%}else{%>
+            <option value="<%=i%>"><%=i%> of <%=iPageCount%></option>
+            <%}}%>
+          </select>
+          <%} else {%>
+          &nbsp; 
+          <%}%></font>
+          </div></td>
+    </tr>
+		<tr> 
+			<td width="15%" height="25" align="center" class="thinborder"><font size="1"><strong>Date</strong></font></td>
+			<td width="16%" align="center" class="thinborder"><font size="1"><strong>Case # </strong></font></td>
+			<td width="16%" align="center" class="thinborder"><font size="1"><strong>ID Number </strong></font></td>
+			<td width="23%" align="center" class="thinborder"><font size="1"><strong>Name</strong></font></td>
+			<td width="23%" align="center" class="thinborder"><font size="1"><strong>Attended By </strong></font></td>
+			<td width="7%" class="thinborder">&nbsp;</td>
+		</tr>
+    <%for(int i =0; i<vRetResult.size(); i+=16){%>
+		<tr>
+			<td height="25" class="thinborder">&nbsp;<%=(String)vRetResult.elementAt(i+1)%></td>
+			<td class="thinborder">&nbsp;<%=(String)vRetResult.elementAt(i+2)%></td>
+			<td class="thinborder">&nbsp;<%=(String)vRetResult.elementAt(i+10)%></td>
+			<td class="thinborder">&nbsp;<%=WebInterface.formatName((String)vRetResult.elementAt(i+7), (String)vRetResult.elementAt(i+8), (String)vRetResult.elementAt(i+9), 4)%></td>
+			<%
+				strTemp = WI.formatName((String)vRetResult.elementAt(i+3), (String)vRetResult.elementAt(i+4), (String)vRetResult.elementAt(i+5),7);
+				strTemp = WI.getStrValue(strTemp,"(" + (String)vRetResult.elementAt(i+6) + ")&nbsp;","","");
+				strErrMsg = WI.formatName((String)vRetResult.elementAt(i+12), (String)vRetResult.elementAt(i+13), (String)vRetResult.elementAt(i+14),7);
+				strErrMsg = WI.getStrValue(strErrMsg,"(" + (String)vRetResult.elementAt(i+15) + ")&nbsp;","","");				
+				
+				if(strTemp.length() > 0 && strErrMsg.length() > 0)
+					strSlash = " / ";
+				else
+					strSlash = "";
+			%>
+      		<td class="thinborder">&nbsp;<%=strTemp%><%=strSlash%><%=strErrMsg%></td>
+      		<td align="center" class="thinborder">&nbsp;</td>
+    </tr>
+    <%}%>
+  </table>
+<%}%>
+	<table bgcolor="#FFFFFF" width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="10" colspan="9">&nbsp;</td>
+		</tr>
+		<tr>
+			<td height="25" colspan="9" bgcolor="#697A8F" class="footerDynamic">&nbsp;</td>
+		</tr>
+	</table>
+	
+	<input type="hidden" name="search_visit_log">
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>
+

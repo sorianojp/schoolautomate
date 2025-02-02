@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Subject Schedule Reference Page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript">
+function copyValueToParent()
+{
+
+	if(document.subschedule.sub_sec_index.value == "0" || document.subschedule.sec_name_value.value == "0")
+	{
+		window.close();
+		return;
+	}
+
+	eval('window.opener.document.'+document.subschedule.form_name.value+'.'+document.subschedule.sec_index_name.value+'.value=\"'+document.subschedule.sub_sec_index.value+'\"');
+	eval('window.opener.document.'+document.subschedule.form_name.value+'.'+document.subschedule.sec_name.value+'.value=\"'+document.subschedule.sec_name_value.value+'\"');
+	//eval('window.opener.document.'+document.subschedule.form_name.value+'.checkbox'+document.subschedule.index_of_.value+'.checked=true');
+
+	window.close();
+	return;
+}
+function AssignSecIndex(subSecIndex,section)
+{
+	document.subschedule.sub_sec_index.value = subSecIndex;
+	document.subschedule.sec_name_value.value = section;
+}
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,enrollment.Advising,java.util.Vector " %>
+<%
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+	String strDegreeType = WI.fillTextValue("degree_type");
+
+	String strErrMsg = null;
+	String strTemp = null;
+	boolean[] bolConflict = {false}; // this is passed to getSubjectScheduleTime to check if the subject is conflict with the previous
+long lTime = new java.util.Date().getTime();
+
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Enrollment-advising-subject schedule","subject_schedule.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Enrollment","ADVISING & SCHEDULING",request.getRemoteAddr(),
+														"subject_schedule.jsp");
+//switch off security if called from online advisign page of student... this page can't be refreshed.
+if(WI.fillTextValue("online_advising").compareTo("1") ==0)
+	iAccessLevel = 2;
+
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+//end of authenticaion code.
+
+String strCurIndex = request.getParameter("cur_index");
+
+String strOfferingYrFrom = request.getParameter("syf");
+String strOfferingYrTo = request.getParameter("syt");
+String strOfferingSem = request.getParameter("semester");
+
+String strCourseIndex = WI.fillTextValue("course_index");
+String strMajorIndex  = WI.fillTextValue("major_index");
+String strSubIndex    = WI.fillTextValue("sub_index");
+
+
+
+//System.out.println("I am here.");
+long lT = new java.util.Date().getTime();
+Advising advising = new Advising();
+Vector vSectionDetail = new Vector();
+Vector vSchedule = new Vector();
+Vector vSubInfo = advising.getSubjectInfo(dbOP,strCurIndex,strDegreeType);
+if(vSubInfo == null)
+	strErrMsg = advising.getErrMsg();
+else /// do all processing here.
+{
+	if(WI.fillTextValue("sec_startsWith").length() > 0) 
+		advising.strSecStartsWith = WI.fillTextValue("sec_startsWith");
+		
+	vSectionDetail = advising.getSubSectionDetail(dbOP,strCourseIndex,strMajorIndex,strSubIndex,
+															strOfferingYrFrom,strOfferingYrTo,strOfferingSem,strDegreeType,null);
+	if(vSectionDetail == null || vSectionDetail.size() == 0)
+		strErrMsg = advising.getErrMsg();
+}
+
+//System.out.println( (lT - new java.util.Date().getTime())/100);
+%>
+<form name="subschedule">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="2" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF"><strong>::::
+          SUBJECT SCHEDULE PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="98%" height="25">&nbsp;</td>
+    </tr>
+<%
+if(strErrMsg != null)
+{%>	<tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td><%=strErrMsg%></td>
+
+    </tr>
+<%dbOP.cleanUP();return;}%>
+  </table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#FFFFFF">
+      <td  width="2%" height="25">&nbsp;</td>
+      <td width="28%" height="25">Code: <strong><%=(String)vSubInfo.elementAt(0)%></strong></td>
+      <td  colspan="3" height="25">Name: <strong><%=(String)vSubInfo.elementAt(1)%></strong></td>
+      <td width="33%">Category: <strong><%=(String)vSubInfo.elementAt(2)%></strong></td>
+    </tr>
+  </table>
+
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <%
+if(strDegreeType.compareTo("1") ==0 || strDegreeType.compareTo("2") ==0)
+{%>
+    <tr bgcolor="#FFFFFF">
+      <td width="2%" height="25">&nbsp;</td>
+      <td height="25" colspan="2">Units :<strong><%=(String)vSubInfo.elementAt(3)%></strong></td>
+      <td width="37%" height="25">&nbsp;</td>
+      <td colspan="2" width="33%" height="25">&nbsp;</td>
+    </tr>
+    <%}else{%>
+    <tr bgcolor="#FFFFFF">
+      <td width="2%" height="25">&nbsp;</td>
+      <td height="25" colspan="2">Lec. units :<strong><%=(String)vSubInfo.elementAt(3)%></strong></td>
+      <td width="37%" height="25">Lab. units :<strong><%=(String)vSubInfo.elementAt(4)%></strong></td>
+      <td colspan="2" width="33%" height="25">Total units :<strong><%=Float.parseFloat((String)vSubInfo.elementAt(3))+Float.parseFloat((String)vSubInfo.elementAt(4))%></strong></td>
+    </tr>
+    <%}%>
+    <tr bgcolor="#FFFFFF">
+      <td colspan="6" height="25">&nbsp;</td>
+    </tr>
+  </table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#B9B292">
+      <td height="25" colspan="9"><div align="center">SUBJECT
+          SCHEDULES </div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td width="1%" height="25">&nbsp;</td>
+      <td colspan="2" height="25">&nbsp;</td>
+      <td width="16%" height="25" colspan="6">
+	  <a href="javascript:copyValueToParent();"><img src="../../../images/form_proceed.gif" width="81" height="21" border="0"></a>
+	  </td>
+    </tr>
+  </table>
+  <table width="100%" border="1" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#FFFFFF">
+      <td width="11%" height="25"><div align="center"><strong><font size="1">SECTION(ROOM 
+          #) </font></strong></div></td>
+      <td width="25%"><div align="center"><font size="1"><strong>SCHEDULE
+          (Days/Time) </strong></font></div></td>
+      <td width="33%"><div align="center"><font size="1"><strong>COURSE
+          OFFERING THE SUBJECT</strong></font></div></td>
+<!--      <td width="7%"><div align="center"><font size="1"><strong>REGULAR
+          / IRREGULAR</strong></font></div></td>-->
+      <td width="8%"><div align="center"><strong><font size="1">MAX. NO. OF STUDENTS</font></strong></font></div></td>
+      <td width="10%"><div align="center"><font size="1"><strong>NO.
+          OF STUDENTS ENROLLED</strong></font></div></td>
+      <td width="6%"><div align="center"><strong><font size="1">STATUS</font></strong></div></td>
+      <td width="7%"><div align="center"><font size="1"><strong>SELECT</strong></font></div></td>
+    </tr>
+
+<%
+strTemp = null;//System.out.println(vSectionDetail.size());
+String strSchedule = null;//System.out.println(" I am here. 1");
+
+for(int i=0; i< vSectionDetail.size(); ++i){
+bolConflict[0] = false;
+if(vSectionDetail.elementAt(i+6) != null && vSectionDetail.elementAt(i+7) != null &&
+	Integer.parseInt((String)vSectionDetail.elementAt(i+6)) <= Integer.parseInt((String)vSectionDetail.elementAt(i+7)))
+{
+	strTemp = "Closed";
+}
+else
+	strTemp = "Open";strSchedule = null;
+/**/
+strSchedule = advising.getSubjectScheduleTime(dbOP,(String)vSectionDetail.elementAt(i+1),
+	  	request.getParameter("sec_index_list"),bolConflict,request.getParameter("IS_FOR_LAB"),
+		request.getParameter("lab_list"),request.getParameter("NO_CONFLICT"),
+		request.getParameter("no_conflict_list"));
+if(strSchedule == null) {
+	i = i+7;
+	continue;
+}
+/**/
+//strRoomNoUsedInSchJSP has the room information. %>
+   <tr bgcolor="#FFFFFF">
+      <td height="25" align="center"><%=(String)vSectionDetail.elementAt(i+2)%>
+	  <br>(<%=advising.strRoomNoUsedInSchJSP%>)</td>
+      <td align="center">
+	  <%=strSchedule%>
+	  </td>
+      <td align="center"><%=WI.getStrValue(vSectionDetail.elementAt(i+3),"For all course")%></td>
+<!--
+      <td align="center"><%=WI.getStrValue(vSectionDetail.elementAt(i+4),"N/A")%><strong>/</strong><%=WI.getStrValue(vSectionDetail.elementAt(i+5),"N/A")%></td>
+-->
+      <td align="center"><%=(String)vSectionDetail.elementAt(i+6)%></td>
+      <td align="center"><%=WI.getStrValue(vSectionDetail.elementAt(i+7),"0")%></td>
+      <td align="center"><%=strTemp%></td>
+      <td><div align="center"> <!-- do not show the radio button if it is a conflict -->
+      <%if(strTemp.compareTo("Closed") !=0)
+	  	if(!bolConflict[0]){%>
+	      <input type="radio" name="radiobutton" value="radiobutton" onClick='AssignSecIndex("<%=(String)vSectionDetail.elementAt(i+1)%>","<%=(String)vSectionDetail.elementAt(i+2)%>")'>
+       <%}else{%>
+	      Conflict
+		<%
+		bolConflict[0] = false;}%>
+
+	    </div></td>
+    </tr>
+<%	i = i+7;}%>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <td width="12%"></tr>
+    <tr bgcolor="#FFFFFF">
+      <td width="84%">&nbsp;</td>
+      <td width="16%" height="25">
+	  <a href="javascript:copyValueToParent();"><img src="../../../images/form_proceed.gif" width="81" height="21" border="0"></a>
+	  </td>
+    </tr>
+    <tr bgcolor="#B8CDD1">
+      <td height="25" colspan="8" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+  <input type="hidden" name="sub_sec_index" value="0">
+  <input type="hidden" name="sec_name_value" value="0">
+
+  <input type="hidden" name="form_name" value="<%=request.getParameter("form_name")%>">
+  <input type="hidden" name="sec_name" value="<%=request.getParameter("sec_name")%>">
+  <input type="hidden" name="sec_index_name" value="<%=request.getParameter("sec_index_name")%>">
+  <input type="hidden" name="sec_index_list" value="<%=request.getParameter("sec_index_list")%>">
+
+  <!-- added on Sept 17 to take care of the subject with sub_subject offereing like caregiver -->
+  <input type="hidden" name="course_index" value="<%=WI.fillTextValue("course_index")%>">
+  <input type="hidden" name="major_index" value="<%=WI.fillTextValue("major_index")%>">
+  <input type="hidden" name="sub_index" value="<%=WI.fillTextValue("sub_index")%>">
+  <input type="hidden" name="degree_type" value="<%=WI.fillTextValue("degree_type")%>">
+  
+  <input type="hidden" name="index_of_" value="<%=WI.fillTextValue("index_of_")%>">
+
+
+  <input type="hidden" name="sec_startsWith" value="<%=WI.fillTextValue("sec_startsWith")%>">
+
+</form>
+</body>
+</html>
+<%//System.out.println("Total Time : "+( new java.util.Date().getTime() - lTime));
+dbOP.cleanUP();
+//System.out.println( (lT - new java.util.Date().getTime())/100);
+%>
+

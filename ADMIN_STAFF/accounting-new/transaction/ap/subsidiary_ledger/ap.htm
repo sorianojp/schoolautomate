@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/css/tableBorder.css" rel="stylesheet" type="text/css"></head>
+</head>
+<script language="javascript" src="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/jscript/date-picker.js"></script>
+<script language="javascript">
+function ShowDetail(strPrintStat) {
+	strTBDate = document.form_.bl_date.value;
+	if(strTBDate.length == 0) {
+		alert("Please enter  cutoff date..");
+		return;
+	}
+	document.form_.print_stat.value = strPrintStat;
+	document.form_.print_pg.value = "1";
+	document.form_.submit();
+}
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.WebInterface" %>
+<form name="form_" method="post" action="/ADMIN_STAFF/accounting/reports/financial_statements/balance_sheet/bl_1st_page.jsp">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="2" align="center" bgcolor="#A49A6A"><font color="#FFFFFF">
+	  <strong>:::: ACCOUNTS PAYABLE SUBSIDIARY  PAGE ::::</strong></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25" colspan="2"><font size="1">&nbsp;</font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td width="4%" height="25"><label></label></td>
+      <td width="96%">Payee Type :
+        <select name="select5">
+          <option>Supplier</option>
+          <option>Non-Supplier</option>
+        </select>
+        <label>
+        <select name="select5">
+          <option>Company</option>
+          <option>Individual</option>
+        </select>
+        <select name="select5">
+          <option>Employee/Staff</option>
+          <option>Non-employee/staff</option>
+        </select>
+        </label></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <label></label>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+  
+  <tr>
+    <td height="25" colspan="8" align="center" bgcolor="#B4C5D6" class="thinborder"><strong><font color="#000000">:: A/P LEDGER OF $PAYEE_NAME :: </font></strong></td>
+    </tr>
+  <tr> 
+    <td width="10%" height="25" class="thinborder"><strong>DATE</strong></td>
+    <td width="23%" height="25" class="thinborder"><strong>PARTICULAR</strong></td>
+    <td width="11%" height="25" class="thinborder"><strong>INVOICE # </strong></td>
+    <td width="9%" class="thinborder"><strong>PO # </strong></td>
+    <td width="14%" height="25" class="thinborder"><strong>POSTING REF.  </strong></td>
+    <td width="9%" class="thinborder"><strong>DEBIT</strong></td>
+    <td width="10%" height="25" class="thinborder"><strong>CREDIT</strong></td>
+    <td width="14%" height="25" class="thinborder"><strong>BALANCE</strong></td>
+  </tr>
+  <tr> 
+    <td height="25" class="thinborder">01/01/2007</td>
+    <td height="25" class="thinborder">01/01/2007</td>
+    <td height="25" class="thinborder">00010</td>
+    <td class="thinborder">&nbsp;</td>
+    <td height="25" class="thinborder">50,000.00</td>
+    <td class="thinborder">99,999,999.00</td>
+    <td height="25" class="thinborder"><label>99,999,999.00</label></td>
+    <td height="25" class="thinborder">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="25" class="thinborder">02/01/2007</td>
+    <td height="25" class="thinborder">02/01/2007</td>
+    <td height="25" class="thinborder">00025</td>
+    <td class="thinborder">&nbsp;</td>
+    <td height="25" class="thinborder">25,000.00</td>
+    <td class="thinborder">&nbsp;</td>
+    <td height="25" class="thinborder">&nbsp;</td>
+    <td height="25" class="thinborder">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td height="25">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+    <td height="25" colspan="3" align="right"><strong>Total Payable : &nbsp;&nbsp;&nbsp;</strong></td>
+    <td height="25" colspan="2"><input name="textfield2" type="text" value="35,000.00" size="12" maxlength="12">
+      <strong>$currency</strong></td>
+    </tr>
+  <tr> 
+    <td height="25" colspan="8">&nbsp;</td>
+    </tr>
+</table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="17%" height="25">&nbsp;</td>
+      <td width="83%" height="25" style="font-size:10px;">
+<img src="../../../../../images/print.gif" border="0">click to PRINT LEDGER </td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25"><span style="font-size:10px;"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf-2007.09.06/ADMIN_STAFF/accounting/transaction/ap/request_for_payment_approval/show_all_request.htm" target="_self"></a></span></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" colspan="2" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+  <input type="hidden" name="print_pg">
+  <input type="hidden" name="print_stat">
+</form>
+</body>
+</html>

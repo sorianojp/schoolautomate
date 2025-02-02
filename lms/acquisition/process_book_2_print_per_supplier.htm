@@ -1,0 +1,420 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../css/tableBorder.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+a:link {
+	color: #FFFFFF;
+	text-decoration:none;
+	font-size:12px;
+	font-family:"lucida grande", "trebuchet ms", sans;
+	}
+a:visited {
+	color: #FFFFFF;
+	text-decoration:none;
+	font-size:12px;
+	font-family:"lucida grande", "trebuchet ms", sans;
+	}
+a:active {
+	color: #FFFFFF;
+	text-decoration:none;
+	font-size:12px;
+	font-family:"lucida grande", "trebuchet ms", sans;
+	}
+a:hover {
+	color:#f00;
+	font-weight:700;
+	}
+.tabFont {
+	color:#444444;
+	font-weight:700;
+	font-size:12px;
+	font-family:"lucida grande", "trebuchet ms", sans;
+}
+</style>
+</head>
+<script src="../../jscript/common.js"></script>
+<script language="javascript">
+function SavePayment(iIndex) {
+	document.form_.page_action.value = "1";
+	document.form_.index_.value = iIndex;
+}
+function focusID() {
+	document.form_.user_id.focus();
+}
+function PrintReceipt(strReceiptCode) {
+	var loadPg = "./fine_pmt_receipt.jsp?code_no="+strReceiptCode;
+	var win=window.open(loadPg,"myfile",'dependent=no,width=700,height=500,top=5,left=5,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+function PrintReceipt2() {
+	//get receipt # and call printReceipt
+	var strReceiptCode = prompt("Please enter Payment Receipt #", "");
+	if(strReceiptCode.length == 0) {
+		alert("To Print payment receipt, please enter receipt Number.");
+		return;
+	}
+	return PrintReceipt(strReceiptCode);
+}
+function NewFine(strUserIndex) {
+	if(strUserIndex.length == 0) {
+		alert("Please enter Patron's ID and click proceed.");
+		return;
+	}
+	var loadPg = "./fine_post.jsp?user_i="+strUserIndex;
+	var win=window.open(loadPg,"myfile",'dependent=no,width=700,height=500,top=45,left=45,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+function PayBalance(strUserIndex) {
+	if(strUserIndex.length == 0) {
+		alert("Please enter Patron's ID and click proceed.");
+		return;
+	}
+	var loadPg = "./fine_paybalance.jsp?user_i="+strUserIndex;
+	var win=window.open(loadPg,"myfile",'dependent=no,width=600,height=300,top=200,left=200,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+function FullLedger(strUserIndex) {
+	if(strUserIndex.length == 0) {
+		alert("Please enter Patron's ID and click proceed.");
+		return;
+	}
+	var bolIsPrint = "";
+	if(confirm("Do you want to print?"))
+		bolIsPrint = "1";
+	var loadPg = "./full_ledger.jsp?user_i="+strUserIndex+"&print_="+bolIsPrint;
+	var win=window.open(loadPg,"myfile",'dependent=no,width=700,height=600,top=50,left=50,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+</script>
+<%@ page language="java" import="utility.*,lms.LmsUtil,java.util.Vector" %>
+<%
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+	String strErrMsg = null; String strTemp = null;
+	String strUserIndex  = null;
+
+	boolean bolShowIDInput = true;
+	if(WI.fillTextValue("myhome").length() > 0)
+		bolShowIDInput = false;
+
+//authenticate this user.
+	int iAccessLevel = 0;
+	java.util.Hashtable svhAuth = (java.util.Hashtable)request.getSession(false).getAttribute("svhAuth");
+	if(request.getSession(false).getAttribute("userIndex") == null)
+		iAccessLevel = -1; // user is logged out.
+	else if (svhAuth != null && svhAuth.size() == 1 && svhAuth.get("ALL") != null)//super user.
+		iAccessLevel = Integer.parseInt(WI.getStrValue(svhAuth.get("ALL"),"0"));
+	else if (svhAuth != null)
+		iAccessLevel = Integer.parseInt(WI.getStrValue(svhAuth.get("LIB_Circulation".toUpperCase()),"0"));
+
+	if(iAccessLevel == -1)//for fatal error.
+	{
+		request.getSession(false).setAttribute("go_home","../lms/");
+		request.getSession(false).setAttribute("errorMessage","Please login to access this page.");
+		response.sendRedirect("../../commfile/fatal_error.jsp");
+		return;
+	}
+	else if(iAccessLevel == 0)//NOT AUTHORIZED.
+		bolShowIDInput = false;
+
+//end of authenticaion code.
+
+	try
+	{
+		dbOP = new DBOperation();
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+
+	String strPreparedToEdit = WI.getStrValue(WI.fillTextValue("preparedToEdit"),"0");
+
+	Vector vLibUserInfo = null; //Vector vFineOutstanding = null;
+	Vector vRetResult   = null; Vector vEditInfo = null;
+	LmsUtil lUtil    = new LmsUtil();
+
+	String strUserID = WI.fillTextValue("user_id");
+	if(bolShowIDInput && strUserID.length() > 0 ) {
+		strUserIndex = dbOP.mapUIDToUIndex(WI.fillTextValue("user_id"));
+		if(strUserIndex == null)
+			strErrMsg = "ID : "+WI.fillTextValue("user_id")+" does not exist in system.";
+	}
+	else if(!bolShowIDInput) {
+		strUserID = (String)request.getSession(false).getAttribute("userId");
+		strUserIndex = (String)request.getSession(false).getAttribute("userIndex");
+	}
+//// get user information.
+	if(strUserIndex != null ) {
+		vLibUserInfo = lUtil.getLibraryUserInfoBasic(dbOP, strUserIndex);
+		if(vLibUserInfo == null)
+			strErrMsg = lUtil.getErrMsg();
+		/**
+		else {
+			lms.FineManagement fineMgmt = new lms.FineManagement();
+			///if page action = 1, i must save fine.
+			if(WI.fillTextValue("page_action").equals("1")) {
+				strTemp = fineMgmt.payFineSingle(dbOP, strUserIndex, request);
+				if(strTemp != null)
+					strErrMsg = "Fine Payment successful. Payment Receipt # is "+
+						"<a href='javascript:PrintReceipt("+strTemp+
+						");'><font size=3>"+strTemp+"</font></a>. Click on Receipt # to print receipt";
+				else
+					strErrMsg = fineMgmt.getErrMsg();
+			}
+			vFineOutstanding = fineMgmt.getOutstandingFine(dbOP, strUserIndex);
+		}**/
+
+		lms.PatronInformation pInfo = new lms.PatronInformation();
+		strTemp = WI.fillTextValue("page_action");
+		if(strTemp.length() > 0) {
+			if(pInfo.operateOnCirculationMsg(dbOP, request, Integer.parseInt(strTemp), strUserIndex) == null)
+				strErrMsg = pInfo.getErrMsg();
+			else {
+				if(strTemp.equals("0"))
+					strErrMsg = "Message removed successfully.";
+				else if(strTemp.equals("1"))
+					strErrMsg = "Message added successfully.";
+				else
+					strErrMsg = "Message edited successfull.";
+			}
+		}
+		if(strPreparedToEdit.equals("1"))
+			vEditInfo = pInfo.operateOnCirculationMsg(dbOP, request, 3, strUserIndex);
+		vRetResult = pInfo.operateOnCirculationMsg(dbOP, request, 4, strUserIndex);
+		if(strErrMsg == null && vRetResult == null)
+			strErrMsg = pInfo.getErrMsg();
+}
+
+
+
+
+	String[] astrConvertSem   = {"SUMMER","1ST SEM","2ND SEM","3RD SEM","4TH SEM"};
+	String[] astrConvertYrLevel = {"N/A", "1st Yr","2nd Yr","3rd Yr","4th Yr","5th Yr","6th Yr","7th Yr"};
+
+String strMyHome = WI.fillTextValue("myhome");
+%>
+<body ">
+<form action="./patron_msg.jsp" method="post" name="form_" onSubmit="SubmitOnceButton(this);">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    
+    <tr>
+      <td height="10" colspan="2"><div align="center">$SCHOOL_NAME </div></td>
+    </tr>
+    <tr>
+      <td height="10" colspan="2"><div align="center">$Address</div></td>
+    </tr>
+    <tr>
+      <td height="10" colspan="2"><div align="center">LEARNING RESOURCE CENTER (show this for UI only) </div></td>
+    </tr>
+    <tr>
+      <td height="10" colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="10" colspan="2">SUPPLIER : $SUPPLIER_NAME </td>
+    </tr>
+    <tr>
+      <td height="10" colspan="2">COLLEGE: $COLLEGE  ($COURSE)</td>
+    </tr>
+    <tr>
+      <td height="10" colspan="2">School Year $SY </td>
+    </tr>
+    <tr>
+      <td height="10" colspan="2">&nbsp;</td>
+    </tr>
+</table>
+<jsp:include page="./inc.jsp?pgIndex=5&user_id=<%=strUserID%>&myhome=<%=strMyHome%>"></jsp:include>
+<!--
+    <table width="100%" border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td background="../images/tableft.gif" height="28" width="10">&nbsp;</td>
+        <td width="60" bgcolor="#000000" align="center"><a href="./patron_summary.jsp?user_id=<%=strUserID%>">Summary</a></td>
+        <td background="../images/tabright.gif" width="10">&nbsp;</td>
+        <td width="2">&nbsp;</td>
+        <td background="../images/tableft.gif" height="28" width="10">&nbsp;</td>
+        <td width="70" bgcolor="#000000" align="center"><a href="javascript:NewFine('<%=WI.getStrValue(strUserIndex)%>');">Circulation</a></td>
+        <td background="../images/tabright.gif" width="10">&nbsp;</td>
+        <td width="2">&nbsp;</td>
+        <td background="../images/tableft.gif" height="28" width="10">&nbsp;</td>
+        <td width="70" bgcolor="#000000" align="center"><a href="javascript:PayBalance('<%=WI.getStrValue(strUserIndex)%>');">Reservation</a></td>
+        <td background="../images/tabright.gif" width="10">&nbsp;</td>
+        <td width="2">&nbsp;</td>
+        <td background="../images/tableft.gif" height="28" width="10">&nbsp;</td>
+        <td width="95" bgcolor="#000000" align="center"><a href="javascript:FullLedger('<%=WI.getStrValue(strUserIndex)%>');">Fine Information</a></td>
+        <td background="../images/tabright.gif" width="10">&nbsp;</td>
+        <td width="2">&nbsp;</td>
+        <td background="../images/tableft_selected.gif" height="28" width="10">&nbsp;</td>
+        <td width="50" bgcolor="#a9b9d1" align="center" class="tabFont">Messages</td>
+        <td background="../images/tabright_selected.gif" width="10">&nbsp;</td>
+        <td width="2">&nbsp;</td>
+        <td background="../images/tableft.gif" height="28" width="10">&nbsp;</td>
+        <td width="65" bgcolor="#000000" align="center"><a href="javascript:PrintReceipt2();">Cir. Setting</a></td>
+        <td background="../images/tabright.gif" width="10">&nbsp;</td>
+        <td width="2">&nbsp;</td>
+        <td background="../images/tableft.gif" height="28" width="10">&nbsp;</td>
+        <td width="50" bgcolor="#000000" align="center"><a href="javascript:PrintReceipt2();">Per. Info</a></td>
+        <td background="../images/tabright.gif" width="10">&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td height="10" colspan="12" valign="top" class="thinborderTOP">&nbsp;</td>
+      </tr>
+	</table>
+-->
+<%
+if(vLibUserInfo != null && vLibUserInfo.size() > 0){
+	boolean bolIsStud = false;
+	if(vLibUserInfo.elementAt(0).equals("1"))
+		bolIsStud = true;
+%>
+<%if(bolShowIDInput){//do not show if called from home page.%>
+<%}//do not show if called from home page. --> bolShowIDInput = true,
+}//show only if vLibUserInfo is not null
+if(vRetResult != null && vRetResult.size() > 0) {%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="thinborder">
+  
+  <tr>
+    <td width="6%" class="thinborder" align="center"><strong>COUNT</strong></td>
+    <td width="6%" height="25" class="thinborder" align="center"><strong>QTY<strong></strong></strong></td>
+    <td width="7%" class="thinborder" align="center"><strong>AUTHOR </strong></td>
+    <%if(bolShowIDInput){%>
+    <td width="22%" class="thinborder" align="center"><strong>TITLE</strong></td>
+    <td width="10%" class="thinborder" align="center"><strong><b>EDITION</b></strong></td>
+    <td width="8%" class="thinborder" align="center"><strong><b>UNIT PRICE </b></strong></td>
+    <td width="10%" class="thinborder" align="center"><strong><b>AMOUNT</b></strong></td>
+    <%}%>
+  </tr>
+<%for(int i =0; i < vRetResult.size(); i += 7){%>
+  <tr>
+    <td class="thinborder">&nbsp;</td>
+    <td height="20" class="thinborder"><%=vRetResult.elementAt(i + 1)%>&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+<%if(bolShowIDInput){%>
+    <td class="thinborder" align="center">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    <%}%>
+  </tr>
+  <tr>
+    <td class="thinborder">&nbsp;</td>
+    <td height="20" class="thinborder">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    </tr>
+  <tr>
+    <td class="thinborder" align="right"><div align="left">&nbsp;</div></td>
+    <td height="20" class="thinborder" align="right">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    <td class="thinborder" align="center">&nbsp;</td>
+    </tr>
+<%}%>
+</table>
+<%}//if vRetResult is not null%>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="1%" height="39">&nbsp;</td>
+    <td width="85%" valign="middle" align="right"><b>TOTAL : </b>&nbsp;</td>
+    <td width="14%" valign="middle">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle" align="right"><b>Less (Discounts)   : </b>&nbsp;</td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle" align="right"><b>AMOUNT PAYABLE  : </b>&nbsp;</td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle">&nbsp;</td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle">&nbsp;</td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+</table>
+
+<input type="hidden" name="page_action">
+<input type="hidden" name="info_index">
+<input type="hidden" name="preparedToEdit" value="<%=strPreparedToEdit%>">
+
+<input type="hidden" name="myhome" value="<%=WI.fillTextValue("myhome")%>">
+</form>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="1%" height="39">&nbsp;</td>
+    <td width="55%" valign="middle">Prepared by: </td>
+    <td width="44%" valign="middle">Conformed by: </td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle">&nbsp;</td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle">$name_login_person(all caps) </td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle">$Position</td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle">&nbsp;</td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle">&nbsp;</td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle">Noted by: </td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle">&nbsp;</td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle">$name_head_librarin</td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25" valign="middle">$Position</td>
+    <td height="20" valign="middle">&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

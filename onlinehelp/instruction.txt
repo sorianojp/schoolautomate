@@ -1,0 +1,6 @@
+keep all the help link from the webpage. These help file is to help the user to use the system.
+
+Way to use this
+<script language="JavaScript" src="../../../jscript/common.js"></script>
+
+<a href='javascript:Help("../../../onlinehelp/whatis_handson.htm");'><img src="../../../images/online_help.gif" border="0"></a>

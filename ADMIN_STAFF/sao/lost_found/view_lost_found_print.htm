@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<style type="text/css">
+<!--
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+
+td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+
+th {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+
+-->
+</style>
+<body >
+<%@ page language="java" import="utility.*,ReportEnrollment,java.util.Vector" %>
+<%
+ 
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	WebInterface WI = new WebInterface(request);
+	
+	String strErrMsg = null;
+	String strTemp = null;
+	String strDegType = null;//0-> uG,1->doctoral,2->college of medicine.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Enrollment-REPORT-student load print","student_sched_print.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		//ErrorLog.logError(exp,"admission_application_sch_veiwall.jsp","While Opening DB Con");
+		
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<table width="100%" border="0">
+    <tr> 
+      <td width="100%"><div align="center"></div></td>
+    </tr>
+</table>
+<table width="100%" border="0">
+  <tr> 
+    <td width="100%"><div align="center">VIRGEN MILAGROSA UNIVERSITY FOUNDATION<br>
+        San Carlos City, Pangasinan<br>
+        <strong><br>
+        OFFICE OF THE STUDENT'S AFFAIRS</strong><br>
+        <br>
+        LOST &amp; FOUND RESULT <br>
+      </div></td>
+  </tr>
+</table>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr > 
+    <td height="19" colspan="2"><div align="center"> 
+        <hr size="1">
+      </div></td>
+  </tr>
+  <tr > 
+    <td width="42%" height="25">Case type :<strong></strong></td>
+    <td width="58%" height="25">Item Category :<strong></strong></td>
+  </tr>
+  <tr > 
+    <td height="25">Total Entries : <strong></strong></td>
+    <td height="25">Date &amp; Time : </td>
+  </tr>
+</table>
+  
+<table width="100%" border="1" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td width="16%" height="21"><div align="center"><strong>DATE</strong></div></td>
+    <td width="26%"><div align="center"><strong>REPORTED BY</strong></div></td>
+    <td width="26%"><div align="center"><strong>LOCATION</strong></div></td>
+    <td width="32%"><div align="center"><strong>DESCRIPTION</strong></div></td>
+  </tr>
+  <tr>
+    <td height="21">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <%
+ int iTotalLoad = 0;//System.out.println(vRetResult);
+ for(int i=1; i< vRetResult.size(); ++i){
+ iTotalLoad += Integer.parseInt((String)vRetResult.elementAt(i+9));
+ %>
+  <% i = i+9;
+}%>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td width="3%" height="18">&nbsp;</td>
+    <td width="73%" valign="top">&nbsp;</td>
+    <td width="24%" valign="top">&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>

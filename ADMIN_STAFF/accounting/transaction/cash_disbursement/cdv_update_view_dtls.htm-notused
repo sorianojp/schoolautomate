@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td width="100%" height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>::::
+          DISBURSEMENT VOUCHER - VIEW DETAILS PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25"><font size="1"><a href="../../../../ADMIN_STAFF/accounting/transaction/petty_cash/petty_cash.htm"><img src="../../../../images/go_back.gif" border="0"></a></font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>Voucher No.</td>
+      <td width="18%"><input name="textfield2" type="text" size="16" maxlength="16">
+        <font size="1">&nbsp;</font> </td>
+      <td width="9%"><font size="1"><a href="../../../../ADMIN_STAFF/accounting/transaction/petty_cash/petty_cash_search.htm"><img src="../../../../images/search.gif" border="0"></a></font></td>
+      <td width="54%"><font size="1"><a href="../../../../ADMIN_STAFF/accounting/transaction/petty_cash/petty_cash.htm"><img src="../../../../images/form_proceed.gif" border="0"></a></font></td>
+    </tr>
+    <tr>
+      <td height="26" colspan="5"><hr size="1"></td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>Voucher No.</td>
+      <td colspan="3"><strong>$voucher_no</strong><font size="1">&nbsp;</font></td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>Requisition No.</td>
+      <td colspan="3"><strong>$req_no</strong><font size="1">&nbsp;</font></td>
+    </tr>
+    <tr>
+      <td width="4%" height="26">&nbsp;</td>
+      <td width="15%">Voucher Date</td>
+      <td colspan="3"><strong>$voucher_Date</strong></td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>Payee</td>
+      <td colspan="3"><strong>$payee_name</strong></td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>Explanation(s)</td>
+      <td colspan="3"><strong>$particulars</strong></td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>Remarks</td>
+      <td colspan="3"><strong>$remarks</strong></td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>Amount </td>
+      <td colspan="3"><strong>$amount</strong></td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>Charged to </td>
+      <td colspan="3"><table width="68%" border="1" cellspacing="0" cellpadding="0">
+          <tr>
+            <td width="74%" height="25"><strong>$account_num :: $account_Description</strong></td>
+            <td width="26%" height="25"><strong><font size="1">$amount</font></strong></td>
+          </tr>
+          <tr>
+            <td height="25">&nbsp;</td>
+            <td height="25">&nbsp;</td>
+          </tr>
+        </table></td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>Prepared by</td>
+      <td colspan="3"><strong>$prepared_by</strong></td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>Checked by</td>
+      <td colspan="3"><strong>$checked_by </strong></td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>Passed for Payment</td>
+      <td colspan="3"><strong>$passed_for_payment</strong> </td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>Approved for Payment</td>
+      <td colspan="3"><strong>$approved_for_payment</strong> </td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="26">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td colspan="3"><font size="1"><a href="petty_cash.htm"><img src="../../../../images/print.gif" border="0"></a>click
+        to PRINT this details &nbsp;&nbsp;&nbsp;&nbsp;<a href="petty_cash.htm"><img src="../../../../images/delete.gif" border="0"></a>click
+        to DELETE this record</font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td height="25"><div align="left"></div></td>
+      <td width="94%" height="25">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25" colspan="2">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1">
+      <td height="25" colspan="2" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

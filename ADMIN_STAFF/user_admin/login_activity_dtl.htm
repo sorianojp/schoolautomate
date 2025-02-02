@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript" src="../../jscript/date-picker.js"></script>
+<script language="JavaScript">
+function PrintPg() {
+	document.esecurity_.print_pg.value = "1";
+	document.esecurity_.submit();
+}
+function GoBack() {
+	location = "./e_security_campus_query.jsp";
+}
+function JumpToPage() {
+	document.esecurity_.print_pg.value = "0";
+	document.esecurity_.submit();
+}
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,eSC.CampusQuery,java.util.Vector" %>
+<%
+ 
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+	String strErrMsg = null;
+	String strTemp = null;
+	Vector vRetResult = null;
+	String strImgFileExt = null;
+	
+	Vector vStudInfo = null;
+
+	if(WI.fillTextValue("print_pg").compareTo("1") ==0){%>
+		<jsp:forward page="./e_security_campus_query_detail_print.jsp" />
+	<%}
+		
+	String strReportToDisp = WI.fillTextValue("report_to_disp");
+	String[] astrConvertToTerm ={"SUMMER","1ST SEM","2ND SEM","3RD SEM","4TH SEM"};
+
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-eSecurity Check-Campus Query","e_security_campus_query_detail.jsp");
+		ReadPropertyFile readPropFile = new ReadPropertyFile();
+		strImgFileExt = readPropFile.getImageFileExtn("imgFileUploadExt");
+		if(strImgFileExt == null || strImgFileExt.trim().length() ==0)
+		{
+			strErrMsg = "Image file extension is missing. Please contact school admin.";
+			dbOP.cleanUP();
+			throw new Exception();
+		}
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		if(strErrMsg == null)
+			strErrMsg = "Error in connection. Please try again.";
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3"><%=strErrMsg%></font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"eSecurity Check","STUDENTS CAMPUS ATTENDANCE QUERY",request.getRemoteAddr(), 
+														"e_security_campus_query_detail.jsp");	
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+//end of authenticaion code.
+int iSearchResult = 0;
+CampusQuery CQ          = new CampusQuery(request);
+	vRetResult = CQ.getTimeInTimeOutDetail(dbOP,request,WI.fillTextValue("report_type"),WI.fillTextValue("stud_id"));
+	if(vRetResult == null)
+		strErrMsg = CQ.getErrMsg();
+	else	
+		iSearchResult = CQ.getSearchCount();
+
+enrollment.OfflineAdmission offlineAdm = new enrollment.OfflineAdmission();
+vStudInfo = offlineAdm.getStudentBasicInfo(dbOP, WI.fillTextValue("stud_id"),null,null,null);
+if(vStudInfo == null) 
+	strErrMsg = offlineAdm.getErrMsg();	
+
+%>	
+
+<form action="./e_security_campus_query_detail.jsp" method="post" name="esecurity_">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#A49A6A"> 
+      <td width="88%" height="25" colspan="5" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" ><strong>:::: 
+          STUDENT'S ATTENDANCE DETAIL PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr > 
+      <td height="25" colspan="5">&nbsp;&nbsp;&nbsp;<font size="3"><%=WI.getStrValue(strErrMsg)%></font></td>
+    </tr>
+    <tr >
+      <td height="25" colspan="5"><a href="javascript:GoBack();"><img src="../../images/go_back.gif" border="0"></a><font size="1">Click 
+        to go back to main page.</font></td>
+    </tr>
+  </table>
+<%
+if(vStudInfo != null && vStudInfo.size() > 0){%>	  
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td colspan="2">&nbsp;</td>
+      <td width="34%" rowspan="6" valign="top"><img src="../../upload_img/<%=WI.fillTextValue("stud_id").toUpperCase()%>.<%=strImgFileExt%>" width="135" height="150"></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td width="18%">Employee ID No. :</td>
+      <td width="46%">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td>Employee Name :</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td height="26">College/Office :</td>
+      <td height="26">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td height="26">Position :</td>
+      <td height="26">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="26">&nbsp;</td>
+      <td height="26" valign="top">&nbsp;</td>
+      <td height="26" valign="top">&nbsp;</td>
+    </tr>
+  </table>
+  <%}//stud info is notnull. 
+if(vRetResult != null && vRetResult.size() > 0){%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr > 
+      <td><div align="right"><a href="javascript:PrintPg();"><img src="../../images/print.gif" border="0" ></a><font size="1">click 
+          to print report</font></div></td>
+    </tr>
+  </table>
+  <table width="100%" border="1" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td height="25" colspan="4" bgcolor="#B9B292"><div align="center">WORK DETAIL 
+          FOR &amp;DATE </div></td>
+    </tr>
+  </table>
+  <table width="100%" border="1" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="25%" height="25"><div align="center"><font size="1"><strong>MODULE</strong></font></div></td>
+      <td width="51%"><div align="center"><font size="1"><strong>SUB-MODULE</strong></font></div></td>
+      <td width="24%"><div align="center"><font size="1"><strong>OPERATION</strong></font></div></td>
+    </tr>
+    <%for(int i = 0; i< vRetResult.size(); i +=3){%>
+    <tr> 
+      <td height="25" align="center">&nbsp;</td>
+      <td height="25"><div align="center"><font size="1">&nbsp;</font></div></td>
+      <td><div align="center"></div></td>
+    </tr>
+    <%}%>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr> 
+      <td height="25" bgcolor="#FFFFFF"><a href="javascript:PrintPg();"><img src="../../images/print.gif" border="0" ></a><font size="1">click 
+        to print report</font></td>
+    </tr>
+  </table>
+ <%}//only if vRetResult is not null %>
+ 
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr> 
+      <td height="25" bgcolor="#FFFFFF">&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="25" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+
+<input type="hidden" name="search_page"> 
+<input type="hidden" name="report_name" value="<%=WI.fillTextValue("report_name")%>">
+<input type="hidden" name="report_to_disp" value="<%=strReportToDisp%>">
+<input type="hidden" name="print_pg">
+
+<input type="hidden" name="stud_id" value="<%=WI.fillTextValue("stud_id")%>">
+<input type="hidden" name="sy_from" value="<%=WI.fillTextValue("sy_from")%>">
+<input type="hidden" name="sy_to" value="<%=WI.fillTextValue("sy_to")%>">
+<input type="hidden" name="semester" value="<%=WI.fillTextValue("semester")%>">
+<input type="hidden" name="date_fr" value="<%=WI.fillTextValue("date_fr")%>">
+<input type="hidden" name="date_to" value="<%=WI.fillTextValue("date_to")%>">
+<input type="hidden" name="report_type" value="<%=WI.fillTextValue("report_type")%>">
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

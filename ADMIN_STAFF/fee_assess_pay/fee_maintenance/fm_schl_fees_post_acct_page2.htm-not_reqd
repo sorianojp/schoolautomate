@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td height="30" colspan="6"><div align="center"><font color="#FFFFFF"><strong>:::: 
+          SCHOOL FACILITIES FEES MAINTENANCE PAGE ::::<br>
+          <font size="1">ADD/CREATE LIST OF INTERNAL ACCOUNTS </font> </strong></font></div></td>
+    </tr>
+	</table>
+	
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25" colspan="3"><a href="fm_schl_fees_post_acct_page1.htm"><img src="../../../images/go_back.gif" width="50" height="27" border="0"></a></td>
+    </tr>
+    <tr> 
+      <td width="4%" height="25">&nbsp;</td>
+      <td width="42%">Fee name : <strong>$fee_name</strong></td>
+      <td width="54%">School Year<strong> : $school_year</strong></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="3"><hr></td>
+    </tr>
+  </table>
+	
+	
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td width="4%" height="25">&nbsp;</td>
+      <td width="9%">Enter ID </td>
+      <td width="18%"><input name="textfield2" type="text" size="16"></td>
+      <td width="69%"><a href="fm_schl_fees_multiple_entry.htm"><img src="../../../images/form_proceed.gif" width="81" height="21" border="0"></a></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="4"><hr></td>
+    </tr>
+  </table>
+  
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td  width="4%"height="25">&nbsp;</td>
+      <td width="96%">Account category :<strong> $&lt;student/employee&gt;</strong></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Account name : <strong>$name</strong></td>
+      <td>School year : <strong>$school_year</strong></td>
+    </tr>
+    <tr> 
+      <td width="4%" height="25">&nbsp;</td>
+      <td width="42%">Course/Major :<strong> $course/$major</strong></td>
+      <td width="54%">Term : <strong>$term</strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Year : <strong>$year_level</strong></td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="3"><hr></td>
+    </tr>
+  </table>
+	
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>Account name : <strong>$name</strong></td>
+    </tr>
+    <tr> 
+      <td width="4%" height="25">&nbsp;</td>
+      <td width="96%">Employee type :<strong> $emp_type</strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Employee status : <strong>$emp_stat</strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">College/Department/Office : <strong>$college/daprtment/office_name</strong></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="2"><hr></td>
+    </tr>
+  </table>	
+	
+	
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>School Facility name : <strong>$&lt;dormitory/transportation&gt;</strong></td>
+    </tr>
+    <tr> 
+      <td width="4%" height="25">&nbsp;</td>
+      <td width="96%">Particular (Room/Door #: Bus Route,etc) : <strong> 
+        <input name="textfield" type="text" size="32">
+        </strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Deposit : <strong>$deposit </strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">O.R. No. :<strong> $O.R. No. </strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Date paid : <strong>$date_paid</strong></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+  </table>
+	
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr> 
+      <td width="1%" height="25">&nbsp;</td>
+      <td width="3%" height="25">&nbsp;</td>
+      <td width="96%" height="25" colspan="3"><img src="../../../images/save.gif" width="48" height="28"><font size="1">click 
+        to save entry<a href="javascript:CancelRecord();"><img src="../../../images/cancel.gif" border="0"></a> 
+        <font size="1">click to cancel or go previous</font></font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="9" bgcolor="#FFFFFF">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="9" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+
+</form>
+</body>
+</html>

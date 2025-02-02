@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/css/reportlink.css" rel="stylesheet" type="text/css">
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf/css/tableBorder.css" rel="stylesheet" type="text/css">
+</head>
+<script language="javascript">
+function EncodeCD(strJVType) {
+	strJVNumber = prompt('To edit or view detail, enter CD number.','Enter CD Number');
+	if(strJVNumber == null)
+		strJVNumber = "";
+	location = "../journal_voucher/journal_voucher_entry.jsp?jv_number="+strJVNumber+"&jv_type="+strJVType+"&is_cd=1";
+}
+</script>
+
+<body bgcolor="#D2AE72">
+<form>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" colspan="2" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>:::: 
+        SETUP TAXES - TAX TYPE PAGE ::::</strong></font></div></td>
+    </tr>
+</table>
+
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+  <tr> 
+    <td height="25" colspan="3"><a href="tax_codes.htm"><img src="../../../../images/go_back.gif" border="0"></a></td>
+    </tr>
+  <tr> 
+    <td width="7%" height="25">&nbsp;</td>
+    <td width="17%" height="25">Tax Type Code : </td>
+    <td width="76%" height="25"><input name="textfield" type="text" size="16" maxlength="16"></td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25">Tax Type Name : </td>
+    <td><input name="textfield2" type="text" size="32" maxlength="32"></td>
+  </tr>
+  <tr>
+    <td height="34">&nbsp;</td>
+    <td height="34">&nbsp;</td>
+    <td height="34"><font size="1"><img src="../../../../images/save.gif" >click to SAVE entries <img src="../../../../images/cancel.gif" >click to CLEAR/CANCEL entries</font> </td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td height="25">&nbsp;</td>
+    <td height="25" align="right"><img src="../../../../images/print.gif"><font size="1">click to print the list</font></td>
+  </tr>
+</table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+    <tr>
+      <td height="26" colspan="4" align="center" class="thinborder"><strong>:: LIST OF TAX TYPE :: </strong></td>
+    </tr>
+    <tr>
+      <td align="center" class="thinborder"><strong>COUNT</strong></td>
+      <td align="center" class="thinborder"><strong>TYPE CODE</strong></td>
+      <td height="26" align="center" class="thinborder"><strong>TYPE NAME </strong></td>
+      <td align="center" class="thinborder"><strong>OPTIONS</strong></td>
+    </tr>
+    
+    <tr>
+      <td width="11%" class="thinborder">1</td>
+      <td width="17%" class="thinborder">VAT</td> 
+      <td width="47%" height="26" class="thinborder">VALUE-ADDED TAX </td>
+      <td width="25%" class="thinborder" align="right"><font size="1"><img src="../../../../images/edit.gif" ><img src="../../../../images/delete.gif" ></font></td>
+    </tr>
+    <tr>
+      <td class="thinborder">2</td>
+      <td class="thinborder">EWT</td>
+      <td height="26" class="thinborder">EXPANDED WITHHOLDING TAX </td>
+      <td class="thinborder" align="right">&nbsp;</td>
+    </tr>
+    <tr>
+      <td class="thinborder">3</td>
+      <td class="thinborder">IT-C</td>
+      <td height="23" class="thinborder">INCOME TAX ON COMPENSATION </td>
+      <td class="thinborder" align="right">&nbsp;</td>
+    </tr>
+    <tr>
+      <td class="thinborder">&nbsp;</td>
+      <td class="thinborder">IT-SE</td>
+      <td height="26" class="thinborder">INCOME TAX - SELF EMPLOYED </td>
+      <td class="thinborder" align="right">&nbsp;</td>
+    </tr>
+    <tr>
+      <td class="thinborder">&nbsp;</td>
+      <td class="thinborder">&nbsp;</td>
+      <td height="26" class="thinborder">&nbsp;</td>
+      <td class="thinborder" align="right">&nbsp;</td>
+    </tr>
+  </table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+  <tr>
+    <td height="23" width="7%">&nbsp;</td>
+    <td width="43%">&nbsp;</td>
+    <td width="50%">&nbsp;</td>
+  </tr>
+  <tr>
+    <td height="25">&nbsp;</td>
+    <td valign="middle">&nbsp;</td>
+    <td valign="middle"></tr>
+  <tr bgcolor="#A49A6A">
+    <td height="25" colspan="3">&nbsp;</td>
+  </tr>
+</table>
+</form>
+</body>
+
+</html>

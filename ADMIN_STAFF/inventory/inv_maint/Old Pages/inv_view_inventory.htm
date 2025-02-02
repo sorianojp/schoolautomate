@@ -1,0 +1,271 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+.style1 {font-size: smaller}
+-->
+</style>
+</head>
+<script language="JavaScript" src="../../../jscript/date-picker.js"></script>
+<script>
+</script>
+<%@ page language="java" import="utility.*,java.util.Vector " buffer="16kb"%>
+<%
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+
+	String strErrMsg = null;
+	String strTemp = null;
+	String strTempStudId = request.getParameter("temp_id");
+	int iMaxDisplayed = 0;
+	String strDegreeType = null;
+
+	Vector[] vAutoAdvisedList = new Vector[2];
+
+
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Clearance-Clearance Management-Manage Signatories","manage_signatories.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Clearance","Clearance Management",request.getRemoteAddr(),
+														"manage_signatories.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+//end of authenticaion code.
+%>
+
+
+<body bgcolor="#D2AE72">
+<form name="form_" action="manage_clearance.jsp" method="post" >
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="5" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" ><strong>:::: 
+          INVENTORY MAINTENANCE - VIEW INVENTORY PAGE ::::</strong></font></div></td>
+    </tr>
+</table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25" colspan="6"><font size="1">&nbsp;</font></td>
+    </tr>
+    <tr> 
+      <td width="2%" height="29">&nbsp;</td>
+      <td colspan="2">College</td>
+      <td height="29" valign="middle"><select name="select">
+        </select></td>
+      <td valign="middle">Status</td>
+      <td height="29" valign="middle"><select name="select2">
+          <option>OK</option>
+          <option>PARTIALLY WORKING</option>
+          <option>DAMAGED</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="29">&nbsp;</td>
+      <td colspan="2">Department</td>
+      <td height="29" valign="middle"><select name="select9">
+        </select></td>
+      <td valign="middle">Building</td>
+      <td height="29" valign="middle"><select name="select11">
+        </select></td>
+    </tr>
+    <tr> 
+      <td width="2%" height="29">&nbsp;</td>
+      <td colspan="2">Laboratory/Stock Room</td>
+      <td width="31%" height="29" valign="middle"><a href="javascript:show_calendar('form_.eff_date');" title="Click to select date" onMouseOver="window.status='Select date';return true;" onMouseOut="window.status='';return true;"> 
+        </a> <select name="select10">
+        </select> </td>
+      <td width="8%" valign="middle">&nbsp;</td>
+      <td width="39%" height="29" valign="middle">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="29" colspan="6"><hr size="1"></td>
+    </tr>
+    <tr> 
+      <td height="29">&nbsp;</td>
+      <td height="29" colspan="5"><strong>SORT</strong></td>
+    </tr>
+    <tr> 
+      <td height="29">&nbsp;</td>
+      <td width="4%" height="29">&nbsp;</td>
+      <td height="29" colspan="4"><select name="select3">
+          <option>Quantity</option>
+          <option>Status</option>
+          <option>College</option>
+          <option>Laboratory/Stock Room</option>
+          <option>Non-Acad Office/Department</option>
+          <option>Building</option>
+        </select> <select name="select4">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="29">&nbsp;</td>
+      <td height="29">&nbsp;</td>
+      <td height="29" colspan="4"><select name="select12">
+          <option>Quantity</option>
+          <option>Status</option>
+          <option>College</option>
+          <option>Laboratory/Stock Room</option>
+          <option>Non-Acad Office/Department</option>
+          <option>Building</option>
+        </select> <select name="select5">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="29">&nbsp;</td>
+      <td height="29">&nbsp;</td>
+      <td height="29" colspan="4"><select name="select13">
+          <option>Quantity</option>
+          <option>Status</option>
+          <option>College</option>
+          <option>Laboratory/Stock Room</option>
+          <option>Non-Acad Office/Department</option>
+          <option>Building</option>
+        </select> <select name="select6">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="29">&nbsp;</td>
+      <td height="29">&nbsp;</td>
+      <td height="29" colspan="4"><select name="select14">
+          <option>Quantity</option>
+          <option>Status</option>
+          <option>College</option>
+          <option>Laboratory/Stock Room</option>
+          <option>Non-Acad Office/Department</option>
+          <option>Building</option>
+        </select> <select name="select7">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="29">&nbsp;</td>
+      <td height="29">&nbsp;</td>
+      <td height="29" colspan="4"><select name="select15">
+          <option>Quantity</option>
+          <option>Status</option>
+          <option>College</option>
+          <option>Laboratory/Stock Room</option>
+          <option>Non-Acad Office/Department</option>
+          <option>Building</option>
+        </select> <select name="select8">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+    </tr>
+    <tr>
+      <td height="29">&nbsp;</td>
+      <td height="29">&nbsp;</td>
+      <td height="29" colspan="4"><select name="select16">
+          <option>Quantity</option>
+          <option>Status</option>
+          <option>College</option>
+          <option>Laboratory/Stock Room</option>
+          <option>Non-Acad Office/Department</option>
+          <option>Building</option>
+        </select> <select name="select16">
+          <option>Ascending</option>
+          <option>Descending</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="29">&nbsp;</td>
+      <td height="29">&nbsp;</td>
+      <td height="29" colspan="4"><img src="../../../images/form_proceed.gif"  border="0"></td>
+    </tr>
+    <tr> 
+      <td height="29">&nbsp;</td>
+      <td height="29">&nbsp;</td>
+      <td height="29" colspan="4"><div align="right"><img src="../../../images/print.gif"  border="0"> 
+          <font size="1">click to print list</font></div></td>
+    </tr>
+  </table>
+	
+  <table width="100%" border="0" cellpadding="1" cellspacing="0"  bgcolor="#FFFFFF" class="thinborder">
+    <tr bgcolor="#ABA37C"> 
+      <td height="25" colspan="7" class="thinborder"><div align="center"> 
+          <p><strong><font size="2">INVENTORY LIST</font></strong></p>
+        </div></td>
+    </tr>
+    <tr> 
+      <td width="14%" class="thinborder"><div align="center"><font size="1"><strong>BUILDING</strong></font></div></td>
+      <td width="13%" class="thinborder"><div align="center"><font size="1"><strong>COLLEGE/ 
+          DEPARMENT </strong></font></div></td>
+      <td width="19%" class="thinborder"><div align="center"><font size="1"><strong>LABORATORY/STOCK 
+          ROOM</strong></font></div></td>
+      <td width="26%" class="thinborder"><div align="center"><font size="1"><strong>NON-ACAD 
+          OFFICE/DEPT.</strong></font></div></td>
+      <td width="6%" height="25" class="thinborder"><div align="center"><font size="1"><strong>QUANTITY</strong></font></div></td>
+      <td width="13%" class="thinborder"><div align="center"><strong><font size="1">DATE 
+          STATUS UPDATED</font></strong></div></td>
+      <td width="9%" class="thinborder"><div align="center"><strong><font size="1">REMARKS</font></strong></div></td>
+    </tr>
+    <tr> 
+      <td class="thinborder">&nbsp;</td>
+      <td class="thinborder">&nbsp;</td>
+      <td class="thinborder">&nbsp;</td>
+      <td class="thinborder">&nbsp;</td>
+      <td height="25" class="thinborder">&nbsp;</td>
+      <td class="thinborder">&nbsp;</td>
+      <td class="thinborder">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td class="thinborder">&nbsp;</td>
+      <td class="thinborder">&nbsp;</td>
+      <td class="thinborder">&nbsp;</td>
+      <td class="thinborder">&nbsp;</td>
+      <td height="25" class="thinborder">&nbsp;</td>
+      <td class="thinborder">&nbsp;</td>
+      <td class="thinborder">&nbsp;</td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="48"  colspan="3"><div align="center"><img src="../../../images/print.gif"  border="0"> 
+          <font size="1">click to print list</font></div></td>
+    </tr>
+    <tr> 
+      <td height="25"  colspan="3" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

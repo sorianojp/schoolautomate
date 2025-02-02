@@ -1,0 +1,183 @@
+<%@ page language="java" import="utility.*, java.util.Vector" %>
+<%
+///added code for HR/companies.
+boolean bolIsSchool = false;
+if( (new CommonUtil().getIsSchool(null)).equals("1"))
+	bolIsSchool = true;
+String[] strColorScheme = CommonUtil.getColorScheme(6);
+//strColorScheme is never null. it has value always.
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../css/regmainlinkcss.css" rel="stylesheet" type="text/css">
+<link href="../../css/treelinkcss.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" type="text/JavaScript">
+<!--
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+//-->
+</script>
+<link href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/css/regmainlinkcss.css" rel="stylesheet" type="text/css">
+<%response.setHeader("Pragma","No-Cache");
+response.setDateHeader("Expires",0);
+response.setHeader("Cache-Control","no-Cache"); //HTTP 1.0
+response.setHeader("Cache-Control","no-store"); //HTTP 1.1
+%>
+</head>
+<body bgcolor="#C39E60" onLoad="MM_preloadImages('file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/images/home_small_admin_rollover.gif','file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/images/help_small_admin_rollover.gif','file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/images/logout_admin_rollover.gif')">
+<style>
+
+.trigger{
+	cursor: pointer;
+	cursor: hand;
+}
+.branch{
+	display: none;
+	margin-left: 16px;
+}
+</style>
+<script language="JavaScript">
+var openImg = new Image();
+openImg.src = "../../images/box_with_minus.gif";
+var closedImg = new Image();
+closedImg.src = "../../images/box_with_plus.gif";
+
+function showBranch(branch){
+	var objBranch = document.getElementById(branch).style;
+	if(objBranch.display=="block")
+		objBranch.display="none";
+	else
+		objBranch.display="block";
+}
+
+function swapFolder(img){
+	objImg = document.getElementById(img);
+	if(objImg.src.indexOf('box_with_plus.gif')>-1)
+		objImg.src = openImg.src;
+	else
+		objImg.src = closedImg.src;
+}
+</script>
+<form action="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/commfile/logout.jsp" method="post" target="_parent">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="8%" height="19" bgcolor="#E9E0D1">&nbsp;</td>
+      <td width="92%" bgcolor="#E9E0D1"> <a href="<%if(bolIsSchool){%>../main%20files/admin_staff_home_button_content.htm<%}else{%>../../index.jsp<%}%>" target="_parent" onMouseOver="MM_swapImage('Image2','','../../images/home_small_admin_rollover.gif',1)" onMouseOut="MM_swapImgRestore()" ><img src="../../images/home_small_admin.gif" name="Image2" width="65" height="22" border="0" id="Image2"></a><a href="javascript:;" onMouseOver="MM_swapImage('Image1','','../../images/help_small_admin_rollover.gif',1)" onMouseOut="MM_swapImgRestore()"><img src="../../images/help_small_admin.gif" name="Image1" width="65" height="22" border="0" id="Image1"></a><a onMouseOver="MM_swapImage('Image3','','../../images/logout_admin_rollover.gif',1)" onMouseOut="MM_swapImgRestore()">
+        <input type="image" src="../../images/logout_admin.gif" name="Image3" width="65" height="22" border="0" id="Image3">
+        </a></td>
+  </tr>
+  </table>
+<input type="hidden" name="logout_url" value="../ADMIN_STAFF/main%20files/admin_staff_bottom_content.htm">
+<input type="hidden" name="body_color" value="#C39E60">
+</form>
+
+<div class="trigger" onClick="showBranch('branch1');swapFolder('folder1')"> <img src="../../images/box_with_plus.gif" id="folder1"> 
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif"> 
+  LOAN </font></strong></div>
+
+<span class="branch" id="branch1"> <font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FFFFFF"></font> 
+<img src="../../images/broken_lines.gif"> <a href="loans/loan_code_mgmt.jsp" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> 
+Loan Code Mgmt</font></a> <br>
+<img src="../../images/broken_lines.gif"> <a href="loans/encode_loans_data.jsp" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> 
+Encode Loans Data</font></a> <br>
+<img src="../../images/broken_lines.gif"> <a href="loans/edit_loans_data.jsp" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif">Edit Loans Data</font></a><br>
+<img src="../../images/broken_lines.gif"> <a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/ADMIN_STAFF/clearances/manage_signatories.htm" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif">Encode Payments Manually</font></a><br>
+<img src="../../images/broken_lines.gif"> <a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/ADMIN_STAFF/clearances/manage_signatories.htm" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif">Edit Loan Payments</font></a><br>
+<img src="../../images/broken_lines.gif"> <a href="loans/loans_search.jsp" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif">Search Loans</font></a><br>
+</span>
+
+
+<img src="../../images/small_white_box.gif" width="7" height="7" border="0" >
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">SEARCH
+ </a> </font></strong><br>
+
+<!-- <div class="trigger" onClick="showBranch('branch3');swapFolder('folder3')"> <img src="../../images/box_with_plus.gif" id="folder3"> 
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">SEARCH</font></strong></div>
+<span class="branch" id="branch3"> <font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FFFFFF"></font> 
+<img src="../../images/broken_lines.gif"> <a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/ADMIN_STAFF/clearances/update_status.htm" target="clearancemainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif">Update 
+Status</font></a><br>
+<img src="../../images/broken_lines.gif"><a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/ADMIN_STAFF/clearances/verify_status.htm" target="clearancemainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> 
+Verify Status</font></a><br>
+<img src="../../images/broken_lines.gif"> <a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/ADMIN_STAFF/clearances/print_list.htm" target="clearancemainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif">Print 
+List</font></a><br>
+<img src="../../images/broken_lines.gif"> <a href="file:///D|/ApacheTomcat4.1.31/webapps/schoolbliz_vmuf_2007.03.28/ADMIN_STAFF/clearances/print_list.htm" target="clearancemainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif">Print 
+Clearance</font></a><br>
+</span>  -->
+
+ <div class="trigger" onClick="showBranch('branch4');swapFolder('folder4')"> <img src="../../images/box_with_plus.gif" width="7" height="7" border="0" id="folder4"> 
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">REPORTS</font></strong></div>
+	<span class="branch" id="branch4"> <font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FFFFFF"></font>
+    <img src="../../images/broken_lines.gif"> <a href="../enrollment/advising/advising_old.jsp" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> Payroll Deductions</font></a><br>
+    <img src="../../images/broken_lines.gif"> <a href="reports/sched_ind_payments.jsp" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> Schedule of Individual<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Payments</font></a><br>
+	<img src="../../images/broken_lines.gif"> <a href="reports/sched_total_monthly_payments.jsp" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> Schedule of Total Monthly <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Payments</font></a><br>
+	<img src="../../images/broken_lines.gif"> <a href="reports/signatures_list_loan_bal.jsp" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> Signatures List for Loan<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Balances</font></a><br>
+	<img src="../../images/broken_lines.gif"> <a href="reports/indv_total_loan_bal.jsp" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> Individual Total Loan <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Balances</font></a><br>
+	<img src="../../images/broken_lines.gif"> <a href="reports/indv_active_loan_bal.jsp" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> Individual Active Loan<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Balances</font></a><br>
+<img src="../../images/broken_lines.gif"> <a href="reports/indv_loan_bal.jsp" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> 
+Listing of Individual<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Balances</font></a><br>
+<img src="../../images/broken_lines.gif"> <a href="reports/indv_loans.jsp" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> 
+Listing of Individual<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Loans</font></a><br>
+	<img src="../../images/broken_lines.gif"> <a href="../enrollment/advising/advising_transferee.htm" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> Listing of Monthly<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Remittances</font></a><br>
+	<img src="../../images/broken_lines.gif"> <a href="../enrollment/advising/advising_transferee.htm" target="retirementmainFrame"><font size="2" face="Geneva, Arial, Helvetica, sans-serif"> Loan Payments<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reconcilliation<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Schedule vs. Actual)</font></a><br>
+</span>
+<!-- 
+ <img src="../../images/small_%20white_%20box.jpg" width="7" height="7" border="0" > 
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif"><a href="../student_sched/enrollment_stud_sched.htm" target="enrolmainFrame">STUDENT 
+  SCHEDULE</a></font></strong><br>
+
+ <div><img src="../../images/small_%20white_%20box.jpg" width="7" height="7" border="0" id="folder5">
+  <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif"><a href="../assessment/enrollment_assessment.htm" target="enrolmainFrame">ASSESSMENT</a>
+  </font></strong></div>
+
+<div class="trigger" onClick="showBranch('branch5');swapFolder('folder5')">
+	<img src="../../images/box_with_plus.jpg" width="7" height="7" border="0" id="folder5"> <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">CHANGE OF SUBJECTS </font></strong></div>
+<span class="branch" id="branch5"> <font size="2" face="Geneva, Arial, Helvetica, sans-serif" color="#FFFFFF">
+<img src="../../images/broken_lines.jpg" width="15" height="15"> <a href="../enrollment/change_subjects/reg_change_subject_drop.htm" target="enrolmainFrame">Drop/Withdraw</a><br>
+<img src="../../images/broken_lines.jpg" width="15" height="15"> <a href="../enrollment/change_subjects/reg_change_subject_add.htm" target="enrolmainFrame">Add</a><br>
+<img src="../../images/broken_lines.jpg" width="15" height="15"> <a href="../enrollment/change_subjects/reg_change_subject_schedules.htm" target="enrolmainFrame">Schedules</a><br>
+<img src="../../images/broken_lines.jpg" width="15" height="15"> <a href="../enrollment/change_subjects/reg_change_subject_print.htm" target="enrolmainFrame">Print 
+New Student Load</a><br>
+</font></span>
+
+<div class="trigger" onClick="showBranch('branch6');swapFolder('folder6')"> <img src="../../images/box_with_plus.jpg" width="7" height="7" border="0" id="folder6"> <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">STATISTICS</font></strong></div>
+  <span class="branch" id="branch6"><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FFFFFF">
+  	<img src="../../images/broken_lines.jpg" width="15" height="15"> <a href="#"><font face="Geneva, Arial, Helvetica, sans-serif">Enrollees</font></a><br>
+  	<img src="../../images/broken_lines.jpg" width="15" height="15"> <a href="#"><font face="Geneva, Arial, Helvetica, sans-serif">Subjects</font></a><br>
+   </font>
+ </span>
+
+<div class="trigger" onClick="showBranch('branch7');swapFolder('folder7')"> <img src="../../images/box_with_plus.jpg" width="7" height="7" border="0" id="folder7"> <strong><font color="#FFFFFF" size="2" face="Geneva, Arial, Helvetica, sans-serif">REPORTS</font></strong></div>
+  <span class="branch" id="branch7"><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FFFFFF">
+  	<img src="../../images/broken_lines.jpg" width="15" height="15"> <a href="#"><font face="Geneva, Arial, Helvetica, sans-serif">Class Lists</font></a><br>
+  	<img src="../../images/broken_lines.jpg" width="15" height="15"> <a href="#"><font face="Geneva, Arial, Helvetica, sans-serif">Students' Schedules</font></a><br>
+ 	</font>
+ </span>-->
+
+
+</body>
+</html>

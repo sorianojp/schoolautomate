@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#D2AE72">
+<form>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="5" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF" ><strong>:::: 
+          PAYROLL: HOLIDAYS CREDIT PAY IMPLEMENTATION PAGE ::::</strong></font></div></td>
+    </tr>
+</table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25" colspan="4">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td width="2%" height="25">&nbsp;</td>
+      <td width="15%">Effectivity Date</td>
+      <td><input name="textfield3" type="text" size="10" maxlength="10"> <img src="../../../images/calendar_new.gif"></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="23">&nbsp;</td>
+      <td>Type of Holiday</td>
+      <td width="32%"><select name="select">
+          <option>Regular National Holidays</option>
+          <option>Nationwide Special Public Non-Working Holidays</option>
+          <option>Special Non-Working Days</option>
+          <option>National Special Working Days</option>
+        </select></td>
+      <td width="51%"><img src="../../../images/form_proceed.gif" ></td>
+    </tr>
+    <tr> 
+      <td height="20" colspan="4"><hr size="1"></td>
+    </tr>
+	</table>
+  <table bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td  width="2%" height="26">&nbsp;</td>
+      <td height="26" colspan="3"><strong><u>Conditions</u></strong> : 
+        <select name="select2">
+          <option>If Holiday is a Working Day</option>
+          <option>If Holiday is Non-working Day</option>
+          <option>If Holiday Falls on Rest Day</option>
+          <option>If Day Before Holiday is Rest Day</option>
+          <option>If Day Before Holiday is a Non-working Day</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="3"><strong><u>Implementation</u></strong> : 
+        <select name="select3">
+          <option>Present</option>
+          <option>Not required to report/Can be absent</option>
+        </select> <input name="textfield" type="text" size="2" maxlength="2"> 
+        <select name="select4">
+          <option>Day(s)</option>
+          <option>Hour(s)</option>
+        </select> <select name="select5">
+          <option>Before </option>
+          <option>Within</option>
+          <option>After</option>
+        </select> <select name="select6">
+          <option>Holiday</option>
+          <option>Working Day</option>
+          <option>Rest Day</option>
+        </select></td>
+    </tr>
+    <tr> 
+      <td height="42">&nbsp;</td>
+      <td width="15%" height="42" valign="bottom">&nbsp;</td>
+      <td width="42%" height="42" valign="bottom"><img src="../../../images/save.gif" width="48" height="28"><font size="1">click 
+        to save entries <img src="../../../images/cancel.gif" ><font size="1">click 
+        to cancel/clear entries</font></font></td>
+      <td width="41%" height="42" valign="bottom"><font size="1">&nbsp;</font></td>
+    </tr>
+    <tr> 
+      <td height="10">&nbsp;</td>
+      <td height="10" valign="bottom">&nbsp;</td>
+      <td height="10" valign="bottom">&nbsp;</td>
+      <td height="10" valign="bottom"><div align="right"><font size="1"><img src="../../../images/print.gif" ><font size="1">click 
+          to print list</font></font></div></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="1" cellspacing="0" cellpadding="0">
+    <tr> 
+      <td height="25" colspan="6" bgcolor="#B9B292"><div align="center">LIST OF 
+          HOLIDAYS CREDIT PAY IMPLEMENTATION</div></td>
+    </tr>
+    <tr> 
+      <td width="159" height="26"><div align="center"><font size="1"><strong>EFFECTIVITY 
+          DATE</strong></font></div></td>
+      <td><div align="center"><font size="1"><strong>TYPE OF HOLIDAY</strong></font></div></td>
+      <td><div align="center"><strong><font size="1">CONDITION</font></strong></div></td>
+      <td><div align="center"><strong><font size="1">IMPLEMENTAITON</font></strong></div></td>
+      <td colspan="2"><div align="center"><strong><font size="1"><strong>OPTIONS</strong></font></strong></div></td>
+    </tr>
+    <tr> 
+      <td height="25"><font size="1">January 01, 2006</font></td>
+      <td width="264"><font size="1">Regular National Holidays</font></td>
+      <td width="276"><font size="1">If Holiday is a Working Day</font></td>
+      <td width="375"><font size="1">Present 1 Day Before Holiday</font></td>
+      <td width="69" height="25"> <div align="center"><a href='javascript:PrepareToEdit("<%=(String)vRetResult.elementAt(i)%>","<%=(String)vRetResult.elementAt(i+1)%>");'><img src="../../../images/edit.gif" width="40" height="26" border="0"></a></div></td>
+      <td width="75"> <div align="center"><a href='javascript:DeleteRecord("<%=(String)vRetResult.elementAt(i)%>");'><img src="../../../images/delete.gif" width="55" height="28" border="0"></a></div></td>
+    </tr>
+    <tr> 
+      <td height="25">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><div align="center"><a href='javascript:PrepareToEdit("<%=(String)vRetResult.elementAt(i)%>","<%=(String)vRetResult.elementAt(i+1)%>");'><img src="../../../images/edit.gif" width="40" height="26" border="0"></a></div></td>
+      <td><div align="center"><a href='javascript:DeleteRecord("<%=(String)vRetResult.elementAt(i)%>");'><img src="../../../images/delete.gif" width="55" height="28" border="0"></a></div></td>
+    </tr>
+  </table>
+  <table  bgcolor="#FFFFFF" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="25"  colspan="3" bgcolor="#A49A6A">&nbsp;</td>
+      </tr>
+  </table>
+</form>
+</body>
+</html>

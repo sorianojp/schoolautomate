@@ -1,0 +1,368 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+</head>
+<script language="JavaScript" src="../../../jscript/date-picker.js"></script>
+<script language="JavaScript" src="../../../jscript/common.js"></script>
+<script language="JavaScript">
+function RemoveTuition() {
+	document.form_.indexT.value = "0";
+	document.form_.submit();
+}
+function RemoveFeeName(strFeeCatg, strIndex) {
+	if(strFeeCatg == 1) {//misc fee
+		eval('document.form_.misc_'+strIndex+'.value = ""');
+	}
+	else {//other fee.
+		eval('document.form_.others_'+strIndex+'.value = ""');
+	}
+	document.form_.submit();
+}
+function ReloadPage()
+{
+	document.form_.submit();
+}
+function AddFeeName()
+{
+	//if it is tuition fee, add in the tuition fee.
+	if(document.form_.fee_catg.selectedIndex == 0) {
+		document.form_.indexT.value = 1;
+		document.form_.tuition_.value = "ALL";
+	}
+	else if(document.form_.fee_catg.selectedIndex == 1) {
+		if(document.form_.fee_name.selectedIndex == 0)
+			document.form_.indexM.value = "1";
+		else
+			document.form_.indexM.value = eval(document.form_.indexM.value) + 1;
+		document.form_.misc_.value = document.form_.fee_name[document.form_.fee_name.selectedIndex].text;
+	}
+	else if(document.form_.fee_catg.selectedIndex == 2) {
+		document.form_.indexO.value = eval(document.form_.indexO.value) + 1;
+		document.form_.others_.value = document.form_.fee_name[document.form_.fee_name.selectedIndex].text;
+	}
+	
+	ReloadPage();
+}
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,java.util.Vector" %>
+<%
+	DBOperation dbOP = null;
+	WebInterface WI = new WebInterface(request);
+	String strErrMsg = null;
+	String strTemp = null;
+	
+	int iListCount = 0;
+	
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Accounting-REPORTS","rec_projection.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Accounting","REPORTS",request.getRemoteAddr(),
+														"rec_projection.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+Vector vRetResult = new Vector();
+
+EnrlReport.FeeExtraction FE = new EnrlReport.FeeExtraction();
+if(WI.fillTextValue("sy_from").length() > 0)
+	FE.getRecProj(dbOP, request);
+
+int iIndexM = Integer.parseInt(WI.getStrValue(WI.fillTextValue("indexM"),"0"));
+
+%>
+<form name="form_" action="./rec_projection.jsp" method="post">
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td width="100%" height="25" colspan="4" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF"><strong>:::: 
+          BACK ACCOUNTS PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25" colspan="4">&nbsp;</td>
+    </tr>
+  </table>
+  <%
+if(false){%>
+  <%}//do not show now.
+%>
+  <table width="100%" border="0" cellpadding="0"  cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="3%" height="25">&nbsp;</td>
+      <td width="10%">School Year</td>
+      <td width="33%">
+        <%
+strTemp = WI.fillTextValue("sy_from");
+if(strTemp.length() ==0)
+	strTemp = (String)request.getSession(false).getAttribute("cur_sch_yr_from");
+%>
+        <input name="sy_from" type="text" size="4" maxlength="4" value="<%=strTemp%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onblur="style.backgroundColor='white'"
+	  onKeypress=" if(event.keyCode<48 || event.keyCode > 57) event.returnValue=false;"
+	  onKeyUp='DisplaySYTo("form_","sy_from","sy_to")'>
+        - 
+        <%
+strTemp = WI.fillTextValue("sy_to");
+if(strTemp.length() ==0)
+	strTemp = (String)request.getSession(false).getAttribute("cur_sch_yr_to");
+%>
+        <input name="sy_to" type="text" size="4" maxlength="4" value="<%=strTemp%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onblur="style.backgroundColor='white'"
+	  readonly="yes">
+        <select name="semester">
+          <option value="">ALL</option>
+          <%
+strTemp = WI.fillTextValue("semester");
+if(strTemp.length() ==0 && WI.fillTextValue("page_value").length() ==0)
+	strTemp = (String)request.getSession(false).getAttribute("cur_sem");
+if(strTemp.compareTo("0") ==0){%>
+          <option value="0" selected>Summer</option>
+          <%}else{%>
+          <option value="0">Summer</option>
+          <%}if(strTemp.compareTo("1") ==0){%>
+          <option value="1" selected>1st Sem</option>
+          <%}else{%>
+          <option value="1">1st Sem</option>
+          <%}if(strTemp.compareTo("2") == 0){%>
+          <option value="2" selected>2nd Sem</option>
+          <%}else{%>
+          <option value="2">2nd Sem</option>
+          <%}if(strTemp.compareTo("3") == 0){%>
+          <option value="3" selected>3rd Sem</option>
+          <%}else{%>
+          <option value="3">3rd Sem</option>
+          <%}%>
+        </select></td>
+      <td width="54%"><font size="1"><a href="javascript:ReloadPage();"><img src="../../../images/refresh.gif" border="0"></a> 
+        click to refresh the page.</font></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="3%" height="25">&nbsp;</td>
+      <td>Display report : 
+        <select name="report_type">
+          <option value="0">Summary (per college)</option>
+          <%
+strTemp = WI.fillTextValue("report_type");
+if(strTemp.compareTo("1") == 0){%>
+          <option value="1" selected>Detailed (per student)</option>
+          <%}else{%>
+          <option value="1">Detailed (per student)</option>
+          <%}%>
+        </select></td>
+    </tr>
+    <%
+if(WI.fillTextValue("load_save_report").compareTo("0") == 0){%>
+    <%}%>
+    <tr> 
+      <td height="25" colspan="2"><hr size="1"></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="146%" height="28" colspan="6"><div align="right"><font size="1"><a href="rec_projection_print.htm" target="_blank"><img src="../../../images/print.gif" width="58" height="26" border="0"></a><font size="1">click 
+          to print </font></font></div></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="1" bgcolor="#808080">
+    <tr bgcolor="#CCCCCC"> 
+      <td height="25" align="center" colspan="2">BACK ACCOUNTS : <strong>Summary 
+        (per college) for $school_year, $term</strong></td>
+    </tr>
+    <tr bgcolor="#FFFFAF"> 
+      <td width="41%" height="25" align="center"><font size="1"><strong>COLLEGE 
+        </strong></font></td>
+      <td width="59%" align="center"><font size="1"><strong>AMOUNT</strong></font></td>
+    </tr>
+    <%
+int iIndex = 0;
+iIndex = Integer.parseInt(WI.getStrValue(WI.fillTextValue("indexT"),"0"));
+for(int i = 0 ; i < iIndex; ++i){%>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+    </tr>
+    <%}
+if(WI.fillTextValue("misc_").length()> 0)
+	vRetResult.addElement(WI.fillTextValue("misc_"));
+if(WI.fillTextValue("misc_").compareTo("ALL") != 0 ) {
+	for(int i = 0 ; i < iIndexM; ++i) {
+		if(WI.fillTextValue("misc_"+i).length() == 0)
+			continue;
+		if(vRetResult.indexOf(WI.fillTextValue("misc_"+i)) != -1)
+			continue;
+		vRetResult.addElement(WI.fillTextValue("misc_"+i));
+		if(WI.fillTextValue("misc_"+i).compareTo("ALL") == 0) {
+			vRetResult.removeAllElements();
+			vRetResult.addElement("ALL");
+			break;
+		}
+	}
+}//end of if condition.
+iIndexM = 0;
+for(int i = 0 ; i < vRetResult.size(); ++i, ++iIndexM){%>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" align="center">&nbsp;</td>
+      <td align="center"><%=(String)vRetResult.elementAt(i)%> </td>
+    </tr>
+    <%}
+vRetResult.removeAllElements();
+iIndex = Integer.parseInt(WI.getStrValue(WI.fillTextValue("indexO"),"0"));
+if(WI.fillTextValue("others_").length()> 0)
+	vRetResult.addElement(WI.fillTextValue("others_"));
+if(WI.fillTextValue("others_").compareTo("ALL") != 0 )
+	for(int i = 0 ; i < iIndex; ++i) {
+		if(WI.fillTextValue("others_"+i).length() == 0)
+			continue;
+		if(vRetResult.indexOf(WI.fillTextValue("others_"+i)) != -1)
+			continue;
+		vRetResult.addElement(WI.fillTextValue("others_"+i));
+		if(WI.fillTextValue("others_"+i).compareTo("ALL") == 0) {
+			vRetResult.removeAllElements();
+			vRetResult.addElement("ALL");
+			break;
+		}
+	}
+for(int i = 0 ; i < vRetResult.size(); ++i){%>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25" align="center"> 
+        <%if(i == 0){%>
+      </td>
+      <td align="center"><%=(String)vRetResult.elementAt(i)%> </td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25" align="center"><strong>TOTAL</strong></td>
+      <td align="center">&nbsp;</td>
+    </tr>
+    <%}%>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="1" bgcolor="#808080">
+    <tr bgcolor="#CCCCCC"> 
+      <td height="25" align="center" colspan="4">BACK ACCOUNTS : <strong>Detailed 
+        (per student per course) for $school_year, $term</strong></td>
+    </tr>
+    <tr bgcolor="#FFFFAF"> 
+      <td width="17%" align="center"><font size="1"><strong>STUDENT ID</strong></font></td>
+      <td width="33%" align="center"><font size="1"><strong>STUDENT NAME</strong></font></td>
+      <td width="39%" height="25" align="center"><font size="1"><strong>COURSE/MAJOR 
+        </strong></font></td>
+      <td width="11%" align="center"><font size="1"><strong>AMOUNT</strong></font></td>
+    </tr>
+    <%
+int iIndex = 0;
+iIndex = Integer.parseInt(WI.getStrValue(WI.fillTextValue("indexT"),"0"));
+for(int i = 0 ; i < iIndex; ++i){%>
+    <tr bgcolor="#FFFFFF"> 
+      <td align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+      <td height="25" align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+    </tr>
+    <%}
+if(WI.fillTextValue("misc_").length()> 0)
+	vRetResult.addElement(WI.fillTextValue("misc_"));
+if(WI.fillTextValue("misc_").compareTo("ALL") != 0 ) {
+	for(int i = 0 ; i < iIndexM; ++i) {
+		if(WI.fillTextValue("misc_"+i).length() == 0)
+			continue;
+		if(vRetResult.indexOf(WI.fillTextValue("misc_"+i)) != -1)
+			continue;
+		vRetResult.addElement(WI.fillTextValue("misc_"+i));
+		if(WI.fillTextValue("misc_"+i).compareTo("ALL") == 0) {
+			vRetResult.removeAllElements();
+			vRetResult.addElement("ALL");
+			break;
+		}
+	}
+}//end of if condition.
+iIndexM = 0;
+for(int i = 0 ; i < vRetResult.size(); ++i, ++iIndexM){%>
+    <tr bgcolor="#FFFFFF"> 
+      <td align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+      <td height="25" align="center">&nbsp;</td>
+      <td align="center"><%=(String)vRetResult.elementAt(i)%> </td>
+    </tr>
+    <%}
+vRetResult.removeAllElements();
+iIndex = Integer.parseInt(WI.getStrValue(WI.fillTextValue("indexO"),"0"));
+if(WI.fillTextValue("others_").length()> 0)
+	vRetResult.addElement(WI.fillTextValue("others_"));
+if(WI.fillTextValue("others_").compareTo("ALL") != 0 )
+	for(int i = 0 ; i < iIndex; ++i) {
+		if(WI.fillTextValue("others_"+i).length() == 0)
+			continue;
+		if(vRetResult.indexOf(WI.fillTextValue("others_"+i)) != -1)
+			continue;
+		vRetResult.addElement(WI.fillTextValue("others_"+i));
+		if(WI.fillTextValue("others_"+i).compareTo("ALL") == 0) {
+			vRetResult.removeAllElements();
+			vRetResult.addElement("ALL");
+			break;
+		}
+	}
+for(int i = 0 ; i < vRetResult.size(); ++i){%>
+    <tr bgcolor="#FFFFFF"> 
+      <td align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+      <td height="22" align="center"> 
+        <%if(i == 0){%>
+      </td>
+      <td align="center"><%=(String)vRetResult.elementAt(i)%> </td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+      <td height="25" align="center"><strong>TOTAL</strong></td>
+      <td align="center">&nbsp;</td>
+    </tr>
+    <%}%>
+  </table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" colspan="8" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+<input type="hidden" name="tuition_">
+<input type="hidden" name="misc_">
+<input type="hidden" name="others_">
+<input type="hidden" name="indexT" value="<%=WI.getStrValue(WI.fillTextValue("indexT"),"0")%>">
+<input type="hidden" name="indexM" value="<%=iIndexM%>">
+<input type="hidden" name="indexO" value="<%=WI.getStrValue(WI.fillTextValue("indexO"),"0")%>">
+
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

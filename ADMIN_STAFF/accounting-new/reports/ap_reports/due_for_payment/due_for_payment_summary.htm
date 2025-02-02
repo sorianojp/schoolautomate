@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../../../css/tableBorder.css" rel="stylesheet" type="text/css"></head>
+</head>
+<script language="javascript" src="../../../../../jscript/date-picker.js"></script>
+<script language="javascript">
+function ShowDetail(strPrintStat) {
+	strTBDate = document.form_.bl_date.value;
+	if(strTBDate.length == 0) {
+		alert("Please enter  cutoff date..");
+		return;
+	}
+	document.form_.print_stat.value = strPrintStat;
+	document.form_.print_pg.value = "1";
+	document.form_.submit();
+}
+</script>
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.WebInterface" %>
+<form name="form_" method="post" action="/ADMIN_STAFF/accounting/reports/financial_statements/balance_sheet/bl_1st_page.jsp">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A"> 
+      <td height="25" colspan="3" align="center" bgcolor="#A49A6A"><font color="#FFFFFF"> 
+        <strong>:::: ACCOUNTS PAYABLE - DUE FOR PAYMENT SUMMARY PAGE ::::</strong></font></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">Show</td>
+      <td height="25"><select name="select">
+          <option>Specific Date</option>
+          <option>Date Range</option>
+          <option>Month</option>
+        </select></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td height="25">&nbsp;</td>
+      <td height="25"><input name="textfield" type="text" size="10" maxlength="10"> 
+        <span style="font-size:10px;"><a href="../../../transaction/ap/subsidiary_ledger/subsidiary_ledger.htm"><img src="../../../../../images/calendar_new.gif" border="0"></a> 
+        to 
+        <input name="textfield2" type="text" size="10" maxlength="10">
+        <span style="font-size:10px;"><a href="../../../transaction/ap/subsidiary_ledger/subsidiary_ledger.htm"><img src="../../../../../images/calendar_new.gif" border="0"></a> 
+        </span></span></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="25">&nbsp;</td>
+      <td width="10%" height="25">&nbsp;</td>
+      <td width="83%" height="25"><span style="font-size:10px;"><span style="font-size:10px;"> 
+        <select name="select2">
+          <option>January</option>
+          <option>February</option>
+          <option>March</option>
+          <option>April</option>
+          <option>May</option>
+          <option>June</option>
+        </select>
+        </span></span></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td height="38">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><span style="font-size:10px;"><a href="../../../transaction/ap/subsidiary_ledger/subsidiary_ledger.htm"><img src="../../../../../images/form_proceed.gif" border="0"></a></span></td>
+    </tr>
+    <tr bgcolor="#FFFFFF"> 
+      <td width="7%" height="38">&nbsp;</td>
+      <td colspan="2"><div align="right"><span style="font-size:10px;"><a href="../../../transaction/ap/subsidiary_ledger/subsidiary_ledger.htm"><img src="../../../../../images/print.gif" border="0"></a>click 
+          to print report</span></div></td>
+    </tr>
+  </table> 
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF" class="thinborder">
+    <tr bgcolor="#B4C5D6"> 
+      <td height="26" colspan="6" class="thinborder"><div align="center"><strong><font color="#FF0000">:: 
+          TOTAL DUE FOR PAYMENT : $specified_show_option ::</font></strong></div></td>
+    </tr>
+    <tr bgcolor="#B4C5D6"> 
+      <td width="15%" height="26" class="thinborder"><div align="center"><font size="1"><strong>TYPE</strong></font></div></td>
+      <td width="27%" height="26" class="thinborder"><div align="center"><font size="1"><strong>PAYEE 
+          NAME</strong></font></div></td>
+      <td width="11%" class="thinborder"><div align="center"><font size="1"><strong>DATE 
+          DUE </strong></font></div></td>
+      <td width="14%" height="26" class="thinborder"><div align="center"><font size="1"><strong>REFERENCE 
+          # </strong></font></div></td>
+      <td width="22%" height="26" class="thinborder"><div align="center"><font size="1"><strong>AMOUNT</strong></font></div></td>
+      <td width="11%" class="thinborder"><div align="center"><font size="1"><strong>VIEW 
+          DETAILS</strong></font></div></td>
+    </tr>
+    <tr> 
+      <td height="25" class="thinborder">SUPPLIER</td>
+      <td height="25" class="thinborder">Thinking Tools</td>
+      <td class="thinborder" align="right">01/01/2007</td>
+      <td height="25" class="thinborder" align="right">00010</td>
+      <td height="25" class="thinborder" align="right">5,000.00</td>
+      <td class="thinborder" align="right"><span style="font-size:10px;"><strong><a href="../../../transaction/ap/subsidiary_ledger/subsidiary_ledger.htm"><img src="../../../../../images/view.gif" border="0"></a></strong></span></td>
+    </tr>
+    <tr> 
+      <td height="29" class="thinborder">NON-SUPPLIER</td>
+      <td height="29" class="thinborder">Ellen Nayak</td>
+      <td class="thinborder" align="right">01/01/2007</td>
+      <td height="29" class="thinborder" align="right">00025</td>
+      <td height="29" class="thinborder" align="right">25,000.00</td>
+      <td class="thinborder" align="right"><span style="font-size:10px;"><strong><a href="../../../transaction/ap/subsidiary_ledger/subsidiary_ledger.htm"><img src="../../../../../images/view.gif" border="0"></a></strong></span></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td width="42%" height="25" rowspan="4">&nbsp;</td>
+      <td width="25%" rowspan="4"><strong>TOTAL BALANCE : &nbsp;&nbsp;&nbsp;</strong></td>
+      <td height="25"><strong>$TOTAL $currency1</strong></td>
+    </tr>
+    <tr>
+      <td height="25"><strong>$TOTAL $currency2</strong></td>
+    </tr>
+    <tr>
+      <td height="25"><strong>$TOTAL $currency3</strong></td>
+    </tr>
+    <tr>
+      <td height="25"><strong>$TOTAL $currency4</strong></td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td height="25" colspan="3">&nbsp;</td>
+    </tr>
+    <tr bgcolor="#B8CDD1"> 
+      <td height="25" colspan="3" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+  <input type="hidden" name="print_pg">
+  <input type="hidden" name="print_stat">
+</form>
+</body>
+</html>

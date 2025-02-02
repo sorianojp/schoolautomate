@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css" />
+</head>
+<script language="JavaScript" src="../../../jscript/common.js"></script>
+<script language="JavaScript">
+function clickSubmit()
+{
+	document.appschedule.setsubmit.value = 1;
+}
+function EditRecord()
+{
+	document.appschedule.editRecord.value="1";
+}
+
+</script>
+
+
+<body bgcolor="#D2AE72">
+<%@ page language="java" import="utility.*,enrollment.CloseSchoolYear" %>
+<%
+
+	DBOperation dbOP = null;
+	SessionInterface sessInt = new SessionInterface();
+	MessageConstant mConst = new MessageConstant();
+	WebInterface WI = new WebInterface(request);
+	String strErrMsg = "";
+	String strTemp = null;
+	String[] astrCurSchYrInfo = null;
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Admission Maintenance-SET SCHOOL YEAR & TERM","sy.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Admission Maintenance","SET SCHOOL YEAR & TERM",request.getRemoteAddr(),
+														"sy.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+//end of authenticaion code.
+
+strTemp =WI.fillTextValue("setsubmit");
+CloseSchoolYear cSYYr = new CloseSchoolYear();
+if(strTemp != null && strTemp.compareTo("1") == 0)
+{
+	//add it here and give a message.
+	if(cSYYr.openNewSchoolYr(dbOP,request))
+		strErrMsg = "School year opened successfully.";
+	else
+		strErrMsg = cSYYr.getErrMsg();
+}
+strTemp = WI.fillTextValue("editRecord");
+if(strTemp.compareTo("1") ==0)
+{
+	if(cSYYr.editSchoolYr(dbOP,request))
+		strErrMsg = "School year edited successfully.";
+	else
+		strErrMsg = cSYYr.getErrMsg();
+}
+
+astrCurSchYrInfo = dbOP.getCurSchYr();
+dbOP.cleanUP();
+
+if(astrCurSchYrInfo == null)
+{
+	astrCurSchYrInfo = new String[3];
+	astrCurSchYrInfo[0]="";astrCurSchYrInfo[1]="";astrCurSchYrInfo[2]="";
+}
+else
+{
+	String[] astrConvertSem = {"Summer","1st Sem","2nd Sem","3rd Sem","4th Sem","5th Sem"};
+	strTemp = astrConvertSem[Integer.parseInt(astrCurSchYrInfo[2])]	;
+}
+
+if(strErrMsg == null) strErrMsg = "";
+%>
+
+
+<form name="appschedule" method="post" action="../../ADMISSION%20MAINTENANCE%20MODULE/school_year/./sy.jsp">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#B5AB73">
+      <td width="131%" height="27" colspan="8"><div align="center"><strong><font color="#FFFFFF" size="2" face="Verdana, Arial, Helvetica, sans-serif">:::: 
+          HR : SET CURRENT TERM PAGE ::::</font></strong></div></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" bgcolor="#FFFFFF">
+    <tr> 
+      <td colspan="3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <%=strErrMsg%></td>
+    </tr>
+    <tr> 
+      <td width="13%">&nbsp;</td>
+      <td width="34%">Current Term in Record</td>
+      <td width="53%">New Term </td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td><strong><%=strTemp%></strong> <input name="old_semester" type="hidden" size="4" value="<%=astrCurSchYrInfo[2]%>" /></td>
+      <td width="53%"><select name="new_semester">
+          <option value="1">1st</option>
+          <option value="2">2nd</option>
+          <option value="3">3rd</option>
+          <option value="4">4th</option>
+          <option value="0">Summer</option>
+        </select></td>
+    </tr>
+    <%
+if(iAccessLevel ==2){%>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td><input type="image" onClick="EditRecord()" src="../../../images/edit.gif" />
+        <font size="1">click to edit current term in record</font></td>
+    </tr>
+    <%}%>
+    <tr> 
+      <td height="22">&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td colspan="3">&nbsp;</td>
+    </tr>
+  </table>
+
+
+  <table width="100%" border="0" bgcolor="#B5AB73">
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+
+<!-- all hidden fields go here -->
+<input type="hidden" name="setsubmit" value="0" />
+<input type="hidden" name="editRecord" value="0" />
+ </form>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<html>
+<SCRIPT LANGUAGE="JavaScript" SRC="/jscript/common.js"></script>
+
+<script>
+     var win = window.open("./ADMIN_STAFF/e_dtr/dtr.jsp", '', 'fullscreen=yes, scrollbars=auto');
+     win.focus();
+	if (!win.opener) win.opener = self;
+
+var ie5IsUp = false;
+
+
+function closeSelf() {
+  var browserType = navigator.appName;
+  var browserVersion = parseInt(navigator.appVersion);
+
+  if (browserType == "Microsoft Internet Explorer") {
+    if (ie5IsUp) {
+      closecontrol.Click();
+    }
+  }
+
+}   
+ie5IsUp = true;
+  
+</script>
+<body>
+
+</body>
+</html>

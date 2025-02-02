@@ -1,0 +1,1028 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>AUF OFFICIAL TRANSCRIPT OF RECORDS</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+th {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+.fontsize9 {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 8px;
+}
+
+    TABLE.thinborder {
+    border-top: solid 1px #000000;
+    border-right: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }	
+    TD.thinborder {
+    border-left: solid 1px #000000;
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+    .thinborderALL {
+    border-left: solid 1px #000000;
+    border-right: solid 1px #000000;
+    border-top: solid 1px #000000;
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+    }
+
+    TD.thinborderLEFT {
+    border-left: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+    TD.thinborderRIGHT {
+    border-right: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+    TD.thinborderLEFTRIGHT {
+    border-left: solid 1px #000000;
+    border-right: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+    TD.thinborderTOP {
+    border-top: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+    TD.thinborderBOTTOM {
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+    TD.thinborderRIGHTBOTTOM {
+    border-right: solid 1px #000000;
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+    TD.thinborderLEFTBOTTOM {
+    border-left: solid 1px #000000;
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+    TD.thinborderLEFTRIGHTBOTTOM {
+    border-left: solid 1px #000000;
+    border-right: solid 1px #000000;
+    border-bottom: solid 1px #000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;	
+    }
+
+-->
+</style>
+</head>
+<%@ page language="java" import="utility.*,java.util.Vector" %>
+<%
+	DBOperation dbOP = null;
+	String strErrMsg = null;
+	String strTemp = null;
+	WebInterface WI = new WebInterface(request);
+	String strDegreeType = null;
+	
+	String strCollegeName = null;//I have to find the college offering course.
+
+	int iRowStartFr = Integer.parseInt(WI.fillTextValue("row_start_fr"));
+	int iRowCount   = Integer.parseInt(WI.fillTextValue("row_count"));
+	int iRowEndsAt  = iRowStartFr + iRowCount;
+	int iLastPage   = Integer.parseInt(WI.fillTextValue("last_page"));
+	
+	int iRowsPrinted = 0;
+	int iMaxRowToDisp = Integer.parseInt(WI.fillTextValue("max_page_to_disp"));
+	
+	int iPageNumber = Integer.parseInt(WI.fillTextValue("page_number"));
+	String strTotalPageNumber = WI.fillTextValue("total_page");
+
+	String strImgFileExt = null;
+
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Registrar Management-REPORTS-OTR","otr_print.jsp");
+		ReadPropertyFile readPropFile = new ReadPropertyFile();
+		strImgFileExt = readPropFile.getImageFileExtn("imgFileUploadExt");
+
+		if(strImgFileExt == null || strImgFileExt.trim().length() ==0)
+		{
+			strErrMsg = "Imange file extension is missing. Please contact school admin.";
+			dbOP.cleanUP();
+			throw new Exception();
+		}
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+
+	//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Registrar Management","REPORTS",request.getRemoteAddr(),
+														"otr_print.jsp");
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+//end of authenticaion code.
+Vector vStudInfo = null;
+Vector vAdditionalInfo = null;
+Vector vEntranceData = null;
+Vector vGraduationData = null;
+Vector vRetResult  = null;
+Vector vCompliedRequirement = null;
+Vector vReqList = null;
+
+Vector vMulRemark = null;
+int iMulRemarkIndex = -1;
+
+
+String[] astrConvertSem = {"SUMMER","1ST SEMESTER","2ND SEMESTER","3RD SEMESTER","4TH SEMESTER"};
+
+enrollment.ReportRegistrar repRegistrar  = new enrollment.ReportRegistrar();
+enrollment.OfflineAdmission offlineAdm = new enrollment.OfflineAdmission();
+enrollment.CourseRequirement cRequirement = new enrollment.CourseRequirement();
+
+if(WI.fillTextValue("stud_id").length() > 0) {
+	vStudInfo = offlineAdm.getStudentBasicInfo(dbOP, WI.fillTextValue("stud_id"));
+	
+	if(vStudInfo == null || vStudInfo.size() ==0)
+		strErrMsg = offlineAdm.getErrMsg();
+	else {
+		strCollegeName = new enrollment.CurriculumMaintenance().getCollegeName(dbOP,(String)vStudInfo.elementAt(5));
+		if(strCollegeName != null)
+			strCollegeName = strCollegeName.toUpperCase();
+			
+		student.StudentInfo studInfo = new student.StudentInfo();
+		vAdditionalInfo = studInfo.getStudInfoOTRCanForGradForm17(dbOP,
+			(String)vStudInfo.elementAt(12));
+		if(vAdditionalInfo == null || vAdditionalInfo.size() ==0)
+			strErrMsg = studInfo.getErrMsg();
+	}
+}
+if(vStudInfo != null && vStudInfo.size() > 0) {
+	enrollment.EntranceNGraduationData entranceGradData = new enrollment.EntranceNGraduationData();
+	vEntranceData = entranceGradData.operateOnEntranceData(dbOP,request,4);	
+	vGraduationData = entranceGradData.operateOnGraduationData(dbOP,request,4);
+	if(vEntranceData == null || vGraduationData == null)
+		strErrMsg = entranceGradData.getErrMsg();
+		
+	Vector vFirstEnrl = cRequirement.getFirstEnrollment(dbOP,request.getParameter("stud_id"),
+														(String)vStudInfo.elementAt(7),
+													(String)vStudInfo.elementAt(8));
+		if (vFirstEnrl != null) {
+			vRetResult = cRequirement.getStudentPendingCompliedList(dbOP,(String)vStudInfo.elementAt(12),
+											(String)vFirstEnrl.elementAt(0),(String)vFirstEnrl.elementAt(1),
+											(String)vFirstEnrl.elementAt(2),false,false,true,true);
+										
+		if(vRetResult == null && strErrMsg == null)
+			strErrMsg = cRequirement.getErrMsg();
+		else {
+			vCompliedRequirement = (Vector)vRetResult.elementAt(1);
+		}
+	  }else strErrMsg = cRequirement.getErrMsg();	
+}
+
+//save encoded information if save is clicked.
+Vector vForm17Info = null;
+vForm17Info = repRegistrar.operateOnForm17Form18EncodedInfo(dbOP, request,2,true);
+if(vForm17Info != null && vForm17Info.size() ==0)
+	vForm17Info = null;
+
+if(vStudInfo != null && vStudInfo.size() > 0) {
+	strDegreeType = (String)vStudInfo.elementAt(15);
+//	System.out.println("strDegreeType : " + strDegreeType);
+	vRetResult = repRegistrar.getOTROfCanForGrad(dbOP, WI.fillTextValue("stud_id"), strDegreeType, true);
+	
+	if(vRetResult == null)
+		strErrMsg = repRegistrar.getErrMsg();
+	else	
+		vMulRemark = (Vector)vRetResult.remove(0);
+
+	if (strDegreeType != null && strDegreeType.equals("1")) {
+		astrConvertSem[0] = "SUMMER";
+		astrConvertSem[1] = "1ST TRIMESTER";
+		astrConvertSem[2] = "2ND TRIMESTER";
+		astrConvertSem[3] = "3RD TRIMESTER";
+		astrConvertSem[4] = "";
+	}
+}
+String strCurrentSchoolName = SchoolInformation.getSchoolName(dbOP,false,false);
+
+boolean bolIsRLEHrs = false;
+boolean bolShowLecLabHr = false; String[] astrLecLabHr = null;//gets lec/lab hour information.
+String strRLEHrs    = null;
+String strCE        = null;
+
+
+if(vRetResult.toString().indexOf("hrs") > 0 && WI.fillTextValue("show_rle").compareTo("1") == 0)
+	bolIsRLEHrs = true;
+
+if(WI.fillTextValue("show_leclab").compareTo("1") == 0)	
+	bolShowLecLabHr = true;
+	
+//System.out.println(vStudInfo);
+//System.out.println(vMulRemark);
+
+
+%>
+
+<body topmargin="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td width="15%">&nbsp;</td>
+    <td align="center"><img src="../../../../images/logo/AUF-HEADER-tor.gif" width="533" height="116"></td>
+    <td width="15%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td headers="20">&nbsp;</td>
+    <td align="center">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+<%
+if(iPageNumber != 1){%>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td width="2%">&nbsp;</td>
+    <td width="6%" height="18"><div align="right">Name:</div></td>
+    <td width="40%" class="thinborderBOTTOM"><strong>&nbsp;<%=((String)vStudInfo.elementAt(2)).toUpperCase()%>,&nbsp;<%=((String)vStudInfo.elementAt(0)).toUpperCase()%> <%=WI.getStrValue(vStudInfo.elementAt(1)," ").toUpperCase()%></strong></td>
+    <td width="14%"><div align="right">Course : </div></td>
+    <td width="38%" class="thinborderBOTTOM"><strong>&nbsp;<%=(String)vStudInfo.elementAt(7)%> </strong></td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+    <td height="18">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+<%}else{%>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td width="82%"><table width="98%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td width="15%">Name :<br> </td>
+          <td width="92%" class="thinborderBOTTOM"><strong>&nbsp;<%=((String)vStudInfo.elementAt(2)).toUpperCase()%>, <%=((String)vStudInfo.elementAt(0)).toUpperCase()%> <%=WI.getStrValue(vStudInfo.elementAt(1)," ").toUpperCase()%></strong></td>
+        </tr>
+      </table></td>
+    <td width="18%" rowspan="8"><img src="../../../../upload_img/<%=WI.fillTextValue("stud_id").toUpperCase()+"."+strImgFileExt%>" width="130" height="130" border="1" align="top"></td>
+  </tr>
+  <tr> 
+    <td><table width="98%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td width="15%">Course :</td>
+          <td width="91%" class="thinborderBOTTOM">&nbsp;<%=(String)vStudInfo.elementAt(7)%></td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr> 
+    <td><table width="98%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td width="15%">Major :</td>
+          <td width="91%" class="thinborderBOTTOM">&nbsp;<%=WI.getStrValue((String)vStudInfo.elementAt(8))%></td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr> 
+    <td><table width="98%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td width="15%">Address :</td>
+          <td width="85%" class="thinborderBOTTOM">&nbsp;<%=WI.getStrValue((String)vAdditionalInfo.elementAt(3))%><%=WI.getStrValue((String)vAdditionalInfo.elementAt(4),", ","","")%><%=WI.getStrValue((String)vAdditionalInfo.elementAt(5),", ","","")%><%=WI.getStrValue((String)vAdditionalInfo.elementAt(7),"-","","")%><%=WI.getStrValue((String)vAdditionalInfo.elementAt(6),", ","","")%></td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr> 
+    <td><table width="98%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td width="15%">Date of Birth :</td>
+          <td width="30%" class="thinborderBOTTOM">&nbsp;<%=WI.getStrValue(vAdditionalInfo.elementAt(1))%></td>
+          <td width="18%"> &nbsp;Place of Birth: </td>
+          <td width="37%" class="thinborderBOTTOM"><%=WI.getStrValue(vAdditionalInfo.elementAt(2),"&nbsp;")%></td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr> 
+    <td><table width="98%" border="0" cellpadding="0" cellspacing="0">
+        <tr> 
+          <td width="21%">Entrance Credential: </td>
+          <td width="24%" class="thinborderBOTTOM">&nbsp; <% 
+		  
+		  	strTemp = WI.fillTextValue("entrance_data");
+		  
+// update already.. use the text box and let them edit!		  
+// if (false && vCompliedRequirement != null && vCompliedRequirement.size() > 0) {
+//	for (int i = 0; i < vCompliedRequirement.size(); i+= 3) {
+//		if (i == 0) strTemp = (String)vCompliedRequirement.elementAt(i+1);
+//		else strTemp +="," + (String)vCompliedRequirement.elementAt(i+1);
+//		}
+//	}
+%> <%=strTemp%> </td>
+          <td width="18%"> &nbsp;Admission Date : </td>
+          <td width="37%" class="thinborderBOTTOM">
+<% if(vEntranceData != null) {%>
+		  <%=WI.getStrValue((String)vEntranceData.elementAt(23),"&nbsp;")%> 
+<%}else{%> &nbsp; <%}%>
+		  </td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr> 
+    <td><table width="98%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td width="21%">Elementary School</td>
+          <td width="59%" class="thinborderBOTTOM"> &nbsp; <%
+if(vEntranceData != null)
+	strTemp = WI.getStrValue(vEntranceData.elementAt(16),WI.getStrValue(vEntranceData.elementAt(3)));
+else	
+	strTemp = "&nbsp;";
+%> <%=strTemp%></td>
+          <td width="7%"><div align="right">&nbsp;Year:</div></td>
+          <td width="13%" class="thinborderBOTTOM">&nbsp; <%
+if(vEntranceData != null)
+	strTemp = WI.getStrValue(vEntranceData.elementAt(20));
+else	
+	strTemp = "&nbsp;";
+%> <%=strTemp%></td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr> 
+    <td><table width="98%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td width="21%">High School</td>
+          <td width="59%" class="thinborderBOTTOM"> &nbsp; <%
+if(vEntranceData != null)
+	strTemp = WI.getStrValue(vEntranceData.elementAt(5),"&nbsp;");
+else	
+	strTemp = "&nbsp;";
+%> <%=strTemp%> </td>
+          <td width="7%"><div align="right">&nbsp;Year:</div></td>
+          <td width="13%" class="thinborderBOTTOM">&nbsp; <%
+if(vEntranceData != null)
+	strTemp = WI.getStrValue(vEntranceData.elementAt(22));
+else	
+	strTemp = "&nbsp;";
+%> <%=strTemp%></td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr> 
+    <td valign="top"> <table width="98%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td width="21%">School Last Attended</td>
+<% if (vEntranceData != null && vEntranceData.size()>0){
+	strTemp = (String)vEntranceData.elementAt(7);
+	if (strTemp == null) 
+		strTemp = (String)vEntranceData.elementAt(5);
+   }
+%>
+          <td width="52%" class="thinborderBOTTOM">&nbsp; <%=WI.getStrValue(strTemp)%> </td>
+          <td width="7%"><div align="right">&nbsp;Year:</div></td>
+          <td width="20%" class="thinborderBOTTOM">&nbsp;
+<% if(vEntranceData != null) {
+
+		int iYearTo = Integer.parseInt(WI.getStrValue((String)vEntranceData.elementAt(24),"0"));
+		
+		if (iYearTo != 0) 
+			strTemp = " " +  Integer.toString(iYearTo - 1) + " - " +  Integer.toString(iYearTo );
+		else
+			strTemp = "";
+%>
+		  <%=strTemp%> 
+<%}%>		  
+		  
+		  </td>
+        </tr>
+      </table></td>
+    <td width="18%"><table width="98%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td width="21%">ID #</td>
+          <td width="79%" class="thinborderBOTTOM"><%=WI.fillTextValue("stud_id").toUpperCase()%></td>
+        </tr>
+        <tr> 
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+      </table></td>
+  </tr>
+</table>
+<%}//if iPage number = 1
+
+if(vRetResult != null && vRetResult.size() > 0){
+	int iNumWeeks = 0;
+	int iColspan = 2;
+	if (WI.fillTextValue("weeks").length() > 0) iNumWeeks = Integer.parseInt(WI.fillTextValue("weeks"));
+	
+	if (bolShowLecLabHr)  iColspan +=2;
+	if (bolIsRLEHrs) iColspan++;
+		
+%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr bgcolor="#FFFFFF"> 
+    <td height="10" colspan="<%=iColspan%>" class="thinborderBOTTOM">&nbsp;</td>
+    <td colspan="2" class="thinborderBOTTOM">&nbsp;</td>
+    <td class="thinborderBOTTOM">&nbsp;</td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="25" colspan="<%=iColspan%>" class="thinborder"><div align="center"><strong>ACADEMIC 
+        RECORD</strong></div></td>
+    <td colspan="2" class="thinborder"><div align="center"><strong>GRADES</strong></div></td>
+    <td width="10%" rowspan="2" class="thinborderLEFTRIGHTBOTTOM"><div align="center"><strong>UNITS</strong></div></td>
+  </tr>
+  <tr bgcolor="#FFFFFF"> 
+    <td width="18%" height="25" class="thinborder"><div align="center"><strong>COURSE 
+        NO.</strong></div></td>
+    <td width="53%" class="thinborder"><div align="center"> <strong>DESCRIPTIVE 
+        TITLE </strong></div></td>
+    <%if(bolShowLecLabHr){%>
+    <td width="7%" class="thinborderBOTTOM"><div align="center"><strong>LEC<br>
+        (HRS) </strong></div></td>
+    <td width="7%" class="thinborderBOTTOM"><div align="center"><strong>LAB (HRS)</strong></div></td>
+    <%}if(bolIsRLEHrs){%>
+    <td width="7%" class="thinborderBOTTOM"><div align="center"><strong> RLE (HRS)</strong></div></td>
+    <%}%>
+    <td width="10%" class="thinborder"><div align="center"> <strong>FINAL </strong></div></td>
+    <td width="10%" class="thinborder"><div align="center"><strong>RE-EXAM</strong></div></td>
+  </tr>
+  <%
+int iIndexOfSubGroup = 0; //to get index of group compare the vRetResult with the group info vector
+String strSchoolName = null;
+String strPrevSchName = null;
+String strSchNameToDisp = null;
+
+String strSYSemToDisp   = null;
+String strCurSYSem      = null;
+String strPrevSYSem     = null;
+
+boolean bolIsSchNameNull    = false;
+boolean  bolCrossEnrolled   = false;//i have to set it to true if school name is null - if information has 
+boolean  bolPrinted = false; // print only once
+
+//school name after it is null, it is encoded as cross enrollee.
+
+String strHideRowLHS = "<!--";
+String strHideRowRHS = "-->";
+int iCurrentRow = 0;//System.out.println(vRetResult);
+
+String strCrossEnrolleeSchPrev   = null;
+String strCrossEnrolleeSch       = null;
+//System.out.println("iMaxRowToDisp 1 : " + iMaxRowToDisp);
+
+if(WI.fillTextValue("addl_remark").length() > 0 && iLastPage == 1){
+
+	int iTemp = 1;
+	 strTemp = WI.fillTextValue("addl_remark");
+	int iIndexOf = 0;
+
+	while((iIndexOf = strTemp.indexOf("<br>",iIndexOf + 1)) != -1)
+		++iTemp;
+
+	 iMaxRowToDisp = iMaxRowToDisp - iTemp; 
+}
+//System.out.println(vRetResult);
+
+for(int i = 0 ; i < vRetResult.size(); i += 11, ++iCurrentRow){
+//I have to now check if this subject is having RLE hours. 
+//String strRLEHrs    = null;
+//String strCE        = null;
+//System.out.println(vRetResult.elementAt(i + 8));
+	if(vRetResult.size() > (i + 16) && vRetResult.elementAt(i + 8) != null && 
+		//((String)vRetResult.elementAt(i + 8)).toLowerCase().indexOf("inc") != -1 &&  -- removed for inc checking. 
+		vRetResult.elementAt(i + 6) != null && vRetResult.elementAt(i + 6 + 11) != null && 
+		((String)vRetResult.elementAt(i + 6)).compareTo((String)vRetResult.elementAt(i + 6 + 11)) == 0 && //sub code,
+	    ((String)vRetResult.elementAt(i + 1)).compareTo((String)vRetResult.elementAt(i + 1 + 11)) == 0 && //sy_from
+		((String)vRetResult.elementAt(i + 2)).compareTo((String)vRetResult.elementAt(i + 2 + 11)) == 0 && //sy_to
+		WI.getStrValue(vRetResult.elementAt(i + 3),"1").compareTo(WI.getStrValue(vRetResult.elementAt(i + 3 + 11),"1")) == 0) {   //semester
+			strTemp = (String)vRetResult.elementAt(i + 9 + 11);
+	}
+	else {
+		strTemp = (String)vRetResult.elementAt(i + 9);
+	}
+	
+	strCE  = strTemp;
+	
+	if (strCE!= null && strCE.equals("0") 
+			&& WI.getStrValue((String)vRetResult.elementAt(i + 8),"").toLowerCase().equals("drp")) {
+		
+		strCE = "-";
+	}
+	
+	if(strTemp != null && strTemp.indexOf("hrs") > 0) {
+		strRLEHrs = CommonUtil.formatGrade(strTemp.substring(strTemp.indexOf("(") + 1, strTemp.indexOf("hrs")),0f);
+		strCE     = strTemp.substring(0,strTemp.indexOf("("));
+	}
+	else {
+		strRLEHrs    = null;
+	}
+	
+	strSchoolName = (String)vRetResult.elementAt(i);	
+	
+	if(vRetResult.elementAt(i) == null)
+		bolIsSchNameNull = true;
+	if(vRetResult.elementAt(i) != null && bolIsSchNameNull) //cross enrolled.
+		strSchoolName += " (CROSS ENROLLED)";		
+// uncomment this if school name apprears once.//
+	if(strSchoolName != null) {
+		if(strPrevSchName == null) {
+			strPrevSchName = strSchoolName ;
+			strSchNameToDisp = strSchoolName;
+		}
+		else if(strPrevSchName.compareTo(strSchoolName) ==0) {
+			strSchNameToDisp = null;
+		}
+		else {//itis having a new school name.
+			strPrevSchName = strSchoolName;
+			strSchNameToDisp = strPrevSchName;
+		}
+	}
+	
+	if(i == 0 && strSchoolName == null) {//I have to get the current school name
+		strSchNameToDisp = SchoolInformation.getSchoolName(dbOP,false,false);
+	}
+	if(strSchoolName == null)// && vRetResult.elementAt(i + 10) != null)//subject group name is not null for reg.sub
+		strSchoolName = SchoolInformation.getSchoolName(dbOP,false,false);
+		
+	if(strSchoolName != null)
+		strSchNameToDisp = strSchoolName;	
+		
+ 	//if prev school name is not not null, show the current shcool name.
+	if(strSchoolName == null && strPrevSchName != null) {
+		strSchNameToDisp = strCurrentSchoolName;
+		strPrevSchName = null;
+	}
+
+//strCurSYSem =
+if(vRetResult.elementAt(i+ 3) != null) {//null only if accredited subject - foreign stud.
+	if(((String)vRetResult.elementAt(i+ 3)) != null && ((String)vRetResult.elementAt(i+ 3)).length() == 1) {
+		strCurSYSem = astrConvertSem[Integer.parseInt((String)vRetResult.elementAt(i+ 3))]+" "+
+					(String)vRetResult.elementAt(i+ 1)+" - "+(String)vRetResult.elementAt(i+ 2);
+	}
+	else {
+		strCurSYSem = (String)vRetResult.elementAt(i+ 3)+" "+(String)vRetResult.elementAt(i+ 1)+" - "+
+							(String)vRetResult.elementAt(i+ 2);
+	}
+	if(strCurSYSem != null) {
+		if(strPrevSYSem == null) {
+			strPrevSYSem = strCurSYSem ;
+			strSYSemToDisp = strCurSYSem;
+		}
+		else if(strPrevSYSem.compareTo(strCurSYSem) ==0) {
+			strSYSemToDisp = null;
+		}
+		else {//itis having a new school name.
+			strPrevSYSem = strCurSYSem;
+			strSYSemToDisp = strPrevSYSem;
+		}
+	}
+}
+
+	if(vRetResult.elementAt(i) != null && bolIsSchNameNull) {//cross enrolled.
+		if(strCrossEnrolleeSchPrev == null || strCrossEnrolleeSchPrev.compareTo(strSchoolName) != 0)  {
+			strCrossEnrolleeSchPrev = strSchoolName;
+			strCrossEnrolleeSch     = strSchoolName;
+			strSYSemToDisp = strCurSYSem;
+		}
+	}
+
+
+ //Very important here, it print <!-- if it is not to be shown.
+ if(iCurrentRow < iRowStartFr || iCurrentRow >= iRowEndsAt){strHideRowLHS = "<!--";//I have to do this so i will know if I am priting data or not%>
+  <%=strHideRowLHS%> 
+  <%}else {
+  	++iRowsPrinted;
+	strHideRowLHS = "";
+//	System.out.println("iRowsPrinted 1:" + iRowsPrinted );
+	}//actual number of rows printed. 
+
+if(vMulRemark != null && vMulRemark.size() > 0) {
+	iMulRemarkIndex = ((Integer)vMulRemark.elementAt(0)).intValue();
+	if(iMulRemarkIndex == i){
+	vMulRemark.removeElementAt(0);
+	strTemp = ConversionTable.replaceString((String)vMulRemark.remove(0),"\n","<br>");
+	
+	if (strTemp != null)
+		strTemp = strTemp.toUpperCase();
+	%>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="20" colspan="<%=iColspan+3%>">  &nbsp;&nbsp;<%=strTemp%> </td>
+  </tr>
+  
+  
+  <%}//end of if(iMulRemarkIndex == i)
+}//end of if(vMulRemark != null && vMulRemark.size() > 0) 
+ %>
+<%  if(vEntranceData != null &&  (String)vEntranceData.elementAt(12) != null
+		&& iPageNumber == 1 && !bolPrinted){
+		bolPrinted = true;
+		//if last page, i have to show the remark.
+		// iMaxRowToDisp = iMaxRowToDisp - 2;
+		
+	int iTemp = 1;
+	 strTemp = WI.getStrValue((String)vEntranceData.elementAt(12));
+	int iIndexOf = 0;
+	while(  (iIndexOf = strTemp.indexOf("<br>",iIndexOf + 1)) != -1)
+		++iTemp;
+
+	if (iTemp == 1 && (strTemp.length()/100 > 0)) {
+		iTemp = strTemp.length()/100;
+		if (strTemp.length()%100 > 0)
+			iTemp +=1;
+	}
+	 iRowsPrinted += iTemp; 
+// 	System.out.println("iRowsPrinted 4:" + iRowsPrinted );
+%>
+  <tr>
+    <td height="20" colspan="<%=iColspan+3%>">&nbsp; <%=strTemp%></td>
+  </tr>
+<%}%>  
+
+ 
+<%if(strSchNameToDisp != null && (i ==  0 || (strPrevSchName != null && !strPrevSchName.equals(strSchNameToDisp)))){
+	if (strHideRowLHS == null || strHideRowLHS.length() == 0) 
+		++iRowsPrinted;
+//	System.out.println("iRowsPrinted 3:" + iRowsPrinted );		
+		//do not keep extra line for school name.%>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="20">&nbsp;</td>
+    <td height="20" colspan="<%=iColspan-1%>"><strong><%=strSchNameToDisp.toUpperCase()%></strong></td>
+  </tr>
+  <%strPrevSchName = strSchNameToDisp;
+ } // if(strSchNameToDisp != null && (i ==  0 || (strPrevSchName != null && !strPrevSchName.equals(strSchNameToDisp))))
+
+if(strSYSemToDisp != null){
+		if (strHideRowLHS == null || strHideRowLHS.length() == 0) 
+		++iRowsPrinted;
+%>
+  <tr bgcolor="#FFFFFF"> 
+    <td height="17">&nbsp;</td>
+    <td height="17" colspan="<%=iColspan-1%>"><strong><%=strSYSemToDisp%></strong></td>
+  </tr>
+  <%}
+%>
+  <tr bgcolor="#FFFFFF"> 
+    <td  height="17"><%=vRetResult.elementAt(i + 6)%></td>
+    <td ><%=vRetResult.elementAt(i + 7)%></td>
+    <%if(bolShowLecLabHr){
+	if(strHideRowLHS.length() == 0) 
+		astrLecLabHr = repRegistrar.getOTROfCanLecLabHr(dbOP, false, (String)vRetResult.elementAt(i + 6),(String)vRetResult.elementAt(i + 7),null);%>
+    <td width="7%" align="center">&nbsp; 
+      <%if(astrLecLabHr != null && iNumWeeks > 0){
+	  if (Integer.parseInt(WI.getStrValue(astrLecLabHr[0],"0")) < 30){%>
+      <%=Integer.parseInt(WI.getStrValue(astrLecLabHr[0],"0"))*iNumWeeks%> 
+      <%}else{%>
+      <%=WI.getStrValue(astrLecLabHr[0],"0")%> 
+      <%}}%>
+    </td>
+    <td width="7%" align="center"> 
+      <%if(astrLecLabHr != null && iNumWeeks > 0){
+	  if (Integer.parseInt(WI.getStrValue(astrLecLabHr[1],"0")) < 30){%>
+      <%=Integer.parseInt(WI.getStrValue(astrLecLabHr[1],"0"))*iNumWeeks%> 
+      <%}else{%>
+      <%=WI.getStrValue(astrLecLabHr[1],"0")%> 
+      <%}}%>
+    </td>
+    <%}%>
+    <%if(bolIsRLEHrs){%>
+    <td width="7%"><div align="center"><%=WI.getStrValue(strRLEHrs)%></div></td>
+    <%} 
+if(WI.getStrValue(vRetResult.elementAt(i + 8), "&nbsp;").compareTo("on going") == 0){%>
+    <td colspan="2"><div align="left">&nbsp;&nbsp;&nbsp;&nbsp;GNYA</div></td>
+    <td>&nbsp;</td>
+    <%}else if(WI.getStrValue(vRetResult.elementAt(i + 8), "&nbsp;").compareToIgnoreCase("IN PROGRESS") == 0){%>
+    <td colspan="2"><div align="left">&nbsp;&nbsp;&nbsp;&nbsp;IN PROGRESS</div></td>
+    <td>&nbsp;</td>
+	<%}else{%>
+    <td align="left">&nbsp;&nbsp;&nbsp;&nbsp;<%=WI.getStrValue((String)vRetResult.elementAt(i + 8), "&nbsp;")%></td>
+    <td align="center"> 
+<%
+	//it is re-exam if student has INC and cleared in same semester,
+	strTemp = null;
+	if(vRetResult.size() > (i + 16) && vRetResult.elementAt(i + 8) != null && vRetResult.elementAt(i + 6) != null  && vRetResult.elementAt(i + 6 + 11) != null && //&& ((String)vRetResult.elementAt(i + 8)).toLowerCase().indexOf("inc") != -1 - remove the inc checking..
+		((String)vRetResult.elementAt(i + 6)).compareTo((String)vRetResult.elementAt(i + 6 + 11)) == 0 && //sub code,
+	    ((String)vRetResult.elementAt(i + 1)).compareTo((String)vRetResult.elementAt(i + 1 + 11)) == 0 && //sy_from
+		((String)vRetResult.elementAt(i + 2)).compareTo((String)vRetResult.elementAt(i + 2 + 11)) == 0 && //sy_to
+		WI.getStrValue(vRetResult.elementAt(i + 3),"1").compareTo(WI.getStrValue(vRetResult.elementAt(i + 3 + 11),"1")) == 0) { //semester
+			strTemp = (String)vRetResult.elementAt(i + 9 + 11);
+			%>
+      <%=(String)vRetResult.elementAt(i + 8 + 11)%> 
+      <%i += 11;
+	  		//if (strCE.equals("0")) {
+	  		//	strCE = "-";
+	  		//}
+		}
+	  
+//	  if (strCE.equals("0")) {
+//	  	strCE = "-";
+//	  }
+
+	  %>
+    </td>
+    <td align="center">&nbsp;<%=strCE%>  </td>
+    <%}//sho only if grade is not on going.%>
+  </tr>
+  <%
+   if(iCurrentRow < iRowStartFr || iCurrentRow >= iRowEndsAt){%>
+  <%=strHideRowRHS%> 
+  <%}
+   }//end of for loop
+   %>
+</table>
+<% if (iLastPage == 1){%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<%  if(vGraduationData != null &&  vGraduationData.size() > 0){
+//		System.out.println(vGraduationData);
+		//if last page, i have to show the remark.
+		// iMaxRowToDisp = iMaxRowToDisp - 2;
+		
+	String strCourseCode = dbOP.mapOneToOther("course_offered", "course_name", 
+					"'"+(String)vStudInfo.elementAt(7)+"'","course_code",
+						" and is_del = 0 ");
+		
+	int iTemp = 1;
+	 strTemp = "GRADUATED WITH THE DEGREE OF " + ((String)vStudInfo.elementAt(7)).toUpperCase() + 
+	 			WI.getStrValue(strCourseCode," (",") ","");
+				
+	 if ((String)vGraduationData.elementAt(8) != null)
+	 	strTemp += " ON THE " + WI.formatDate((String)vGraduationData.elementAt(8),6).toUpperCase();
+	
+	 if(vGraduationData.elementAt(6) != null)
+	 	strTemp +=	", AS PER " +vGraduationData.elementAt(6);
+	 if (vGraduationData.elementAt(6) != null && vGraduationData.elementAt(7) != null) 
+	 	 strTemp += ", " + WI.formatDate((String)vGraduationData.elementAt(7),6).toUpperCase() + ".";
+	 else	
+	 	strTemp += ".";
+		
+	if (strTemp.length()/100 > 0) {
+		iTemp = strTemp.length()/100;
+		if (strTemp.length()%100 > 0)
+			iTemp +=1;
+	}
+	 iRowsPrinted += iTemp; 
+// 	System.out.println("iRowsPrinted 4:" + iRowsPrinted );
+%>  
+  <tr>
+    <td height="20" colspan="2" align="center">&nbsp; <%=strTemp%></td>
+  </tr>
+<%} iRowsPrinted++; 
+//	System.out.println("iRowsPrinted 5:" + iRowsPrinted );
+// for nothing follows%>
+  <tr>
+    <td height="20" colspan="2" align="center">***** NOTHING FOLLOWS  ******</td>
+  </tr>
+</table>
+<% } // if (iLastPage == 1)
+	else { // 
+%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td height="20" colspan="2" align="center">*****  NEXT PAGE  ******</td>
+  </tr>
+</table>
+<% }
+//	System.out.println("iMaxRowToDisp : " + iMaxRowToDisp);
+//	System.out.println("iRowsPrinted : " + iRowsPrinted);
+
+if (iMaxRowToDisp - iRowsPrinted > 0) {%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<%   for(int abc = 0; abc < iMaxRowToDisp - iRowsPrinted; ++abc){  // insert space  %>
+<tr>
+    <td height="20">&nbsp;</td>
+  </tr>
+<%}%>
+</table>
+<%}%>
+
+
+
+<%}//only if student is having grade infromation.%>
+<% if (iPageNumber ==1 ) {%>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="thinborderALL">
+  <tr> 
+    <td height="15" colspan="13" class="fontsize9">&nbsp;GRADING SYSTEM</td>
+  </tr>
+  <tr> 
+    <td width="4%" height="13" class="fontsize9">&nbsp;</td>
+    <td width="7%">&nbsp;</td>
+    <td width="11%">&nbsp;</td>
+    <td width="4%">&nbsp;</td>
+    <td width="7%">&nbsp;</td>
+    <td width="10%">&nbsp;</td>
+    <td width="4%">&nbsp;</td>
+    <td width="7%">&nbsp;</td>
+    <td width="10%">&nbsp;</td>
+    <td width="4%">&nbsp;</td>
+    <td width="15%">&nbsp;</td>
+    <td width="4%">&nbsp;</td>
+    <td width="12%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15" class="fontsize9">&nbsp;1.00</td>
+    <td class="fontsize9">97 - 100</td>
+    <td class="fontsize9">Excellent</td>
+    <td class="fontsize9">1.75</td>
+    <td class="fontsize9">88 - 90</td>
+    <td class="fontsize9">Good </td>
+    <td class="fontsize9">2.50</td>
+    <td class="fontsize9">79 - 81</td>
+    <td class="fontsize9">Fair</td>
+    <td class="fontsize9">5.00</td>
+    <td class="fontsize9">below 75 - Failure</td>
+    <td class="fontsize9">Dr</td>
+    <td class="fontsize9">Dropped</td>
+  </tr>
+  <tr> 
+    <td height="15" class="fontsize9">&nbsp;1.25</td>
+    <td class="fontsize9">94 - 96</td>
+    <td class="fontsize9">Very Good </td>
+    <td class="fontsize9">2.00</td>
+    <td class="fontsize9">85 - 87</td>
+    <td class="fontsize9">Good</td>
+    <td class="fontsize9">2.75</td>
+    <td class="fontsize9">77 - 78</td>
+    <td class="fontsize9">Fair</td>
+    <td class="fontsize9">INC</td>
+    <td class="fontsize9">Incomplete</td>
+    <td class="fontsize9">FA</td>
+    <td rowspan="2" valign="top" class="fontsize9">Failure due to <br>
+      Absences</td>
+  </tr>
+  <tr> 
+    <td height="15" class="fontsize9">&nbsp;1.50</td>
+    <td class="fontsize9">91 - 93</td>
+    <td class="fontsize9">Very Good</td>
+    <td class="fontsize9">2.25</td>
+    <td class="fontsize9">82 - 84</td>
+    <td class="fontsize9">Good</td>
+    <td class="fontsize9">3.00</td>
+    <td class="fontsize9">75 - 76 </td>
+    <td class="fontsize9">Passed</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="15">&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="10" colspan="13" class="fontsize9">&nbsp;&nbsp;For Graduate School 
+      : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;below 90 no credit for Ph.D.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;below 
+      85 no credit for M.A</td>
+  </tr>
+  <tr>
+    <td height="10" colspan="13">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="10" colspan="13" class="fontsize9"><div align="center">ONE UNIT 
+        OF CREDIT is one hour lecture or recitation, or three hours of laboratory, 
+        drafting or shop work each week for the period of a complete semester</div></td>
+  </tr>
+  <tr> 
+    <td height="10" colspan="13"><hr width="90%" size="1"></td>
+  </tr>
+  <tr valign="top"> 
+    <td height="20" colspan="13" class="fontsize9"><div align="center">Any erasure 
+        or alteration on this transcript renders the whole document invalid unless 
+        authenticated by the signature of the University Registrar.</div></td>
+  </tr>
+</table>
+<%} %>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <%if(iPageNumber == 1){%>
+  <tr> 
+    <td height="19" colspan="2">&nbsp;</td>
+  </tr>  
+  <tr> 
+    <td height="19" colspan="2"> REMARKS : &nbsp;&nbsp;&nbsp;<u>
+		<%=WI.getStrValue(WI.fillTextValue("addl_remark"),"&nbsp;&nbsp;&nbsp;","&nbsp;&nbsp;&nbsp;","")%></u><br><br></td>
+  </tr>
+  <tr> 
+    <td height="18" colspan="2">&nbsp;DATE : &nbsp;&nbsp;&nbsp;<u>&nbsp;&nbsp;&nbsp;<%=WI.getTodaysDate(6)%>&nbsp;&nbsp;&nbsp;</u></td>
+  </tr>
+  <%}else{%>
+  <tr> 
+    <td height="18" colspan="2">&nbsp;</td>
+  </tr>  
+  <tr> 
+    <td height="20" colspan="2">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="20" colspan="2">&nbsp;</td>
+  </tr>
+  <%}%>
+</table>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td height="12" valign="bottom"><font size="1" face="Georgia, Times New Roman, Times, serif">&nbsp;</font></td>
+  </tr>
+  <tr> 
+    <td height="12" valign="bottom"><font size="1" face="Georgia, Times New Roman, Times, serif">
+	(NOT VALID WITHOUT UNIVERSITY SEAL) </font></td>
+  </tr>
+</table>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="2">
+  <tr> 
+    <td height="10" colspan="5" valign="bottom" class="fontsize9">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="30%" height="10" valign="bottom"><font size="1" face="Georgia, Times New Roman, Times, serif">Prepared 
+      by: </font></td>
+    <td width="5%" valign="bottom"><font face="Times New Roman, Times, serif">&nbsp;</font></td>
+    <td width="30%" valign="bottom"><font size="1" face="Georgia, Times New Roman, Times, serif">Verified 
+      by: </font></td>
+    <td width="5%" valign="bottom">&nbsp;</td>
+    <td width="30%" valign="bottom">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td height="30" align="center" valign="bottom" class="thinborderBOTTOM">&nbsp;<strong><%=WI.fillTextValue("prep_by1")%></strong></td>
+    <td height="30">&nbsp;</td>
+    <td height="30" align="center" valign="bottom" class="thinborderBOTTOM">&nbsp;<strong><%=WI.fillTextValue("check_by1")%></strong></td>
+    <td height="30" valign="bottom">&nbsp;</td>
+    <td height="30" align="center" valign="bottom" class="thinborderBOTTOM"><strong><%=WI.fillTextValue("registrar_name")%></strong></td>
+  </tr>
+  <tr> 
+    <td height="10" valign="bottom" class="fontsize9"><br>
+      <img src="../../../../images/logo/AUF-footer_tor.gif" width="122" height="25"></td>
+    <td valign="bottom" class="fontsize9">&nbsp;</td>
+    <td valign="bottom" class="fontsize9">&nbsp;</td>
+    <td valign="bottom" class="fontsize9">&nbsp;</td>
+    <td valign="top" class="fontsize9"><div align="center"><font size="1" face="Georgia, Times New Roman, Times, serif">UNIVERSITY 
+        REGISTRAR</font></div></td>
+  </tr>
+</table>
+<%if (iPageNumber != 1) { %>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td height="25" valign="bottom" style="font-size:10px">SHEET 
+      <%=iPageNumber%> OF <%=strTotalPageNumber%></td>
+  </tr>
+</table>
+<%}%>
+
+<%//System.out.println(WI.fillTextValue("print_"));
+if(WI.fillTextValue("print_").compareTo("1") == 0){%>
+<script language="javascript">
+ window.setInterval("javascript:window.print();",0);
+</script>
+<%}%>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

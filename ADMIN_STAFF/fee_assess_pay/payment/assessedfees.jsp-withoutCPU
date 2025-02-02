@@ -1,0 +1,1079 @@
+<%
+	String strSchoolCode = (String)request.getSession(false).getAttribute("school_code");
+	if(strSchoolCode == null)
+		strSchoolCode = "";
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../css/fontstyle.css" rel="stylesheet" type="text/css">
+<link href="../../../css/tableBorder.css" rel="stylesheet" type="text/css">
+</head>
+<SCRIPT LANGUAGE="JavaScript" SRC="../../../jscript/common.js"></script>
+<SCRIPT LANGUAGE="JavaScript" SRC="../../../jscript/td.js"></script>
+<script language="JavaScript" src="../../../jscript/date-picker.js"></script>
+<script language="JavaScript">
+function UpdateNationality(strStudID, strStudIndex, strIsTempStud) {
+	var pgLoc = "./update_stud_nationality.jsp?stud_id="+strStudID+"&stud_index="+strStudIndex+"&is_temp_stud="+strIsTempStud;
+	var win=window.open(pgLoc,"PrintWindow",'width=800,height=300,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+/** --> not in use, i have to popup a winodow to maintain naitonality.
+function UpdateNationality()
+{
+//call this to change the nationality status.
+	document.fa_payment.updateNationality.value = "1";
+	document.fa_payment.submit();
+}
+*/
+/**
+*	If this page is called for view or print the assessment directly, then do not submit.
+*/
+function ReturnValidate()
+{
+	if(document.fa_payment.view_status.value.length > 0)
+	{
+		this.PrintViewPayment(document.fa_payment.view_status.value);
+		return false;
+	}
+	return true;
+}
+function ShowHideApprovalNo()
+{
+/*	if(document.fa_payment.payment_mode.selectedIndex == 2)
+		document.fa_payment.approval_number.disabled = false;
+	else
+		document.fa_payment.approval_number.disabled = true;
+*/	document.fa_payment.amount.value = "";
+	ReloadPage();
+}
+function ShowHideCheckNO()
+{
+	if(document.fa_payment.payment_type.selectedIndex == 1 || document.fa_payment.payment_type.selectedIndex == 3) {
+		document.fa_payment.CHECK_FR_BANK_INDEX.disabled = false;
+		document.fa_payment.check_number.disabled = false;
+	}
+	else {
+		document.fa_payment.CHECK_FR_BANK_INDEX.selectedIndex = 0;
+		document.fa_payment.CHECK_FR_BANK_INDEX.disabled = true;
+		document.fa_payment.check_number.disabled = true;
+	}
+	//show or hide emp ID input fields.
+	if(document.fa_payment.payment_type.selectedIndex == 2)
+	{
+		showLayer('_empID');
+		showLayer('_empID1');
+	}
+	else
+	{
+		hideLayer('_empID');
+		hideLayer('_empID1');
+		document.fa_payment.cash_adv_from_emp_id.value = "";
+	}
+	if(document.fa_payment.payment_type.selectedIndex == 3)
+		showLayer('myADTable1');
+	else
+		hideLayer('myADTable1');
+	document.fa_payment.chk_amt.value = "";
+	document.fa_payment.cash_amt.value = "";
+}
+function ReloadPage()
+{
+	document.fa_payment.addRecord.value="";
+	document.fa_payment.submit();
+}
+function AddRecord()
+{
+	document.fa_payment.addRecord.value="1";
+	document.fa_payment.hide_save.src = "../../../images/blank.gif";
+	<%
+	if(strSchoolCode.startsWith("CPU") || strSchoolCode.startsWith("CLDH")){%>
+		this.SukliComputation();
+	<%}//show Sukli computation%>
+	document.fa_payment.submit();
+}
+function PrintViewPayment(strViewStatus)
+{
+	var strStudID = document.fa_payment.stud_id.value;
+	if(strStudID.length ==0)
+		alert("Enter student ID");
+	else
+	{
+		<%//request.getSession(false).setAttribute("school_code","LNU");
+		if(request.getSession(false).getAttribute("school_code") != null &&	((String)request.getSession(false).getAttribute("school_code")).startsWith("LNU")){%>//for LNU only.
+			location = "./enrollment_receipt_print_lnu.jsp?stud_id="+escape(strStudID)+"&view_status="+strViewStatus;
+		<%}else{%>
+			location = "./assessedfees_print.jsp?stud_id="+escape(strStudID)+"&view_status="+strViewStatus;
+		<%}%>
+	}
+}
+function FocusID() {
+	document.fa_payment.stud_id.focus();
+}
+function OpenSearch() {
+	var pgLoc = "../../../search/srch_stud.jsp?opner_info=fa_payment.stud_id";
+	var win=window.open(pgLoc,"PrintWindow",'width=800,height=600,top=10,left=10,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+	win.focus();
+}
+function computeCashChkAmt() {
+	var totAmt  = document.fa_payment.amount.value;
+	var chkAmt  = document.fa_payment.chk_amt.value;
+	var cashAmt = document.fa_payment.cash_amt.value;
+
+	if(totAmt.length == 0)
+		return;
+	if(chkAmt.length == 0) {
+		document.fa_payment.cash_amt.value = "";
+		return;
+	}
+	cashAmt = eval(totAmt - chkAmt);
+	document.fa_payment.cash_amt.value = eval(cashAmt);
+}
+
+///this is added for CLDH and CPU only.
+function SukliComputation() {
+	var vAmtPaid = document.fa_payment.amount.value;
+
+	var vAmtReceived  = prompt("Please enter Amount received.", vAmtPaid);
+    if(vAmtReceived == null || vAmtReceived.length == 0)  {
+		vAmtReceived = vAmtPaid;
+	}
+	document.fa_payment.sukli.value = vAmtReceived;
+}
+function ApplyLateFine() {
+	if(!document.fa_payment.late_fine.checked) {
+		document.fa_payment.late_fine_amt.value = "";
+		document.fa_payment.late_fine_amt.disabled = true;
+	}
+	else {
+		document.fa_payment.late_fine_amt.disabled = false;
+		document.fa_payment.late_fine_amt.value = "200";
+	}
+}
+</script>
+<body bgcolor="#D2AE72" onLoad="FocusID();">
+<%@ page language="java" import="utility.*,enrollment.Advising,enrollment.FAPaymentUtil,enrollment.FAPayment,enrollment.FAFeeOperation,java.util.Vector" buffer="20kb" %>
+<%
+	DBOperation dbOP = null;
+	String strErrMsg = null;
+	String strTemp = null;
+
+
+	String[] astrSchYrInfo = null;
+	String[] astrConvertSem = {"Summer","1st Semester","2nd Semester","3rd Semester"};
+
+	WebInterface WI = new WebInterface(request);
+//add security here.
+	try
+	{
+		dbOP = new DBOperation((String)request.getSession(false).getAttribute("userId"),
+								"Admin/staff-Fee Assessment & Payments-PAYMENT-assessedfees(enrollment)","assessedfees.jsp");
+	}
+	catch(Exception exp)
+	{
+		exp.printStackTrace();
+		%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		Error in opening connection</font></p>
+		<%
+		return;
+	}
+//authenticate this user.
+CommonUtil comUtil = new CommonUtil();
+int iAccessLevel = comUtil.isUserAuthorizedForURL(dbOP,(String)request.getSession(false).getAttribute("userId"),
+														"Fee Assessment & Payments","PAYMENT",request.getRemoteAddr(),
+														"assessedfees.jsp");
+if(WI.fillTextValue("view_status").length() > 0)
+	iAccessLevel = 2;
+
+if(iAccessLevel == -1)//for fatal error.
+{
+	dbOP.cleanUP();
+	request.getSession(false).setAttribute("go_home","../ADMIN_STAFF/main%20files/admin_staff_home_button_content.htm");
+	request.getSession(false).setAttribute("errorMessage",comUtil.getErrMsg());
+	response.sendRedirect("../../../commfile/fatal_error.jsp");
+	return;
+}
+else if(iAccessLevel == 0)//NOT AUTHORIZED.
+{
+	dbOP.cleanUP();
+	response.sendRedirect("../../../commfile/unauthorized_page.jsp");
+	return;
+}
+
+//end of authenticaion code.
+
+astrSchYrInfo = dbOP.getCurSchYr();
+if(astrSchYrInfo == null)//db error
+{
+	%>
+		<p align="center"> <font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+		<%=dbOP.getErrMsg()%></font></p>
+	<%
+	dbOP.cleanUP();
+	return;
+}
+Vector vStudInfo = null;
+Vector vMiscFeeInfo = null;
+Vector vTemp = null;
+
+
+float fTutionFee    = 0f;
+float fCompLabFee   = 0f;
+float fMiscFee      = 0f;
+float fOutstanding  = 0f;
+float fMiscOtherFee = 0f;//This is the misc fee other charges,
+
+float fEnrollmentDiscount = 0f; //this sum of full payment, early enrollment or late enrollment discount/fine implementations.
+String strEnrolmentDiscDetail = null;
+float fPayableAfterDiscount = 0f;
+
+double dReservationFee = 0d;//only for CGH.
+
+
+FAPaymentUtil paymentUtil = new FAPaymentUtil();
+FAPayment faPayment = new FAPayment();
+FAFeeOperation fOperation = new FAFeeOperation();
+Advising advising = new Advising();
+if(WI.fillTextValue("updateNationality").compareTo("1") ==0){
+	//I have to change the nationality status.
+	boolean bolIsForeignStud = false;
+	boolean bolIsTempStud    = false;
+	enrollment.StudentInformation studInfo = new enrollment.StudentInformation();
+	if(WI.fillTextValue("is_tempstud").compareTo("1") == 0)//temp stud.
+		bolIsTempStud = true;
+	if(WI.fillTextValue("is_alien").compareTo("0") ==0)//change status to alien
+		bolIsForeignStud  = true;
+	if(!studInfo.changeForeignStat(dbOP, WI.fillTextValue("stud_index"),bolIsTempStud,bolIsForeignStud,null))//only called to change status to 0
+		strErrMsg = studInfo.getErrMsg();
+
+}
+
+strTemp = request.getParameter("addRecord");
+String strStudIndex = null;
+if(strTemp != null && strTemp.compareTo("1") ==0)
+{//dbOP.forceAutoCommitToFalse();
+	if(faPayment.savePayment(dbOP,request,true)) {
+		if(strSchoolCode.startsWith("LNU")) {
+			dbOP.cleanUP();
+			response.sendRedirect(response.encodeRedirectURL("./assessedfees_print.jsp?view_status=0&stud_id="+request.getParameter("stud_id")));
+		}
+		else {
+			if( (strSchoolCode.startsWith("CPU") || strSchoolCode.startsWith("AUF") || strSchoolCode.startsWith("UI") ||
+				strSchoolCode.startsWith("UDMC") || strSchoolCode.startsWith("CGH") || strSchoolCode.startsWith("CLDH")) &&
+						request.getParameter("stud_id") != null) {
+				//student should be validated.
+				strStudIndex = dbOP.mapUIDToUIndex(request.getParameter("stud_id"));
+				if(strStudIndex != null) {//old student.
+					enrollment.RegAssignID regAssignID = new enrollment.RegAssignID();
+					if(!regAssignID.confirmOldStudEnrollment(dbOP, request.getParameter("stud_id"),(String)request.getSession(false).getAttribute("userId")))
+						strErrMsg = regAssignID.getErrMsg();
+				}
+				else {//temp student.
+					enrollment.RegAssignID regAssignID = new enrollment.RegAssignID();
+					strStudIndex = regAssignID.confirmTempStudEnrollment(dbOP, request.getParameter("stud_id"),(String)request.getSession(false).getAttribute("userId"));
+					if(strStudIndex == null)
+						strErrMsg = regAssignID.getErrMsg();
+					else	
+						strStudIndex = dbOP.mapUIDToUIndex(strStudIndex);
+				}
+			}
+			
+			//if CGH and if student is paying late fine, post it.
+			if(strSchoolCode.startsWith("CGH") && strStudIndex != null && 
+					WI.fillTextValue("late_fine").length() > 0 && WI.fillTextValue("late_fine_amt").length() > 0) {
+				//post charge here. 
+				strTemp = "insert into FA_STUD_PAYABLE (PAYABLE_TYPE,AMOUNT,NO_OF_UNITS,USER_INDEX,"+
+					"SY_FROM,SY_TO,SEMESTER,CREATED_BY,CREATE_DATE,TRANSACTION_DATE,note) values (4,"+
+				WI.fillTextValue("late_fine_amt")+",1,"+strStudIndex+","+WI.fillTextValue("sy_from")+","+
+				WI.fillTextValue("sy_to")+","+WI.fillTextValue("semester")+","+
+				request.getSession(false).getAttribute("userIndex")+",'"+WI.getTodaysDate()+"','"+
+				ConversionTable.convertTOSQLDateFormat(WI.fillTextValue("date_of_payment"))+
+				"','Late payment surcharge(D/P)')";
+				dbOP.executeUpdateWithTrans(strTemp,null,null,false);
+				///i have to show late enrollment surcharge here.
+				double dTotalPmt = Double.parseDouble(WI.fillTextValue("amount"));
+				dTotalPmt = dTotalPmt - Double.parseDouble(WI.fillTextValue("late_fine_amt"));
+				request.getSession(false).setAttribute("lf_reason",": P"+CommonUtil.formatFloat(dTotalPmt,true)+"<br>Late payment surcharge : P"+
+				CommonUtil.formatFloat(Double.parseDouble(WI.fillTextValue("late_fine_amt")),true) );		
+				//System.out.println("Successful");
+			}
+			//dbOP.rollbackOP();
+			dbOP.cleanUP();
+			String strSukli = WI.fillTextValue("sukli");
+			if(strSukli.length() > 0) {
+				//keep change in attribute.
+				double dAmtReceived = Double.parseDouble(WI.fillTextValue("sukli"));
+				dAmtReceived = dAmtReceived - Double.parseDouble(WI.fillTextValue("amount"));
+				strSukli = "&sukli="+ CommonUtil.formatFloat(dAmtReceived,true);
+			}
+			response.sendRedirect(response.encodeRedirectURL("./payment_prior_enrolment_print.jsp?or_number="+request.getParameter("or_number")+strSukli));
+		}
+		return;
+	}
+	else
+		strErrMsg = faPayment.getErrMsg();
+}
+
+vStudInfo = advising.getStudInfo(dbOP,request.getParameter("stud_id"));
+if(vStudInfo == null) strErrMsg = advising.getErrMsg();
+else
+{
+	astrSchYrInfo[0]=(String)vStudInfo.elementAt(16);//take sy from/to/sem from student registration information.
+	astrSchYrInfo[1]=(String)vStudInfo.elementAt(17);
+	astrSchYrInfo[2]=(String)vStudInfo.elementAt(18);
+
+	paymentUtil.setTempUser((String)vStudInfo.elementAt(10));
+	vMiscFeeInfo = paymentUtil.getMiscFeeDetail(dbOP,
+        (String)vStudInfo.elementAt(0),(String)vStudInfo.elementAt(2),
+        (String)vStudInfo.elementAt(3),(String)vStudInfo.elementAt(6),
+        astrSchYrInfo[0],astrSchYrInfo[1],astrSchYrInfo[2]);
+	if(vMiscFeeInfo == null)
+		strErrMsg = paymentUtil.getErrMsg();
+
+//check if first payment is already paid, if so, take to view/print instead of displaying all information detail.
+	if(strErrMsg == null)
+	{
+		if(faPayment.isFirstPmtDuringEnrlPaid(dbOP,(String)vStudInfo.elementAt(0),
+												astrSchYrInfo[0],astrSchYrInfo[1],
+												(String)vStudInfo.elementAt(6),astrSchYrInfo[2],
+												paymentUtil.isTempStudInStr()) )
+		{
+			strErrMsg = faPayment.getErrMsg();
+		}
+	}
+}
+if(strErrMsg == null) //collect fee details here.
+{
+	fTutionFee = fOperation.calTutionFee(dbOP, (String)vStudInfo.elementAt(0),paymentUtil.isTempStud(),
+					astrSchYrInfo[0],astrSchYrInfo[1],(String)vStudInfo.elementAt(6),astrSchYrInfo[2]);
+	if(fTutionFee > 0)
+	{
+		fMiscFee 	= fOperation.calMiscFee(dbOP, (String)vStudInfo.elementAt(0),paymentUtil.isTempStud(),
+					astrSchYrInfo[0],astrSchYrInfo[1],(String)vStudInfo.elementAt(6),astrSchYrInfo[2]);
+		fCompLabFee = fOperation.calHandsOn(dbOP, (String)vStudInfo.elementAt(0),paymentUtil.isTempStud(),
+					astrSchYrInfo[0],astrSchYrInfo[1],(String)vStudInfo.elementAt(6),astrSchYrInfo[2]);
+		fOperation.checkIsEnrolling(dbOP,(String)vStudInfo.elementAt(0),
+							astrSchYrInfo[0],astrSchYrInfo[1],astrSchYrInfo[2]);
+
+		fOutstanding= fOperation.calOutStandingOfPrevYearSem(dbOP, (String)vStudInfo.elementAt(0));
+
+		fMiscOtherFee = fOperation.getMiscOtherFee();
+
+		boolean bolIsFullPmt = false;
+		if(WI.fillTextValue("payment_mode").length() == 0 || WI.fillTextValue("payment_mode").compareTo("0") ==0)
+			bolIsFullPmt = true;
+		if(WI.fillTextValue("date_of_payment").length() > 0) {
+			enrollment.FAFeeOperationDiscountEnrollment test = new enrollment.FAFeeOperationDiscountEnrollment(bolIsFullPmt,
+																			WI.fillTextValue("date_of_payment"));
+			vTemp = test.calEnrollmentDateDiscount(dbOP, fTutionFee,fTutionFee+fMiscFee+fCompLabFee,
+			(String)vStudInfo.elementAt(0),paymentUtil.isTempStud(),
+						astrSchYrInfo[0],astrSchYrInfo[1],
+                                                (String)vStudInfo.elementAt(6),astrSchYrInfo[2],
+                                                fOperation.dReqSubAmt);//System.out.println(vTemp);
+			if(vTemp != null && vTemp.size() == 0)
+				vTemp = null;
+
+			if(vTemp != null)
+				strEnrolmentDiscDetail = (String)vTemp.elementAt(0);
+			if(strEnrolmentDiscDetail != null)
+				fEnrollmentDiscount = ((Float)vTemp.elementAt(1)).floatValue();
+			if(bolIsFullPmt)
+				fPayableAfterDiscount = fTutionFee+fMiscFee+fCompLabFee+fOutstanding-fEnrollmentDiscount;
+		}
+		if(strSchoolCode.startsWith("CGH") || strSchoolCode.startsWith("UDMC") )
+			dReservationFee = paymentUtil.getReservationFeeCGH(dbOP, (String)vStudInfo.elementAt(0),astrSchYrInfo[0], astrSchYrInfo[1],
+						astrSchYrInfo[2],paymentUtil.isTempStud());
+
+	}
+	else
+		strErrMsg = fOperation.getErrMsg();
+}
+
+//if no error, get the misc fee details having hands on without computer subjects.
+if(strErrMsg == null)
+{
+	vTemp = paymentUtil.getMiscFeeDetailForHandsOnNotComputer(dbOP,(String)vStudInfo.elementAt(0),paymentUtil.isTempStud(),
+					astrSchYrInfo[0],astrSchYrInfo[1],(String)vStudInfo.elementAt(6),astrSchYrInfo[2]);
+	if(vTemp == null)
+		strErrMsg = paymentUtil.getErrMsg();
+	else
+		vMiscFeeInfo.addAll(vTemp);//System.out.println(vTemp);
+
+	if(fOperation.getLabDepositAmt() > 0f)
+	{
+		vMiscFeeInfo.addElement("Laboratory Deposit");
+		vMiscFeeInfo.addElement(Float.toString(fOperation.getLabDepositAmt()));
+		vMiscFeeInfo.addElement("1");//Other charges.
+	}
+}//System.out.println(fOperation.getReqSubFeeDtls());
+//System.out.println(fCompLabFee);
+//System.out.println(vMiscFeeInfo);
+
+if(fMiscFee <=0.1f) {
+	vMiscFeeInfo = new Vector();
+	fCompLabFee = 0f;
+	vMiscFeeInfo.addElement("");vMiscFeeInfo.addElement("");vMiscFeeInfo.addElement("");
+}
+
+
+
+////////////// addl for AUF
+Vector vOthAssessmentSetting = null;
+if(vStudInfo != null && vStudInfo.size() > 0 && astrSchYrInfo != null){
+	request.setAttribute("sy_from",astrSchYrInfo[0]);
+	request.setAttribute("sy_to",astrSchYrInfo[1]);
+	request.setAttribute("semester",astrSchYrInfo[2]);
+	vOthAssessmentSetting = new enrollment.FAFeeOptional().operateOnAddlAssessementSetting(dbOP, request, 7);
+}
+
+
+
+//Incase of CGH, i have to check if there is a late fine set, if not set, i have to findout if 
+//student should pay late fine.
+boolean bolShowLateFine = false;
+if(strSchoolCode.startsWith("CGH") && astrSchYrInfo[0] != null && 
+	WI.fillTextValue("date_of_payment").length() > 0){
+	//more code here.
+	bolShowLateFine = 
+		new enrollment.FAFeeOperationDiscountEnrollment().isLateFeeApplicable(dbOP,astrSchYrInfo[0],astrSchYrInfo[2],
+																	 WI.fillTextValue("date_of_payment"));
+	if(bolShowLateFine)
+		fEnrollmentDiscount = -1 * Float.parseFloat(WI.getStrValue(WI.fillTextValue("late_fine_amt"),"200"));
+}
+
+%>
+<form name="fa_payment" action="./assessedfees.jsp" method="post" onSubmit="return ReturnValidate();">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#A49A6A">
+      <td height="25" bgcolor="#A49A6A"><div align="center"><font color="#FFFFFF"><strong>::::
+          PAYMENT OF ASSESSED FEES PAGE ::::</strong></font></div></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td height="25">&nbsp;&nbsp;&nbsp;<font size="3">
+	  <%=WI.getStrValue(strErrMsg)%></font>
+	  </td>
+    </tr>
+  </table>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td width="2%" height="25">&nbsp;</td>
+      <td colspan="2" height="25">Enter Student ID </td>
+      <td width="18%" height="25"><input name="stud_id" type="text" size="16" value="<%=WI.fillTextValue("stud_id")%>" class="textbox_bigfont"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">      </td>
+      <td width="6%"><a href="javascript:OpenSearch();"><img src="../../../images/search.gif" width="37" height="30" border="0"></a></td>
+      <td width="28%"><input name="image" type="image" src="../../../images/form_proceed.gif" onClick="javascript:document.fa_payment.addRecord.value='';"></td>
+      <td width="29%">
+	  <%//get here cutoff time information.
+	  Vector vTempCO = new enrollment.FADailyCashCollectionDtls().getCurrentCutoffStat(dbOP, (String)request.getSession(false).getAttribute("userId"));//System.out.println(vTempCO);
+	  if(vTempCO != null){%>
+		  <table width="85%" class="thinborderALL" cellpadding="0" cellspacing="0">
+		  <tr><td height="20" align="right">
+		  <%
+		  strTemp = "Time :: "+(String)vTempCO.elementAt(0);
+		  if(vTempCO.elementAt(1) != null) {//cut off time is set.
+		  	if( ((String)vTempCO.elementAt(2)).compareTo("1") == 0)
+				strTemp += "<br><font color=red>Cut off :: "+(String)vTempCO.elementAt(1)+"</font>";
+			else
+				strTemp += "<br>Cut off :: "+(String)vTempCO.elementAt(1);
+		  }
+                  if(vTempCO.elementAt(2) != null)
+                  	strTemp += "<br>Collection :: "+(String)vTempCO.elementAt(3);
+                  %>
+              <strong><%=strTemp%></strong> </td>
+          </tr>
+		  </table>
+	   <%}//only if cutoff time is set.%>	  </td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td colspan="2" height="25">Date of payment</td>
+      <td height="25" colspan="2">
+<%
+strTemp = WI.fillTextValue("date_of_payment");
+if(strTemp.length() ==0)
+	strTemp = new enrollment.FADailyCashCollectionDtls().getProbableDateofPayment(dbOP);
+%> <input name="date_of_payment" type="text" size="12" maxlength="12" readonly="yes" value="<%=strTemp%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+        <a href="javascript:show_calendar('fa_payment.date_of_payment');" title="Click to select date" onMouseOver="window.status='Select date';return true;" onMouseOut="window.status='';return true;"><img src="../../../images/calendar_new.gif" border="0"></a>      </td>
+      <td height="25" colspan="2">
+<%if(bolShowLateFine){
+	strTemp = WI.fillTextValue("late_fine");
+	if(strTemp.equals("1"))
+		strTemp = " checked";
+%>
+	  	<input name="late_fine" type="checkbox" value="1" onClick="ApplyLateFine();"<%=strTemp%>> 
+		<font size="1" color="#0000FF"><b>Apply Late Fine</b></font> 
+<%
+strTemp = WI.fillTextValue("late_fine_amt");
+if(strTemp.length() == 0) 
+	strTemp = "200";
+%>
+		<input type="text" name="late_fine_amt" class="textbox" value="<%=strTemp%>"
+		onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'" size="5"
+		 onKeyUp="AllowOnlyInteger('fa_payment','late_fine_amt');" maxlength="5">
+<%}%>
+	  </td>
+    </tr>
+  </table>
+<%
+if(vStudInfo != null && vStudInfo.size() > 0)
+{%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td colspan="3" height="25"><hr size="1">
+        <!-- enter here all hidden fields for student. -->
+        <input type="hidden" name="stud_index" value="<%=(String)vStudInfo.elementAt(0)%>">
+        <input type="hidden" name="year_level" value="<%=(String)vStudInfo.elementAt(6)%>">
+        <input type="hidden" name="semester" value="<%=astrSchYrInfo[2]%>"> <input type="hidden" name="sy_from" value="<%=astrSchYrInfo[0]%>">
+        <input type="hidden" name="sy_to" value="<%=astrSchYrInfo[1]%>"> <input type="hidden" name="is_tempstud" value="<%=paymentUtil.isTempStudInStr()%>">
+      </td>
+    </tr>
+    <tr>
+      <td  width="2%" height="25">&nbsp;</td>
+      <td width="43%" height="25">Student name :<strong> <%=(String)vStudInfo.elementAt(1)%>
+        </strong></td>
+      <td height="25">Course :<strong><%=(String)vStudInfo.elementAt(7)%></strong></td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">Enrolling yr level :<strong><%=WI.getStrValue(vStudInfo.elementAt(6),"N/A")%></strong>
+      </td>
+      <td height="25">
+        <%if(vStudInfo.elementAt(8) != null){%>
+        Major:<strong><%=(String)vStudInfo.elementAt(8)%></strong>
+        <%}%>
+      </td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25" colspan="2">School Year/Term : <strong><%=astrSchYrInfo[0]%>
+        - <%=astrSchYrInfo[1]%> / <%=astrConvertSem[Integer.parseInt(astrSchYrInfo[2])]%></strong>
+      </td>
+    </tr>
+    <tr>
+      <td height="25">&nbsp;</td>
+      <td height="25">Foreign Student : <font color="#9900FF"><strong>
+        <%
+enrollment.CourseRequirement CR = new enrollment.CourseRequirement();
+boolean bolIsAlienNationality = CR.isForeignNational(dbOP, (String)vStudInfo.elementAt(0),paymentUtil.isTempStud());
+if(bolIsAlienNationality)
+	strTemp = "1";
+else
+	strTemp = "0";
+
+	  if(bolIsAlienNationality){%>
+        YES <%=WI.getStrValue(CR.getStudNationality(),"(",")","")%><input type="hidden" name="is_alien" value="1">
+        <%}else{%>
+        NO <input type="hidden" name="is_alien" value="0">
+        <%}%>
+        </strong></font></td>
+      <td height="25">
+	  <a href='javascript:UpdateNationality("<%=WI.fillTextValue("stud_id")%>","<%=(String)vStudInfo.elementAt(0)%>",
+	  "<%=paymentUtil.isTempStudInStr()%>");'><img src="../../../images/update.gif" border="0"></a>
+	  	<font size="1">Click to change foreign nationality status</font></td>
+    </tr>
+  </table>
+<%}//if student info is not null
+if(vMiscFeeInfo != null && vMiscFeeInfo.size() > 0 && fTutionFee > 0){%>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#B9B292">
+      <td width="58%" height="25" colspan="9"><div align="center">STUDENT ASSESSMENT</div></td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+    <tr>
+      <td colspan="4" bgcolor="#D2D6C0"><div align="center"><font color="#000066" size="1"><strong>::
+          FEE DETAILS ::</strong></font></div></td>
+      <td height="31" colspan="3" bgcolor="#E9EADF"><div align="center"><font color="#000066" size="1"><strong>::
+          PAYMENT DETAILS ::</strong></font></div></td>
+    </tr>
+    <tr >
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td colspan="2" bgcolor="#D2D6C0"><font size="1">TUITION FEE :<strong><font size="1"><%=WI.getStrValue(fOperation.getRebateCon())%> </font></strong></font></td>
+      <td width="18%" bgcolor="#D2D6C0"><font size="1"><strong><%=CommonUtil.formatFloat(fTutionFee,true)%></strong></font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td width="21%" bgcolor="#E9EADF"><font size="1">PAYEE TYPE</font></td>
+      <td width="37%" bgcolor="#E9EADF"><font size="1"><strong>
+        <select name="payee_type" onChange="ReloadPage();">
+          <option value="0">Student/Parent/Relative/Grants</option>
+          <%
+strTemp = WI.fillTextValue("payee_type");
+if(strTemp.compareTo("1") == 0){%>
+          <option value="1" selected>Institutional</option>
+          <%}else{%>
+          <option value="1">Institutional</option>
+          <%}%>
+        </select>
+        </strong> </font></td>
+    </tr>
+    <tr >
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td colspan="2" bgcolor="#D2D6C0"><font size="1">COMP. LAB. FEE : </font></td>
+      <td bgcolor="#D2D6C0"><font size="1"><strong><%=fCompLabFee%> </strong></font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">PAYEE NAME </font></td>
+      <td bgcolor="#E9EADF"><font size="1">
+        <% if(strTemp.compareTo("1") ==0) //institutional
+{%>
+        <select name="ai_index">
+          <%=dbOP.loadCombo("AI_INDEX","AFF_INST_NAME"," from FA_AFFILIATED_INST where is_del=0 order by AFF_INST_NAME asc", request.getParameter("ai_index"), false)%>
+        </select>
+        <%}else{%>
+        N/A
+        <%}%>
+        </font></td>
+    </tr>
+    <tr >
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td colspan="3" bgcolor="#D2D6C0"><font size="1">MISCELLANEOUS FEES</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">PAYMENT MODE </font></td>
+      <td bgcolor="#E9EADF"><font size="1"><strong>
+        <select name="payment_mode" onChange="ShowHideApprovalNo();">
+          <option value="0">Full</option>
+          <%
+strTemp = request.getParameter("payment_mode");
+if(strTemp == null && vOthAssessmentSetting != null && vOthAssessmentSetting.size() > 0)
+	strTemp = (String)vOthAssessmentSetting.elementAt(1);
+if(strTemp == null)
+	strTemp = "";
+if(strTemp.compareTo("1") ==0)
+{%>
+          <option value="1" selected>Installment</option>
+          <%}else{%>
+          <option value="1">Installment</option>
+          <%}if(strTemp.compareTo("2") ==0){%>
+          <!--          <option value="2" selected>Educational Assistance</option>-->
+          <%}else{%>
+          <!--          <option value="2">Educational Assistance</option>-->
+          <%}%>
+        </select>
+        </strong></font></td>
+    </tr>
+    <tr >
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td width="3%" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td width="19%" bgcolor="#D2D6C0"><font size="1"><%=(String)vMiscFeeInfo.elementAt(0)%></font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 1){%>
+        <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(1),true)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">ASSISTANCE TYPE</font></td>
+      <td bgcolor="#E9EADF"><font size="1">
+        <% if(strTemp.compareTo("2") ==0) //Educational assistance.
+{%>
+        <select name="adjustment">
+          <%=dbOP.loadCombo("FA_FA_INDEX","MAIN_TYPE_NAME"," from FA_FEE_ADJUSTMENT where is_del=0 and is_valid=1 and tree_level=0 order by MAIN_TYPE_NAME asc", request.getParameter("adjustment"), false)%>
+        </select>
+        <%}else{%>
+        N/A
+        <%}%>
+        </font></td>
+    </tr>
+    <tr >
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 5 && ((String)vMiscFeeInfo.elementAt(5)).compareTo("0") ==0){%>
+        <%=(String)vMiscFeeInfo.elementAt(3)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 8 && ((String)vMiscFeeInfo.elementAt(8)).compareTo("0") ==0){%>
+        <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(4),true)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">AMOUNT PAID </font></td>
+      <td bgcolor="#E9EADF"><font size="1"><strong>
+        <%
+if(fPayableAfterDiscount > 0f){%>
+        <%//=CommonUtil.formatFloat(fPayableAfterDiscount,true)%>
+        <!-- <input type="hidden" name="amount" value="<%=fPayableAfterDiscount%>"> -->
+        <%strTemp = CommonUtil.formatFloat((fPayableAfterDiscount - dReservationFee),true);
+strTemp = ConversionTable.replaceString(strTemp,",","");
+if(vOthAssessmentSetting != null && vOthAssessmentSetting.size() > 0 && request.getParameter("amount") == null && vOthAssessmentSetting.elementAt(3) != null)
+	strTemp = (String)vOthAssessmentSetting.elementAt(3);
+%>
+        <input name="amount" type="text" size="16" value="<%=strTemp%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+        <%}else{%>
+        <input name="amount" type="text" size="16" value="<%=WI.fillTextValue("amount")%>" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'"
+	  onKeypress=" if(event.keyCode<46 || event.keyCode== 47 || event.keyCode > 57) event.returnValue=false;">
+        <%}%>
+        Php </strong></font></td>
+    </tr>
+    <tr >
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 8 && ((String)vMiscFeeInfo.elementAt(8)).compareTo("0") ==0){%>
+        <%=(String)vMiscFeeInfo.elementAt(6)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 8 && ((String)vMiscFeeInfo.elementAt(8)).compareTo("0") ==0){%>
+        <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(7),true)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td colspan="2" bgcolor="#E9EADF"><font size="1" color="#0000FF"><b>
+        <%if(strEnrolmentDiscDetail != null){%>
+        <%=strEnrolmentDiscDetail%>
+        <%}%>
+        </b></font>&nbsp;</td>
+    </tr>
+    <tr >
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 11 && ((String)vMiscFeeInfo.elementAt(11)).compareTo("0") ==0){%>
+        <%=(String)vMiscFeeInfo.elementAt(9)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 11  && ((String)vMiscFeeInfo.elementAt(11)).compareTo("0") ==0){%>
+        <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(10),true)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">APPROVAL DATE</font></td>
+      <td bgcolor="#E9EADF"><font size="1">
+        <input name="date_approved" type="text" size="16" value="<%=WI.fillTextValue("date_approved")%>" class="textbox"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+        <a href="javascript:show_calendar('fa_payment.date_approved');" title="Click to select date" onMouseOver="window.status='Select date';return true;" onMouseOut="window.status='';return true;"><img src="../../../images/calendar_new.gif" border="0"></a>
+        </font> </td>
+    </tr>
+    <tr >
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 14  && ((String)vMiscFeeInfo.elementAt(14)).compareTo("0") ==0){%>
+        <%=(String)vMiscFeeInfo.elementAt(12)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 14  && ((String)vMiscFeeInfo.elementAt(14)).compareTo("0") ==0){%>
+        <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(13),true)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">PAYMENT RECEIVE TYPE</font></td>
+      <td bgcolor="#E9EADF"><select name="pmt_receive_type" onChange="ReloadPage();">
+          <option value="Internal">Internal</option>
+          <%
+strTemp = WI.fillTextValue("pmt_receive_type");
+if(strTemp.compareTo("External") ==0){%>
+          <option value="External" selected>External</option>
+          <%}else{%>
+          <option value="External">External</option>
+          <%}%>
+        </select> </td>
+    </tr>
+    <tr >
+      <td width="1%" height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 17  && ((String)vMiscFeeInfo.elementAt(17)).compareTo("0") ==0){%>
+        <%=(String)vMiscFeeInfo.elementAt(15)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 17  && ((String)vMiscFeeInfo.elementAt(17)).compareTo("0") ==0){%>
+        <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(16),true)%>
+        <%}%>
+        </font></td>
+      <td width="1%" bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">BANK NAME </font></td>
+      <td bgcolor="#E9EADF"> <% if(strTemp.compareTo("External") ==0) //External
+{%> <select name="bank">
+          <%=dbOP.loadCombo("AB_INDEX","AFF_BANK_NAME"," from FA_AFFILIATED_BANK where is_del=0 order by AFF_BANK_NAME asc",
+   		request.getParameter("bank"), false)%> </select> <%}else{%>
+        N/A
+        <%}%> </td>
+    </tr>
+    <tr>
+      <td height="24" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 20  && ((String)vMiscFeeInfo.elementAt(20)).compareTo("0") ==0){%>
+        <%=(String)vMiscFeeInfo.elementAt(18)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 20  && ((String)vMiscFeeInfo.elementAt(20)).compareTo("0") ==0){%>
+        <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(19),true)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF" valign="top"><font size="1">PAYMENT TYPE</font></td>
+      <td bgcolor="#E9EADF"><font size="1">
+        <select name="payment_type" onChange="ShowHideCheckNO();">
+          <option value="0">Cash</option>
+          <%
+strTemp = WI.fillTextValue("payment_type");
+if(strTemp.compareTo("1") ==0){%>
+          <option value="1" selected>Check</option>
+          <%}else{%>
+          <option value="1">Check</option>
+          <%}if(strTemp.compareTo("2") ==0){%>
+          <option value="2" selected>Salary deduction</option>
+          <%}else{%>
+          <option value="2">Salary deduction</option>
+          <%}if(strTemp.compareTo("5") ==0){%>
+          <option value="5" selected>Cash and check</option>
+          <%}else{%>
+          <option value="5">Cash and check</option>
+          <%}%>
+        </select>
+        <div id="myADTable1">Amt Chk
+          <input name="chk_amt" type="text" size="8" class="textbox"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="AllowOnlyFloat('fa_payment','amount');computeCashChkAmt();style.backgroundColor='white'"
+	  onKeyUp="AllowOnlyFloat('fa_payment','chk_amt');computeCashChkAmt();">
+        Cash
+        <input name="cash_amt" type="text" size="8" class="textbox_noborder" readonly="yes" style="background-color: #E9EADF;">
+        </div>
+        <input type="text" value="Emp ID:" class="textbox_noborder" size="6" id="_empID" readonly="yes" style="background-color: #E9EADF;">
+        <input type="text" name="cash_adv_from_emp_id" value="<%=WI.fillTextValue("cash_adv_from_emp_id")%>" size="16" id="_empID1" class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+        </font></td>
+    </tr>
+    <tr>
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 23  && ((String)vMiscFeeInfo.elementAt(23)).compareTo("0") ==0){%>
+        <%=(String)vMiscFeeInfo.elementAt(21)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 23  && ((String)vMiscFeeInfo.elementAt(23)).compareTo("0") ==0){%>
+        <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(22),true)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">CHECK #</font></td>
+      <td bgcolor="#E9EADF"><font size="1">
+        <%
+strTemp = "";
+if(request.getParameter("payment_type") == null || 	 request.getParameter("payment_type").trim().length() ==0 ||
+	request.getParameter("payment_type").compareTo("0") == 0)
+{
+	strTemp = "disabled";
+}%>
+        <input type="text" name="check_number" value="<%=WI.fillTextValue("check_number")%>" <%=strTemp%> class="textbox"
+	  onfocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+        <br>
+        <select name="CHECK_FR_BANK_INDEX" style="font-size:10px" >
+          <option value=""></option>
+          <%=dbOP.loadCombo("BANK_INDEX","BANK_CODE +':::'+BRANCH",
+		" from FA_BANK_LIST  order by bank_code", request.getParameter("CHECK_FR_BANK_INDEX"), false)%>
+        </select>
+<script language="JavaScript">
+ShowHideCheckNO();
+</script>
+        </font></td>
+    </tr>
+    <tr>
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 26  && ((String)vMiscFeeInfo.elementAt(26)).compareTo("0") ==0){%>
+        <%=(String)vMiscFeeInfo.elementAt(24)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#D2D6C0"><font size="1">
+        <%if(vMiscFeeInfo.size() > 26  && ((String)vMiscFeeInfo.elementAt(26)).compareTo("0") ==0){%>
+        <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(25),true)%>
+        <%}%>
+        </font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">REFERENCE NUMBER</font></td>
+      <td bgcolor="#E9EADF"><font size="1"><b>
+        <input name="or_number" type="text" size="16" value="<%=paymentUtil.generateORNumber(dbOP,(String)request.getSession(false).getAttribute("userId"))%>" class="textbox_bigfont"
+	  onFocus="style.backgroundColor='#D3EBFF'" onBlur="style.backgroundColor='white'">
+        <!--		<%
+	   	//strTemp = paymentUtil.generateORNumber(dbOP);
+	   //	if(strTemp == null)
+	   //		strTemp = paymentUtil.getErrMsg();
+		//else{%>
+        <input type="hidden" name="or_number" value="<%//=strTemp%>">
+        <%//}%>
+        <%//=strTemp%> -->
+        </b></font></td>
+    </tr>
+    <%
+for(int i = 27; i< vMiscFeeInfo.size(); i +=2){
+	if( ((String)vMiscFeeInfo.elementAt(i + 2)).compareTo("0") !=0) {
+		++i;
+		continue;
+	}
+	%>
+    <tr>
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1"> <%=(String)vMiscFeeInfo.elementAt(i++)%> </font></td>
+      <td bgcolor="#D2D6C0"><font size="1"> <%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(i),true)%> </font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp; <b> </b> </font></td>
+    </tr>
+    <%}%>
+    <tr>
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1"><strong>TOTAL MISC :</strong></font></td>
+      <td bgcolor="#D2D6C0"><font size="1"><strong><%=CommonUtil.formatFloat(fMiscFee - fMiscOtherFee,true)%> </strong></font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font> </td>
+    </tr>
+    <%
+if(fMiscOtherFee > 0f){%>
+    <tr>
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td colspan="3" bgcolor="#D2D6C0"><font size="1">OTHER CHARGES</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font> </td>
+    </tr>
+    <%
+for(int i = 0; i< vMiscFeeInfo.size(); i +=3){
+	if( ((String)vMiscFeeInfo.elementAt(i + 2)).compareTo("0") ==0) {
+		continue;
+	}
+	%>
+    <tr>
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1"><%=(String)vMiscFeeInfo.elementAt(i)%></font></td>
+      <td bgcolor="#D2D6C0"><font size="1"><%=CommonUtil.formatFloat((String)vMiscFeeInfo.elementAt(i+1),true)%></font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font> </td>
+    </tr>
+    <%}%>
+    <tr>
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#D2D6C0"><font size="1"><strong> OTHER CHARGE :</strong></font></td>
+      <td bgcolor="#D2D6C0"><font size="1"><strong><%=CommonUtil.formatFloat(fMiscOtherFee,true)%> </strong></font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font> </td>
+    </tr>
+    <%}%>
+    <tr>
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td colspan="3" bgcolor="#D2D6C0"><hr size="1"></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"> <font size="1"><font size="1">&nbsp; </font></td>
+    </tr>
+    <tr>
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td colspan="2" bgcolor="#D2D6C0"><font size="1"><strong>TOTAL TUITION FEE
+        : </strong></font></td>
+      <td bgcolor="#D2D6C0"><font size="1"><strong><%=CommonUtil.formatFloat(fTutionFee+fCompLabFee+fMiscFee,true)%> </strong></font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+    </tr>
+    <tr>
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td colspan="2" bgcolor="#D2D6C0"><font size="1"><strong>OLD ACCOUNT :</strong></font></td>
+      <td bgcolor="#D2D6C0"><font size="1"><strong><%=CommonUtil.formatFloat(fOutstanding,true)%></strong></font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+    </tr>
+    <tr>
+      <td height="25" bgcolor="#D2D6C0"><font size="1">&nbsp;</font></td>
+      <td colspan="2" bgcolor="#D2D6C0"><font size="1"><strong>TOTAL AMOUNT DUE
+        :</strong></font></td>
+      <td bgcolor="#D2D6C0"><font size="1"><strong><%=CommonUtil.formatFloat(fTutionFee+fCompLabFee+fMiscFee + fOutstanding - fEnrollmentDiscount,true)%></strong></font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+      <td bgcolor="#E9EADF"><font size="1">&nbsp;</font></td>
+    </tr>
+    <%
+if(strSchoolCode.startsWith("CGH") || strSchoolCode.startsWith("UDMC") ){
+double dTotalPayable = fTutionFee+fCompLabFee+fMiscFee + fOutstanding - dReservationFee - fEnrollmentDiscount;
+%>
+    <tr>
+      <td height="25" bgcolor="#D2D6C0">&nbsp;</td>
+      <td colspan="2" bgcolor="#D2D6C0"> <%if(dTotalPayable > 0d){%> <font size="1"><strong>LESS RESERVATION FEE
+        :</strong></font> <%}%></td>
+      <td bgcolor="#D2D6C0"><%if(dTotalPayable > 0d){%> <%=CommonUtil.formatFloat(dReservationFee,true)%> <%}%></td>
+      <td bgcolor="#E9EADF">&nbsp;</td>
+      <td bgcolor="#E9EADF"><font size="1"><strong>FULL PAYMENT : <%=CommonUtil.formatFloat(dTotalPayable,true)%></strong></font></td>
+      <td bgcolor="#E9EADF"><font size="1"><strong>
+	  <%if(strSchoolCode.startsWith("CGH")){%>
+	  50% : <%=CommonUtil.formatFloat(dTotalPayable/2,true)%>
+	  <%}else{%>
+	  DP : <%=CommonUtil.formatFloat( (dTotalPayable + dReservationFee)/2 - dReservationFee,true)%>
+	  <%}%>
+	  
+	  </strong></font></td>
+    </tr>
+    <%
+}%>
+  </table>
+
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#FFFFFF">
+      <td height="25" colspan="9"><hr size="1"></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+      <td width="0%" height="25">&nbsp;</td>
+      <td colspan="4" height="25"><div align="center">
+<%if(iAccessLevel > 1){%>
+          <a href="javascript:AddRecord();"><img name="hide_save" src="../../../images/save.gif" border="0"></a>
+          <font size="1">click to save entries</font>
+<%}%>		  </div></td>
+      <td colspan="3" height="25">&nbsp;</td>
+      <td width="5%"  height="25">&nbsp;</td>
+    </tr>
+</table>
+<%} //end of display if vMisFee is not null
+%>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#FFFFFF">
+      <td height="25" colspan="9">
+<%
+//this is used to allow the user to view or print the fee payment if studetn has already paid
+if(WI.fillTextValue("view_status").length() > 0 || (strErrMsg != null && strErrMsg.endsWith("#PRINT#")) )
+{%>
+<a href="javascript:PrintViewPayment(1);"><img src="../../../images/view.gif" border="0"></a><font size="1">Click to view payment detail</font>
+ &nbsp;(OR) &nbsp; <a href="javascript:PrintViewPayment(0);"><img src="../../../images/print.gif" border="0"></a><font size="1">Click to print payment detail</font>
+
+<%}%>
+	 </td>
+    </tr>
+    <tr bgcolor="#B8CDD1">
+      <td height="25" colspan="9" bgcolor="#A49A6A">&nbsp;</td>
+    </tr>
+  </table>
+
+ <input type="hidden" name="addRecord" value="0">
+ <input type="hidden" name="payment_for" value="0">
+ <input type="hidden" name="view_status" value="<%=WI.fillTextValue("view_status")%>">
+ <input type="hidden" name="updateNationality">
+
+ <input type="hidden" name="sukli">
+
+</form>
+</body>
+</html>
+<%
+dbOP.cleanUP();
+%>

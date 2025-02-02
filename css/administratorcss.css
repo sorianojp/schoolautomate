@@ -1,0 +1,15 @@
+.regmainlinkscss {
+	color: #FFFFFF;
+}
+a:link {
+	color: #FFFFFF;
+}
+a:visited {
+	color: #FFFFFF;
+}
+a:hover {
+	color: #C0C0C0;
+}
+a:active {
+	color: #C0C0C0;
+}
